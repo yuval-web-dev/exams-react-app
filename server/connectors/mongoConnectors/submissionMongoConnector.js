@@ -6,7 +6,7 @@ const isEqual = require('fast-deep-equal')
 
 const { connString, dbName } = require('./dbDetails.js')
 const { submissionObject } = require('./dbObjects.js')
-const { onFail, onSuccess } = require('./connectorFuncs.js')
+const { onFail, onSuccess } = require('./connectorHelpers.js')
 
 const submissionSchema = new Schema(submissionObject, { collection: 'submissions' })
 

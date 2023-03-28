@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv').config({ path: './dotenv/.env' })
 
 const { createController, readController, updateController, deleteController } = require('./controllers/index.js')
-const { logger } = require('./helpers.js')
+const { consoleTimeLogger } = require('./serverHelpers.js')
 
 const app = express()
 const port = 3001
@@ -14,10 +14,10 @@ app.use(express.json())
 
 app.use(cors())
 
-app.listen(port, logger(`server started and listening on port ${port}`))
+app.listen(port, consoleTimeLogger(`server started and listening on port ${port}`))
 
 app.use((req, res, next) => {
-  logger(`incoming ${req.method} request from ${req.hostname}:${req.ip} RECEIVED`)
+  consoleTimeLogger(`incoming ${req.method} request from ${req.hostname}:${req.ip} RECEIVED`)
   next()
 })
 
@@ -30,5 +30,5 @@ app.patch('/api/update', updateController)
 app.delete('/api/delete', deleteController)
 
 app.use((req, res) => {
-  logger(`incoming ${req.method} request from ${req.hostname}:${req.ip} FULFILLED`)
+  consoleTimeLogger(`incoming ${req.method} request from ${req.hostname}:${req.ip} FULFILLED`)
 })
