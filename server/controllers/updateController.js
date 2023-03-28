@@ -4,15 +4,18 @@ const updateController = (req, res, next) => {
     // const { updatedExamJson } = req.body
     // Use the mongoConnector here
     // ...
-    return res
-      .json({ body: 'update api response' })
-      .status(500)
+    res
+      .json({ body: '/api/update response' })
+      .status(200)
       .end()
   }
   catch (err) {
     console.error(err)
-    return res.status(500).end()
+    res
+      .status(500)
+      .end()
   }
+  next()
 }
 
 module.exports = {
