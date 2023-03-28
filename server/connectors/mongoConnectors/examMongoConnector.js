@@ -6,7 +6,7 @@ const isEqual = require('fast-deep-equal')
 
 const { connString, dbName } = require('./dbDetails.js')
 const { examObject } = require('./dbObjects.js')
-const { onFail, onSuccess } = require('./connectorFuncs.js')
+const { onFail, onSuccess } = require('./connectorHelpers.js')
 
 const examSchema = new Schema(examObject, { collection: 'exams' })
 
