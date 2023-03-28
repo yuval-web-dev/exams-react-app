@@ -5,11 +5,11 @@ const answerObject = {
 }
 
 const questionObject = {
-  answers: [answerObject] = [],
   isRandomized: Boolean = null,
+  answers: [answerObject] = []
 }
 
-const errorsObject = {
+const errorObject = {
   question: questionObject = null,
   selectedAnswer: answerObject = null,
   correctAnswer: answerObject = null
@@ -20,14 +20,14 @@ export const submissionObject = {
   submittorName: String = null,
   examID: String = null,
   grade: Number = null,
-  errors: errorsObject = null
+  errors: [errorObject] = null
 }
 
 export const examObject = {
-  questions: [questionObject] = [],
-  examName: String = null,
+  name: String = null,
   lecturer: String = null,
   date: Date = null,
   duration: Number = null,
   isRandomized: Boolean = null,
+  questions: [questionObject] = []
 }
