@@ -4,11 +4,10 @@ const readController = (req, res, next) => {
     // const { requestedFilter } = req.body
     // Use the mongoConnector here
     // ...
-    console.log('asdfasdf')
     res
       .json({ body: `/api/read response` })
       .status(200)
-      .send()
+      .end()
   }
   catch (err) {
     console.error(err)
