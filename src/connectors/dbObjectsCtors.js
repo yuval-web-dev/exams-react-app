@@ -2,19 +2,16 @@
 // Every object here MUST correlate with its matching
 //  Mongoose Schema object in 'dbSchemaBodies' file in the backend.
 
-function answerObject(bodyText = null, isCorrect = null) {
-  this.bodyText = bodyText
-  this.isCorrect = isCorrect
-}
-
-function questionObject(bodyText = null, bodyImg = null, isRandomized = null, answers = []) {
+function questionObject(bodyText = null, bodyImg = null, isRandomized = null, answers = [], correctAnswer = null) {
   this.bodyText = bodyText
   this.bodyImg = bodyImg
   this.isRandomized = isRandomized
   this.answers = answers
+  this.correctAnswer = this.correctAnswer
 }
 
-function examObject(name = null, lecturer = null, date = null, duration = null, isRandomized = null, questions = []) {
+function examObject(id = null, name = null, lecturer = null, date = null, duration = null, isRandomized = null, questions = []) {
+  this.id = id
   this.name = name
   this.lecturer = lecturer
   this.date = date
@@ -38,7 +35,6 @@ function submissionObject(submittorId = null, submittorName = null, examID = nul
 }
 
 export {
-  answerObject,
   questionObject,
   examObject,
   errorObject,

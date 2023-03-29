@@ -14,6 +14,7 @@ const questionSchemaBody = {
 }
 
 const examSchemaBody = {
+  id: String,
   name: String,
   lecturer: String,
   date: Date,

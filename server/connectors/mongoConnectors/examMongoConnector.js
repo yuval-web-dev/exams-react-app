@@ -1,17 +1,15 @@
 // Read this:
 // https://mongoosejs.com/docs/api/model.html
 const { mongoose, Schema } = require('mongoose')
-const isEqual = require('fast-deep-equal')
 
-
-const { connString, dbName } = require('./dbDetails.js')
+const { connString, dbName, dbCollections } = require('./dbDetails.js')
 const { examSchemaBody, submissionSchemaBody } = require('./dbSchemaBodies.js')
 const { onFail, onSuccess } = require('./connectorHelpers.js')
 
 
-const examSchema = new Schema(examSchemaBody, { collection: 'exams' })
+const examSchema = new Schema(examSchemaBody, { collection: dbCollections.exams })
+const submissionSchema = new Schema(submissionSchemaBody, { collections: dbCollections.submissions })
 const ExamModel = mongoose.model('ExamModel', examSchema)
-const submissionSchema = new Schema(submissionSchemaBody, { collection: 'submissions' })
 const SubmissionModel = mongoose.model('SubmissionModel', submissionSchema)
 let isConnected = false
 
@@ -57,10 +55,10 @@ const insertMany = async (docs = [], type = null) => {
     //     throw err
     //   }
     // })
-    if (type === 'exam') {
+    if (type === 'exams') {
       await ExamModel.insertMany(docs)
     }
-    else if (type === 'submission') {
+    else if (type === 'submissions') {
       await SubmissionModel.insertMany(docs)
     }
     else {
