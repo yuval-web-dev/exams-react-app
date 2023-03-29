@@ -1,4 +1,4 @@
-const { insertMany } = require('../connectors/mongoConnectors/examMongoConnector.js')
+const { insertMany } = require('../db/index.js')
 
 const createController = async (req, res, next) => {
   try {

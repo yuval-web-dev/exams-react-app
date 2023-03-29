@@ -2,15 +2,15 @@
 // https://mongoosejs.com/docs/api/model.html
 const { mongoose, Schema } = require('mongoose')
 
-const { connString, dbName, dbCollections } = require('./dbDetails.js')
+const { connString, dbName } = require('./dbDetails.js')
 const { examSchemaBody, submissionSchemaBody } = require('./dbSchemaBodies.js')
-const { onFail, onSuccess } = require('./connectorHelpers.js')
+const { onFail, onSuccess } = require('./dbConnectorHelpers.js')
 
 
-const examSchema = new Schema(examSchemaBody, { collection: dbCollections.exams })
-const submissionSchema = new Schema(submissionSchemaBody, { collections: dbCollections.submissions })
-const ExamModel = mongoose.model('ExamModel', examSchema)
-const SubmissionModel = mongoose.model('SubmissionModel', submissionSchema)
+const examSchema = new Schema(examSchemaBody)
+const submissionSchema = new Schema(submissionSchemaBody)
+const ExamModel = mongoose.model('exam', examSchema, 'exams_collection')
+const SubmissionModel = mongoose.model('submission', submissionSchema, 'submissions_collection')
 let isConnected = false
 
 

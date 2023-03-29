@@ -4,13 +4,18 @@ import { questionObject, examObject, errorObject, submissionObject } from './dbO
 import { url } from './consts.js'
 
 const addExam = async () => {
-  let loremAnswer1 = new answerObject('2', false)
-  let loremAnswer2 = new answerObject('4', true)
-  let loremAnswer3 = new answerObject('6', false)
-  let loremAnswer4 = new answerObject('8', false)
-  let loremQuestion1 = new questionObject('What is the GCD of 648, 762?', null, true, [loremAnswer1, loremAnswer2, loremAnswer3, loremAnswer4])
+  let loremQuestion1 = new questionObject(
+    'What is the GCD of 648, 762?',
+    null,
+    true,
+    ['2', '4', '6', '8'],
+    '4'
+  )
 
-  let loremErr1 = new errorObject(loremQuestion1, loremQuestion1.answers[0])
+  let loremErr1 = new errorObject(
+    loremQuestion1,
+    '6'
+  )
 
   let loremExam = new examObject(
     '01',
@@ -28,7 +33,7 @@ const addExam = async () => {
     '01',
     90,
     [
-
+      loremErr1
     ]
   )
 

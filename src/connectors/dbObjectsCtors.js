@@ -18,12 +18,12 @@ function examObject(id = null, name = null, lecturer = null, date = null, durati
   this.duration = duration
   this.isRandomized = isRandomized
   this.questions = questions
+  this.isModifible = true
 }
 
-function errorObject(question = null, selectedAnswer = null, correctAnswer = null) {
+function errorObject(question = null, selectedAnswer = null) {
   this.question = question
   this.selectedAnswer = selectedAnswer
-  this.correctAnswer = correctAnswer
 }
 
 function submissionObject(submittorId = null, submittorName = null, examID = null, grade = null, errs = []) {
