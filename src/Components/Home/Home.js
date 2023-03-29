@@ -1,25 +1,16 @@
+import e from 'cors'
 import React, { useState } from 'react'
 import { Container, Row, Col, Button } from 'react-bootstrap'
+
+import { addExam } from '../../connectors/serverConnector'
 
 const Home = () => {
 
   return (
     <Container>
-      <Row>
-        Question
-      </Row>
-      <Row className=''>
-        Answer 1
-      </Row>
-      <Row className=''>
-        Answer 2
-      </Row>
-      <Row className=''>
-        Answer 3
-      </Row>
-      <Row className=''>
-        Answer 4
-      </Row>
+      <Button onClick={addExam}>
+        Add Exam
+      </Button>
     </Container>
   )
 }

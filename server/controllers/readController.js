@@ -1,4 +1,4 @@
-const readController = (req, res, next) => {
+const readController = async (req, res, next) => {
   try {
     // TODO:
     // const { requestedFilter } = req.body

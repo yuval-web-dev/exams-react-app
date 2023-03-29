@@ -2,7 +2,6 @@
 // https://mongoosejs.com/docs/api/model.html
 
 const { mongoose, Schema } = require('mongoose')
-const isEqual = require('fast-deep-equal')
 
 const { connString, dbName } = require('./dbDetails.js')
 const { submissionObject } = require('./dbObjects.js')

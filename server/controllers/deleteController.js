@@ -1,4 +1,4 @@
-const deleteController = (req, res, next) => {
+const deleteController = async (req, res, next) => {
   try {
     // TODO:
     // const { filterToDelete } = req.body

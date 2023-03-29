@@ -1,18 +1,18 @@
 // Read this:
 // https://mongoosejs.com/docs/api/model.html
-
 const { mongoose, Schema } = require('mongoose')
 const isEqual = require('fast-deep-equal')
 
+
 const { connString, dbName } = require('./dbDetails.js')
-const { examObject } = require('./dbObjects.js')
+const { examSchemaBody, submissionSchemaBody } = require('./dbSchemaBodies.js')
 const { onFail, onSuccess } = require('./connectorHelpers.js')
 
-const examSchema = new Schema(examObject, { collection: 'exams' })
 
+const examSchema = new Schema(examSchemaBody, { collection: 'exams' })
 const ExamModel = mongoose.model('ExamModel', examSchema)
-
 let isConnected = false
+
 
 const connect = async () => {
   const action = `connecting to database '${dbName}'`
@@ -45,16 +45,16 @@ const docExists = async (id = null) => {
   }
 }
 
-export const insertMany = async (docs = []) => {
+const insertMany = async (docs = []) => {
   const action = `inserting docs`
   try {
     await connect()
-    docs.forEach((doc) => {
-      if (!isEqual(doc, examObject)) {
-        console.err(`doc ${doc} is not of the correct schema`)
-        throw err
-      }
-    })
+    // docs.forEach((doc) => {
+    //   if (!isEqual(doc, examObject)) {
+    //     console.err(`doc ${doc} is not of the correct schema`)
+    //     throw err
+    //   }
+    // })
     await ExamModel.insertMany(docs)
   }
   catch (err) {
@@ -63,7 +63,7 @@ export const insertMany = async (docs = []) => {
   }
 }
 
-export const fetchById = async (id = null) => {
+const fetchById = async (id = null) => {
   const action = `fetching doc: ${id}`
   try {
     await connect()
@@ -77,7 +77,7 @@ export const fetchById = async (id = null) => {
   }
 }
 
-export const fetchByFilter = async (filterObj = {}) => {
+const fetchByFilter = async (filterObj = {}) => {
   const action = `fetching all docs by filter: ${filterObj}`
   try {
     await connect()
@@ -91,7 +91,7 @@ export const fetchByFilter = async (filterObj = {}) => {
   }
 }
 
-export const updateById = async (id = null, updateObj = {}) => {
+const updateById = async (id = null, updateObj = {}) => {
   const action = `updating doc: ${id}`
   try {
     if (! await docExists(id)) {
@@ -108,7 +108,7 @@ export const updateById = async (id = null, updateObj = {}) => {
   }
 }
 
-export const updateByFilter = async (filterObj = {}, updateObj = {}) => {
+const updateByFilter = async (filterObj = {}, updateObj = {}) => {
   const action = `updating docs`
   // EXAMPLE: updateObj = { $set: { key: newval } }
   try {
@@ -122,7 +122,7 @@ export const updateByFilter = async (filterObj = {}, updateObj = {}) => {
   }
 }
 
-export const deleteById = async (id = null) => {
+const deleteById = async (id = null) => {
   const action = `deleting doc: ${id}`
   try {
     if (! await docExists(id)) {
@@ -140,7 +140,7 @@ export const deleteById = async (id = null) => {
   }
 }
 
-export const deleteByFilter = async (filterObj = {}) => {
+const deleteByFilter = async (filterObj = {}) => {
   const action = `deleting all docs with filter: ${filterObj}`
   try {
     await connect()
@@ -151,4 +151,15 @@ export const deleteByFilter = async (filterObj = {}) => {
     onFail(action)
     throw err
   }
+}
+
+
+module.exports = {
+  insertMany,
+  fetchById,
+  fetchByFilter,
+  updateById,
+  updateByFilter,
+  deleteById,
+  deleteByFilter
 }

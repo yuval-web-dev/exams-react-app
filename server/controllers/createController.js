@@ -1,9 +1,16 @@
-const createController = (req, res, next) => {
+const isEqual = require('fast-deep-equal')
+
+const { insertMany } = require('../connectors/mongoConnectors/examMongoConnector.js')
+
+const createController = async (req, res, next) => {
   try {
     // TODO:
     // const { createdExamJson } = req.body
     // Use the mongoConnector here
     // ...
+    const exam = req.body
+    await insertMany([exam])
+
     res
       .json({ body: '/api/create response' })
       .status(200)

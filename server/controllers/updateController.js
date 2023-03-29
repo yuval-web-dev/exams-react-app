@@ -1,4 +1,4 @@
-const updateController = (req, res, next) => {
+const updateController = async (req, res, next) => {
   try {
     // TODO:
     // const { updatedExamJson } = req.body
