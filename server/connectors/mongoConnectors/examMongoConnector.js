@@ -11,6 +11,8 @@ const { onFail, onSuccess } = require('./connectorHelpers.js')
 
 const examSchema = new Schema(examSchemaBody, { collection: 'exams' })
 const ExamModel = mongoose.model('ExamModel', examSchema)
+const submissionSchema = new Schema(submissionSchemaBody, { collection: 'submissions' })
+const SubmissionModel = mongoose.model('SubmissionModel', submissionSchema)
 let isConnected = false
 
 
@@ -45,7 +47,7 @@ const docExists = async (id = null) => {
   }
 }
 
-const insertMany = async (docs = []) => {
+const insertMany = async (docs = [], type = null) => {
   const action = `inserting docs`
   try {
     await connect()
@@ -55,7 +57,16 @@ const insertMany = async (docs = []) => {
     //     throw err
     //   }
     // })
-    await ExamModel.insertMany(docs)
+    if (type === 'exam') {
+      await ExamModel.insertMany(docs)
+    }
+    else if (type === 'submission') {
+      await SubmissionModel.insertMany(docs)
+    }
+    else {
+      throw 'invalid schema passed as \'type\' param'
+    }
+    onSuccess(action)
   }
   catch (err) {
     onFail(action)

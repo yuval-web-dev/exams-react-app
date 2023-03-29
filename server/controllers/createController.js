@@ -4,13 +4,10 @@ const { insertMany } = require('../connectors/mongoConnectors/examMongoConnector
 
 const createController = async (req, res, next) => {
   try {
-    // TODO:
-    // const { createdExamJson } = req.body
-    // Use the mongoConnector here
-    // ...
-    const exam = req.body
-    await insertMany([exam])
 
+    const exams = req.body
+    // await insertMany(exams, 'exam')
+    console.log(exams)
     res
       .json({ body: '/api/create response' })
       .status(200)

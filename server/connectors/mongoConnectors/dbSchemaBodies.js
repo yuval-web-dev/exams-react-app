@@ -33,7 +33,7 @@ const submissionSchemaBody = {
   submittorName: String,
   examID: String,
   grade: Number,
-  errors: [errorSchemaBody]
+  errs: [errorSchemaBody]
 }
 
 module.exports = {

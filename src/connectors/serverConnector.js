@@ -11,19 +11,21 @@ const addExam = async () => {
   let loremQuestion1 = new questionObject('What is the GCD of 648, 762?', null, true, [loremAnswer1, loremAnswer2, loremAnswer3, loremAnswer4])
 
   let loremExam = new examObject(
-    'Lorem Ipsum',
-    'Dolor Sit Amet',
-    Date(2023, 1, 30, 23, 59, 59, 999),
+    'Communication Networks',
+    'Jim Kurose',
+    new Date(2023, 6, 1, 12, 0, 0, 0),
     2.5,
     true,
     [loremQuestion1]
   )
 
+  let exams = [loremExam]
+
   try {
     await axios({
       method: 'post',
       url: `${url}/api/create`,
-      data: loremExam
+      data: exams
     })
   }
   catch (err) {
