@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { questionObject, examObject, errorObject, submissionObject } from './dbObjectsCtors.js'
+import { questionObject, examObject, errorObject, submissionObject } from './objectsCtors.js'
 import { url } from './consts.js'
 
 const addExam = async () => {
@@ -37,35 +37,36 @@ const addExam = async () => {
     ]
   )
 
+  let exams = [loremExam]
   let submissions = [loremSubmission]
-
-  try {
-    await axios({
-      method: 'post',
-      url: `${url}/api/create`,
-      data: {
-        payload: submissions,
-        type: 'submissions',
-      }
-    })
-  }
-  catch (err) {
-    console.error(err)
-  }
 
   // try {
   //   await axios({
   //     method: 'post',
   //     url: `${url}/api/create`,
   //     data: {
-  //       payload: exams,
-  //       type: 'exams',
+  //       payload: submissions,
+  //       type: 'submissions',
   //     }
   //   })
   // }
   // catch (err) {
   //   console.error(err)
   // }
+
+  try {
+    await axios({
+      method: 'post',
+      url: `${url}/api/create`,
+      data: {
+        payload: exams,
+        type: 'exams',
+      }
+    })
+  }
+  catch (err) {
+    console.error(err)
+  }
 }
 
 export {

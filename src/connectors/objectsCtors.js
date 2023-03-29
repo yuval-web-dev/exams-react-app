@@ -7,7 +7,7 @@ function questionObject(bodyText = null, bodyImg = null, isRandomized = null, an
   this.bodyImg = bodyImg
   this.isRandomized = isRandomized
   this.answers = answers
-  this.correctAnswer = this.correctAnswer
+  this.correctAnswer = correctAnswer
 }
 
 function examObject(id = null, name = null, lecturer = null, date = null, duration = null, isRandomized = null, questions = []) {
