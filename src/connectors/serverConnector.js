@@ -69,6 +69,25 @@ const addExam = async () => {
   }
 }
 
+const authUser = async () => {
+  const username = 'admin'
+  const password = username
+  try {
+    await axios({
+      method: 'post',
+      url: `${url}/api/auth`,
+      data: {
+        payload: { username, password },
+        type: 'student', // or lecturer
+      }
+    })
+  }
+  catch (err) {
+    console.error(err)
+  }
+}
+
 export {
-  addExam
+  addExam,
+  authUser
 }

@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Container, Row, Col, Form, Button } from 'react-bootstrap'
 
-import { addExam } from '../../connectors/serverConnector'
+import { addExam, authUser } from '../../connectors/serverConnector'
 
 const Home = () => {
   return (
     <Container className='d-flex justify-content-center align-items-center' style={{ height: '100vh' }}>
-      <div style={{ maxWidth: 400 }}>
+      {/* <div style={{ maxWidth: 400 }}>
         <Form>
           <Form.Group controlId='formBasicEmail'>
             <Form.Label>Email address</Form.Label>
@@ -23,7 +23,8 @@ const Home = () => {
 
           <Button variant='primary' type='submit'>Submit</Button>
         </Form>
-      </div>
+      </div> */}
+      <Button onClick={authUser}>Auth</Button>
     </Container>
   )
 }
