@@ -7,7 +7,7 @@ import { addExam } from '../../connectors/serverConnector'
 const Home = () => {
 
   return (
-    <Container>
+    <Container variant='fluid' className=''>
       <Button onClick={addExam}>
         Add Exam
       </Button>
