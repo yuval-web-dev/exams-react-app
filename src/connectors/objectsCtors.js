@@ -34,9 +34,15 @@ function submissionObject(submittorId = null, submittorName = null, examID = nul
   this.errs = errs
 }
 
+function userObject(user = null, pass = null) {
+  this.user = user
+  this.pass = pass
+}
+
 export {
   questionObject,
   examObject,
   errorObject,
-  submissionObject
+  submissionObject,
+  userObject
 }

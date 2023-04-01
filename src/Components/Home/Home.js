@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Container, Row, Col, Form, Button } from 'react-bootstrap'
 
-import { addExam, authUser } from '../../connectors/serverConnector'
+import { addExam, authUser, addUser } from '../../connectors/serverConnector'
 
 const Home = () => {
   return (
@@ -24,7 +24,24 @@ const Home = () => {
           <Button variant='primary' type='submit'>Submit</Button>
         </Form>
       </div> */}
-      <Button onClick={authUser}>Auth</Button>
+      <Row className='d-flex flex-column'>
+        <Col>
+          <Button onClick={addExam}>Add Exam</Button>
+        </Col>
+        <Col>
+          <Button onClick={addUser}>Add User</Button>
+        </Col>
+        <Col>
+          <Button onClick={authUser}>Auth User</Button>
+        </Col>
+        <Col>
+          <Form>
+            <Form.Group>
+              <Form.File id='input' label='add images' accept='.jpg,.jpeg,.png,.gif,.webp' />
+            </Form.Group>
+          </Form>
+        </Col>
+      </Row>
     </Container>
   )
 }

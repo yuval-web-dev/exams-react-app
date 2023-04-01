@@ -1,7 +1,8 @@
 import axios from 'axios'
 
-import { questionObject, examObject, errorObject, submissionObject } from './objectsCtors.js'
-import { url } from './consts.js'
+import { questionObject, examObject, errorObject, submissionObject, userObject } from './objectsCtors.js'
+import { host } from './consts.js'
+
 
 const addExam = async () => {
   let loremQuestion1 = new questionObject(
@@ -32,36 +33,13 @@ const addExam = async () => {
     'John Doe',
     '01',
     90,
-    [
-      loremErr1
-    ]
+    [loremErr1]
   )
 
-  let exams = [loremExam]
-  let submissions = [loremSubmission]
-
-  // try {
-  //   await axios({
-  //     method: 'post',
-  //     url: `${url}/api/create`,
-  //     data: {
-  //       payload: submissions,
-  //       type: 'submissions',
-  //     }
-  //   })
-  // }
-  // catch (err) {
-  //   console.error(err)
-  // }
-
   try {
-    await axios({
-      method: 'post',
-      url: `${url}/api/create`,
-      data: {
-        payload: exams,
-        type: 'exams',
-      }
+    await axios.post(`${host}/api/docs/create`, {
+      objectArray: [loremExam],
+      objectType: 'exams',
     })
   }
   catch (err) {
@@ -70,17 +48,20 @@ const addExam = async () => {
 }
 
 const authUser = async () => {
-  const username = 'admin'
-  const password = username
+  const user = 'admin'
+  const pass = 'admin1'
   try {
-    await axios({
-      method: 'post',
-      url: `${url}/api/auth`,
-      data: {
-        payload: { username, password },
-        type: 'student', // or lecturer
-      }
-    })
+    await axios.post(`${host}/api/users/auth`, { user, pass })
+  }
+  catch (err) {
+    console.error(err)
+  }
+}
+
+const addUser = async () => {
+  let newUser = new userObject('admin', 'admin')
+  try {
+    await axios.post(`${host}/api/users/create`, [newUser])
   }
   catch (err) {
     console.error(err)
@@ -89,5 +70,6 @@ const authUser = async () => {
 
 export {
   addExam,
-  authUser
+  authUser,
+  addUser
 }
