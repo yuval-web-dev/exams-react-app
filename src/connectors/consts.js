@@ -1,3 +1,3 @@
-const host = 'http://localhost:3001'
+const host = 'http://localhost:8080'
 
 export { host }

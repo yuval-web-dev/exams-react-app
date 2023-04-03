@@ -10,8 +10,6 @@ const App = () => {
   return (
     <Routes>
       <Route path='/' element={< Home />} />
-      {/* <Route path='/student' Component={Student} />
-      <Route path='/lecturer' Component={Lecturer} /> */}
       <Route path='/*' element={< NotFound />} />
     </Routes>
   )

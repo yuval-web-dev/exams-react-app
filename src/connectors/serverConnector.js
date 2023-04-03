@@ -3,11 +3,19 @@ import axios from 'axios'
 import { questionObject, examObject, errorObject, submissionObject, userObject } from './objectsCtors.js'
 import { host } from './consts.js'
 
+const readFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(new Uint8Array(reader.result))
+    reader.onerror = reject
+    reader.readAsArrayBuffer(file)
+  })
+}
 
-const addExam = async () => {
+const addExam = async (image) => {
   let loremQuestion1 = new questionObject(
     'What is the GCD of 648, 762?',
-    null,
+    image ? await readFile(image) : null,
     true,
     ['2', '4', '6', '8'],
     '4'
@@ -37,10 +45,9 @@ const addExam = async () => {
   )
 
   try {
-    await axios.post(`${host}/api/docs/create`, {
-      objectArray: [loremExam],
-      objectType: 'exams',
-    })
+    await axios.post(`${host}/api/docs/create`,
+      { objectArray: [loremExam], objectType: 'exams' },
+      { maxContentLength: Infinity, maxBodyLength: Infinity })
   }
   catch (err) {
     console.error(err)
