@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import { Home, NotFound } from './Components'
+import { ApiTester, NotFound } from './Components'
 
 
 import './App.css'
@@ -9,7 +9,7 @@ import './App.css'
 const App = () => {
   return (
     <Routes>
-      <Route path='/' element={< Home />} />
+      <Route path='/' element={< ApiTester />} />
       <Route path='/*' element={< NotFound />} />
     </Routes>
   )
