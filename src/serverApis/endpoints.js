@@ -1,5 +1,5 @@
-const host = 'http://localhost:8080/'
-const path = 'api/'
+const host = 'http://localhost:8080'
+const path = '/api'
 
 const examEndpts = {
     'post': host + path + '/exam/create'

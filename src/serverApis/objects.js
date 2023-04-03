@@ -2,15 +2,19 @@
 // Every object here MUST correlate with its matching
 //  Mongoose Schema object in 'dbSchemaBodies.js' file in the backend.
 
-function questionObject(text = null, imageName = null, answers = [], correctAnswer = null, isRandomized = null) {
-  this.text = text
+import { v4 as uuidv4 } from 'uuid'
+
+function questionObject(imageName = null, text = null, answers = [], correctAnswer = null, isRandomized = false) {
+  this.qid = null
   this.imageName = imageName // at first, it will be the name of the uploaded file; When posting an entire exam, it will be renamed to eid-qid
+  this.text = text
   this.answers = answers
   this.correctAnswer = correctAnswer
   this.isRandomized = isRandomized
 }
 
-function examObject(name = null, lecturer = null, date = null, duration = null, questions = [], isRandomized = null) {
+function examObject(name = null, lecturer = null, date = null, duration = null, questions = [], isRandomized = false) {
+  this.eid = uuidv4()
   this.name = name
   this.lecturer = lecturer
   this.date = date

@@ -6,33 +6,24 @@ import { examPost } from '../../serverApis'
 const ApiTester = () => {
   const [file, setFile] = useState(null)
 
-  const handleUpload = (e) => {
-
-    const file = e.target.files[0]
-    // setFile(file)
-    // return
+  const InputOnChangeHandler = (e) => {
     const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onloadend = () => {
-      console.log(reader.result)
-      setFile(reader.result)
-    }
+    reader.readAsDataURL(e.target.files[0])
+    reader.onloadend = () => { setFile(reader.result) }
+  }
+
+  const ButtonOnClickHandler = (e) => {
+    if (file !== null) { examPost(file) }
   }
 
   return (
     <Container className='d-flex justify-content-center align-items-center' style={{ height: '100vh' }}>
       <Row className='d-flex flex-column'>
         <Col>
-          <Button onClick={() => {
-            if (file !== null) {
-              addExam(file)
-            }
-          }}>
-            Add Exam
-          </Button>
+          <input type='file' accept='image/*' onChange={InputOnChangeHandler}></input>
         </Col>
         <Col>
-          <input type='file' accept='image/*' onChange={(e) => handleUpload(e)}></input>
+          <Button onClick={ButtonOnClickHandler}>Submit Exam</Button>
         </Col>
       </Row>
     </Container >

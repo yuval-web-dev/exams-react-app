@@ -1,5 +1,4 @@
 import axios from 'axios'
-import uuid from 'uuid'
 
 import { questionObject, examObject } from '../objects.js'
 import { examEndpts } from '../endpoints.js'
@@ -13,34 +12,28 @@ const readFile = (file) => {
   })
 }
 
-const examPost = async (imgUpload) => {
+const examPost = async (img) => {
   const formData = new FormData()
 
-  const loremExam = new examObject(
-    'Communication Networks',
-    'PhD Kurose, Jim',
-    new Date(2023, 6, 1, 12, 0, 0, 0),
-    2.5,
-    true,
-    [new questionObject(
-      null,
-      true,
-      answers = ['2', '4', '6', '8'],
-      '4'
-    )]
-  )
-
-  formData.append('exam', loremExam)
-
-  loremExam.questions.map(q => {
-    if (Object.keys(q)[0] === 'img') {
-
+  // Hardcoding an exam object to be posted:
+  let loremQ = new questionObject()
+  loremQ.imageName = img.name
+  loremQ.text = 'What is the GCD of 648, 762?'
+  loremQ.answers = ['2', '4', '6', '8']
+  loremQ.correctAnswer = loremQ.answers[1]
+  let loremE = new examObject()
+  loremE.questions.push(loremQ)
+  // Assigning a unique id for each question in the exam:
+  loremE.questions.map((q, idx) => {
+    q.qid = `${loremE.eid}_q${idx}`
+    if (q.imageName !== null) {
+      formData.append(q.imageName, img)
     }
-    formData.append()
   })
-  formData.append('img1', imgUpload)
-  formData.append('img2', imgUpload)
+  const exams = JSON.stringify([loremE, loremE])
 
+  // Exam is finalized, now added to the form data:
+  formData.append('exams', exams)
 
   try {
     await axios.post(examEndpts.post, formData, {
