@@ -4,9 +4,9 @@
 
 import { v4 as uuidv4 } from 'uuid'
 
-function questionObject(imageName = null, text = null, answers = [], correctAnswer = null, isRandomized = false) {
+function questionObject(text = null, answers = [], correctAnswer = null, isRandomized = false) {
   this.qid = null
-  this.imageName = imageName // at first, it will be the name of the uploaded file; When posting an entire exam, it will be renamed to eid-qid
+  this.image = false
   this.text = text
   this.answers = answers
   this.correctAnswer = correctAnswer

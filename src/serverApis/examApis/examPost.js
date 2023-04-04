@@ -3,37 +3,54 @@ import axios from 'axios'
 import { questionObject, examObject } from '../objects.js'
 import { examEndpts } from '../endpoints.js'
 
-const readFile = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(new Uint8Array(reader.result))
-    reader.onerror = reject
-    reader.readAsArrayBuffer(file)
-  })
-}
 
-const examPost = async (img) => {
+const examPost = async (uploads) => {
+  // Hardcoding a user input:
+  let loremQ1 = new questionObject()
+  loremQ1.text = 'What is the GCD of 648, 762?'
+  loremQ1.answers = ['2', '4', '6', '8']
+  loremQ1.correctAnswer = loremQ1.answers[1]
+
+  let loremQ2 = new questionObject()
+  loremQ2.text = 'What is the LCM of 36, 58?'
+  loremQ2.answers = ['140', '264', '864', '1044']
+  loremQ2.correctAnswer = loremQ2.answers[3]
+
+
+  let questionTemplate1 = { // lecturer created a quetsion and attached an image
+    'createdObject': loremQ1,
+    'attachedImage': uploads[0]
+  }
+  let questionTemplate2 = { // lecturer created a quetsion and attached an image
+    'createdObject': loremQ2,
+    'attachedImage': uploads[1]
+  }
+  let templates = [questionTemplate1, questionTemplate2]
+
+  let loremE = new examObject()
   const formData = new FormData()
 
-  // Hardcoding an exam object to be posted:
-  let loremQ = new questionObject()
-  loremQ.imageName = img.name
-  loremQ.text = 'What is the GCD of 648, 762?'
-  loremQ.answers = ['2', '4', '6', '8']
-  loremQ.correctAnswer = loremQ.answers[1]
-  let loremE = new examObject()
-  loremE.questions.push(loremQ)
-  // Assigning a unique id for each question in the exam:
-  loremE.questions.map((q, idx) => {
-    q.qid = `${loremE.eid}_q${idx}`
-    if (q.imageName !== null) {
-      formData.append(q.imageName, img)
+  templates.map((t, idx) => {
+    // genereating a question ID according to the question's exam, then assigning it to it:
+    const questionId = `${loremE.eid}@${idx}`
+    t.createdObject.qid = questionId
+    // if user attached an image with the template, the object will be marked as an image question:
+    if (t.attachedImage !== null) {
+      t.createdObject.image = true
+      // renaming the image attachment as the question's id, so it can be easily saved and indexed in the server's uploads:
+      const oldName = t.attachedImage.name
+      const rename = oldName.replace(/^.*(?=\.)/, questionId)
+      // appending the image to the formData with the new name:
+      formData.append(rename, t.attachedImage)
     }
+    // appending the question to the exam object:
+    loremE.questions.push(t.createdObject)
   })
-  const exams = JSON.stringify([loremE, loremE])
+
+  const exam = JSON.stringify(loremE)
 
   // Exam is finalized, now added to the form data:
-  formData.append('exams', exams)
+  formData.append('exam', exam)
 
   try {
     await axios.post(examEndpts.post, formData, {
