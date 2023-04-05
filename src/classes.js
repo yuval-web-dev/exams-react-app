@@ -5,12 +5,12 @@
 import { v4 as uuidv4 } from 'uuid';
 
 class Question {
-  constructor(text = null, answers = [], correctAnswer = null, isRandomized = false) {
+  constructor(text = null, answers = [], correctAnswers = [], isRandomized = false) {
     this.qid = null;
     this.image = false;
     this.text = text;
     this.answers = answers;
-    this.correctAnswer = correctAnswer;
+    this.correctAnswers = correctAnswers;
     this.isRandomized = isRandomized;
   }
 }

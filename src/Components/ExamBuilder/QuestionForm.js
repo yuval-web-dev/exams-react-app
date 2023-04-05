@@ -1,24 +1,25 @@
 import React, { useState, useRef } from 'react';
-import { Container, Row, Col, Form, Button, Image, ButtonGroup } from 'react-bootstrap'
+import { Form, Button, Image, ButtonGroup } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
-import { examObject, questionObject } from '../../classes';
 import placeholder from '../../assets/placeholder.png'
+import { Question } from '../../classes';
 
 
-
-const QuestionForm = () => {
+const QuestionForm = ({ questions, setQuestions, setActiveTab }) => {
   const [body, setBody] = useState('')
   const [image, setImage] = useState(placeholder)
   const [answers, setAnswers] = useState([])
   const [correctAnswers, setCorrectAnswers] = useState([])
+  const [randomized, setRandomized] = useState(false)
 
-  const fileInputRef = useRef(null);
+  const imageInputRef = useRef(null);
+  // const bodyFormRef = useRef(null);
   const answerFormRef = useRef(null);
 
   const handleClick = () => {
-    if (fileInputRef !== null) {
-      fileInputRef.current.click()
+    if (imageInputRef !== null) {
+      imageInputRef.current.click()
     }
   }
 
@@ -35,8 +36,20 @@ const QuestionForm = () => {
     }
   }
 
+  const handleBodyChange = (e) => {
+    setBody(e.target.value)
+  }
+
+  const handleBodyClear = () => {
+    setBody('')
+  }
+
   const handleAnswerClear = (e) => {
     answerFormRef.current.value = ''
+  }
+
+  const handleRandomToggle = (e) => {
+    setRandomized((prevState) => !prevState)
   }
 
   const handleAnswerAdd = (e) => {
@@ -91,6 +104,23 @@ const QuestionForm = () => {
     })
   )
 
+  const onFormSubmit = () => {
+    // TODO validity checks on all fields before adding to the questions array
+    const newQuestion = new Question()
+    newQuestion.text = body
+    newQuestion.answers = answers
+    newQuestion.correctAnswer = correctAnswers
+    newQuestion.image = image
+    newQuestion.isRandomized = randomized
+    setQuestions([...questions, newQuestion])
+
+    setImage(placeholder)
+    setBody('')
+    answerFormRef.current.value = ''
+
+    setActiveTab('examform')
+  }
+
   return (
     <div>
       <table>
@@ -99,7 +129,7 @@ const QuestionForm = () => {
             <td>Image</td>
             <td>
               <Image src={image} style={{ height: '200px', width: '400px', objectFit: 'cover' }} className='img-fluid border border-2' alt='image depicting the question' onClick={handleClick} />
-              <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageChange} />
+              <input type='file' ref={imageInputRef} style={{ display: 'none' }} onChange={handleImageChange} />
             </td>
             <td />
             <td>
@@ -109,17 +139,17 @@ const QuestionForm = () => {
           <tr>
             <td>Body</td>
             <td>
-              <Form.Control type='text' spellCheck='true' />
+              <Form.Control value={body} type='text' spellCheck='true' pattern='[A-Za-z0-9]+' onChange={handleBodyChange} />
             </td>
             <td />
             <td>
-              <Button variant='outline-warning' onClick={handleImageClear}>Clear</Button>
+              <Button variant='outline-warning' onClick={handleBodyClear}>Clear</Button>
             </td>
           </tr>
           <tr>
             <td>Answer</td>
             <td>
-              <Form.Control ref={answerFormRef} type='text' spellCheck='true' />
+              <Form.Control ref={answerFormRef} type='text' spellCheck='true' pattern='[A-Za-z0-9]+' />
             </td>
             <td></td>
             <td>
@@ -129,9 +159,14 @@ const QuestionForm = () => {
               </ButtonGroup>
             </td>
           </tr>
+          <tr>
+            <td>Randomize?</td>
+            <BootstrapSwitchButton offlabel='No' onlabel='Yes' onChange={handleRandomToggle} />
+          </tr>
           {renderAnswers()}
         </tbody>
       </table>
+      <Button onClick={onFormSubmit}>Submit</Button>
     </div>
   )
 }

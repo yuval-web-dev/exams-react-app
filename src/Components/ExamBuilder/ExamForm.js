@@ -14,7 +14,7 @@ import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 import { Exam, Question, User } from '../../classes';
 
-const ExamForm = () => {
+const ExamForm = ({ user, exam }) => {
 
   const [earliestHourStr, earliestHourNum] = ['09:00', 9 * 60 * 60]
   const latestHourStr = '17:00'
@@ -23,23 +23,13 @@ const ExamForm = () => {
   let tomorrow = new Date()
   tomorrow.setDate(today.getDate() + 1)
 
-  const [exam, setExam] = useState(new Exam())
   const [name, setName] = useState('')
   const [date, setDate] = useState(tomorrow)
   const [startTime, setStartTime] = useState(earliestHourNum)
   const [endTime, setEndTime] = useState(earliestHourNum + minDuration * 60) // internal use
   const [duration, setDuration] = useState(minDuration)
-  const [random, setRandom] = useState(false)
+  const [randomized, setRandomized] = useState(false)
   const [questions, setQuestions] = useState([])
-
-  const user = new User()
-  user.firstname = 'Jim'
-  user.surname = 'Kurose'
-
-  const handleAddQuestion = () => {
-    // TODO handle the questions
-    setQuestions([...questions, new Question()])
-  }
 
   const handleNameChange = (e) => {
     // TODO string check
@@ -76,15 +66,15 @@ const ExamForm = () => {
     }
   }
 
-  const handleDurationSliderChange = (e) => {
+  const handleSliderChange = (e) => {
     const dur = e.target.value
     setDuration(dur)
     setEndTime(startTime + (dur * 60))
   }
 
-  const handleRandomToggle = () => {
+  const handleRandomizeToggle = () => {
     // TODO make this work
-    setRandom((prevRandom) => !prevRandom)
+    setRandomized((prevState) => !prevState)
   }
 
   const handleQuestionsClear = (e) => {
@@ -150,7 +140,7 @@ const ExamForm = () => {
                 <Form.Control type='number' value={duration} min={minDuration} max={maxDuration} onChange={handleDurationChange} />
               </Col>
               <Col className='ps-1'>
-                <RangeSlider value={duration} min={30} max={180} onChange={handleDurationSliderChange} tooltip='off' />
+                <RangeSlider value={duration} min={30} max={180} onChange={handleSliderChange} tooltip='off' />
               </Col>
             </Row>
           </td>
@@ -166,10 +156,9 @@ const ExamForm = () => {
           </td>
         </tr>
         <tr>
-          <td>Randomize</td>
-          <td></td>
+          <td>Randomize?</td>
           <td>
-            <BootstrapSwitchButton onlabel='Random' offlabel='Ordered' checked={false} onChange={handleRandomToggle} />
+            <BootstrapSwitchButton offlabel='No' onlabel='Yes' checked={false} onChange={handleRandomizeToggle} />
           </td>
         </tr>
       </tbody>
