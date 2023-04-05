@@ -15,7 +15,8 @@ const ApiTester = () => {
   }
 
   return (
-    <Container className='d-flex justify-content-center align-items-center' style={{ height: '100vh' }}>
+    <Container variant='fluid'>
+      <h1>API Tester</h1>
       <Row className='d-flex flex-column'>
         <Col>
           <input multiple type='file' accept='image/*' onChange={InputOnChangeHandler}></input>
