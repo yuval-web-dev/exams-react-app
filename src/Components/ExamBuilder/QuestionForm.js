@@ -35,26 +35,27 @@ const QuestionForm = () => {
     <div>
       <h2>Question Form</h2>
       <table>
-        <tr>
-          <td>Attached Image</td>
-          <td>
-            <Image src={image} style={{ height: '200px', width: '400px', objectFit: 'cover' }} className='img-fluid border border-2' alt='image depicting the question' onClick={handleClick} />
-            <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageChange} />
-          </td>
-          <td>
-            <Button variant='outline-primary' onClick={handleClearBtnClick}>Clear</Button>
-          </td>
-        </tr>
-        <tr>
-          <td>Question Body</td>
-          <td>
-            <Form.Control type='text' placeholder='Question Body' spellCheck='true' />
-          </td>
-          <td>
-            <Button variant='outline-primary' onClick={handleClearBtnClick}>Clear</Button>
-          </td>
-        </tr>
-
+        <tbody>
+          <tr>
+            <td>Attached Image</td>
+            <td>
+              <Image src={image} style={{ height: '200px', width: '400px', objectFit: 'cover' }} className='img-fluid border border-2' alt='image depicting the question' onClick={handleClick} />
+              <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageChange} />
+            </td>
+            <td>
+              <Button variant='outline-primary' onClick={handleClearBtnClick}>Clear</Button>
+            </td>
+          </tr>
+          <tr>
+            <td>Question Body</td>
+            <td>
+              <Form.Control type='text' placeholder='Question Body' spellCheck='true' />
+            </td>
+            <td>
+              <Button variant='outline-primary' onClick={handleClearBtnClick}>Clear</Button>
+            </td>
+          </tr>
+        </tbody>
       </table>
       <Row>
         <Col className=''>

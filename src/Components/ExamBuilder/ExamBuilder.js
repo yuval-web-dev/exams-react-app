@@ -4,6 +4,11 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+import RangeSlider from 'react-bootstrap-range-slider';
+
+import TimePicker from 'react-bootstrap-time-picker';
+
+
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 
@@ -12,18 +17,24 @@ import { Exam, Question, User } from '../../classes';
 import QuestionForm from './QuestionForm.js'
 
 const ExamBuilder = () => {
+  const [earliestHourStr, earliestHourNum] = ['09:00', 9 * 60 * 60]
+  const latestHourStr = '17:00'
+  const [minDuration, maxDuration] = [30, 180] // mins
+
   const [exam, setExam] = useState(new Exam())
   const [name, setName] = useState('')
   const [date, setDate] = useState(null)
+  const [startTime, setStartTime] = useState(earliestHourNum)
+  const [endTime, setEndTime] = useState(earliestHourNum + minDuration * 60) // internal use
+  const [duration, setDuration] = useState(minDuration)
   const [random, setRandom] = useState(false)
-
   const [questions, setQuestions] = useState([])
   const today = new Date()
-
 
   const user = new User()
   user.firstname = 'Jim'
   user.surname = 'Kurose'
+
 
   const handleAddQuestion = () => {
     // TODO handle the questions
@@ -38,6 +49,31 @@ const ExamBuilder = () => {
   const handleDateChange = (selectedDate) => {
     // TODO date checks
     setDate(selectedDate)
+  }
+
+  const handleStartTimeChange = (value) => {
+    setStartTime(value)
+    setEndTime(value + (duration * 60))
+  }
+
+  const handleTimeReset = (e) => {
+    setStartTime(earliestHourNum)
+    setEndTime(earliestHourNum + minDuration * 60)
+    setDuration(minDuration)
+  }
+
+  const handleDurationChange = (e) => {
+    const dur = Math.floor(e.target.value)
+    if (dur >= 1 || dur <= 180) {
+      setDuration(dur)
+      setEndTime(startTime + (dur * 60))
+    }
+  }
+
+  const handleDurationSliderChange = (e) => {
+    const dur = e.target.value
+    setDuration(dur)
+    setEndTime(startTime + (dur * 60))
   }
 
   const handleRandomToggle = () => {
@@ -56,12 +92,11 @@ const ExamBuilder = () => {
       <h1>Exam Builder</h1>
       <h2>Exam Form</h2>
       <table>
-        <thead></thead>
         <tbody>
           <tr>
             <td>Author</td>
             <td>
-              <Form.Control readOnly className='text-muted' value={`${user.surname}, ${user.firstname}`} readOnly type='text' />
+              <Form.Control readOnly className='text-muted' value={`${user.surname}, ${user.firstname}`} type='text' />
             </td>
           </tr>
           <tr>
@@ -78,9 +113,7 @@ const ExamBuilder = () => {
             </td>
           </tr>
           <tr>
-            <td>
-              Date
-            </td>
+            <td>Date</td>
             <td>
               <div className='form-group'>
                 <DatePicker className='form-control' selected={date} minDate={today} dateFormat='dd/MM/yyyy' onChange={handleDateChange} />
@@ -88,6 +121,38 @@ const ExamBuilder = () => {
             </td>
             <td>
               <Button variant='outline-warning' onClick={() => { setDate(null) }}>Clear</Button>
+            </td>
+          </tr>
+          <tr>
+            <td>Timeframe</td>
+            <td>
+              <Row>
+                <Col>
+                  <TimePicker value={startTime} step={30} start={earliestHourStr} end={latestHourStr} onChange={handleStartTimeChange} />
+                </Col>
+                <Col>
+                  <TimePicker value={endTime} step={1} className='text-muted' style={{ pointerEvents: 'none' }} />
+                </Col>
+              </Row>
+            </td>
+            <td>
+              <Button variant='outline-warning' onClick={handleTimeReset}>Reset</Button>
+            </td>
+          </tr>
+          <tr>
+            <td>Duration</td>
+            <td>
+              <Row className='align-items-center'>
+                <Col className='col-4 pe-1'>
+                  <Form.Control type='number' value={duration} min={minDuration} max={maxDuration} onChange={handleDurationChange} />
+                </Col>
+                <Col className='ps-1'>
+                  <RangeSlider value={duration} min={30} max={180} onChange={handleDurationSliderChange} tooltip='off' />
+                </Col>
+              </Row>
+            </td>
+            <td>
+
             </td>
           </tr>
           <tr>
@@ -105,7 +170,6 @@ const ExamBuilder = () => {
             </td>
           </tr>
         </tbody>
-        <tfoot></tfoot>
       </table>
       <div style={{ height: '100px' }}></div>
       <QuestionForm />
