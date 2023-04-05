@@ -20,16 +20,19 @@ const ExamBuilder = () => {
   const [earliestHourStr, earliestHourNum] = ['09:00', 9 * 60 * 60]
   const latestHourStr = '17:00'
   const [minDuration, maxDuration] = [30, 180] // mins
+  const today = new Date()
+  let tomorrow = new Date()
+  tomorrow.setDate(today.getDate() + 1)
 
   const [exam, setExam] = useState(new Exam())
   const [name, setName] = useState('')
-  const [date, setDate] = useState(null)
+  const [date, setDate] = useState(tomorrow)
   const [startTime, setStartTime] = useState(earliestHourNum)
   const [endTime, setEndTime] = useState(earliestHourNum + minDuration * 60) // internal use
   const [duration, setDuration] = useState(minDuration)
   const [random, setRandom] = useState(false)
   const [questions, setQuestions] = useState([])
-  const today = new Date()
+
 
   const user = new User()
   user.firstname = 'Jim'
@@ -48,10 +51,16 @@ const ExamBuilder = () => {
 
   const handleDateChange = (selectedDate) => {
     // TODO date checks
+    console.log(JSON.stringify(selectedDate))
     setDate(selectedDate)
   }
 
+  const handleDateReset = () => {
+    setDate(tomorrow)
+  }
+
   const handleStartTimeChange = (value) => {
+    // TODO value validity checks
     setStartTime(value)
     setEndTime(value + (duration * 60))
   }
@@ -106,8 +115,8 @@ const ExamBuilder = () => {
             </td>
           </tr>
           <tr>
-            <td>Name</td>
-            <td><Form.Control value={name} type='text' onChange={handleNameChange} spellCheck='true' /></td>
+            <td>Subject</td>
+            <td><Form.Control value={name} type='text' onChange={handleNameChange} spellCheck='true' style={{ fontWeight: 'bold' }} /></td>
             <td>
               <Button variant='outline-warning' onClick={() => { setName('') }}>Clear</Button>
             </td>
@@ -116,11 +125,11 @@ const ExamBuilder = () => {
             <td>Date</td>
             <td>
               <div className='form-group'>
-                <DatePicker className='form-control' selected={date} minDate={today} dateFormat='dd/MM/yyyy' onChange={handleDateChange} />
+                <DatePicker className='form-control' selected={date} minDate={tomorrow} dateFormat='dd/MM/yyyy' onChange={handleDateChange} />
               </div>
             </td>
             <td>
-              <Button variant='outline-warning' onClick={() => { setDate(null) }}>Clear</Button>
+              <Button variant='outline-warning' onClick={handleDateReset}>Reset</Button>
             </td>
           </tr>
           <tr>
