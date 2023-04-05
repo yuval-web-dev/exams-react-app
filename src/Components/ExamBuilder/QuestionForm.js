@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Container, Row, Col, Form, Button, Image } from 'react-bootstrap'
 
-import { examObject, questionObject } from '../../serverApis/classes';
+import { examObject, questionObject } from '../../classes';
 import placeholder from '../../assets/placeholder.png'
 
 const QuestionForm = () => {
@@ -34,15 +34,36 @@ const QuestionForm = () => {
   return (
     <div>
       <h2>Question Form</h2>
+      <table>
+        <tr>
+          <td>Attached Image</td>
+          <td>
+            <Image src={image} style={{ height: '200px', width: '400px', objectFit: 'cover' }} className='img-fluid border border-2' alt='image depicting the question' onClick={handleClick} />
+            <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageChange} />
+          </td>
+          <td>
+            <Button variant='outline-primary' onClick={handleClearBtnClick}>Clear</Button>
+          </td>
+        </tr>
+        <tr>
+          <td>Question Body</td>
+          <td>
+            <Form.Control type='text' placeholder='Question Body' spellCheck='true' />
+          </td>
+          <td>
+            <Button variant='outline-primary' onClick={handleClearBtnClick}>Clear</Button>
+          </td>
+        </tr>
+
+      </table>
       <Row>
         <Col className=''>
-          <Image src={image} style={{ height: '200px', width: '400px', objectFit: 'cover' }} className='img-fluid border border-2' alt='image depicting the question' onClick={handleClick} />
-          <input type='file' ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageChange} />
+
         </Col>
       </Row>
       <Row>
         <Col>
-          <Button variant='outline-primary' onClick={handleClearBtnClick}>Clear</Button>
+
         </Col>
       </Row>
       <Row>

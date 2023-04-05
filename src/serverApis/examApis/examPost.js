@@ -1,17 +1,17 @@
 import axios from 'axios'
 
-import { questionObject, examObject } from '../objects.js'
+import { Question, Exam } from '../../classes.js'
 import { examEndpts } from '../endpoints.js'
 
 
 const examPost = async (uploads) => {
   // Hardcoding a user input:
-  let loremQ1 = new questionObject()
+  let loremQ1 = new Question()
   loremQ1.text = 'What is the GCD of 648, 762?'
   loremQ1.answers = ['2', '4', '6', '8']
   loremQ1.correctAnswer = loremQ1.answers[1]
 
-  let loremQ2 = new questionObject()
+  let loremQ2 = new Question()
   loremQ2.text = 'What is the LCM of 36, 58?'
   loremQ2.answers = ['140', '264', '864', '1044']
   loremQ2.correctAnswer = loremQ2.answers[3]
@@ -27,7 +27,7 @@ const examPost = async (uploads) => {
   }
   let templates = [questionTemplate1, questionTemplate2]
 
-  let loremE = new examObject()
+  let loremE = new Exam()
   const formData = new FormData()
 
   templates.map((t, idx) => {
