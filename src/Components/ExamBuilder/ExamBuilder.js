@@ -20,6 +20,7 @@ import ExamOverview from './ExamOverview.js';
 
 const ExamBuilder = () => {
   const [exam, setExam] = useState(new Exam())
+  const [questionObj, setQuestionObj] = useState(new Question())
   const [questions, setQuestions] = useState([])
 
   const [activeTab, setActiveTab] = useState('overview')
@@ -34,6 +35,14 @@ const ExamBuilder = () => {
     }
   }
 
+  const handleQuestionFormSave = () => {
+    setQuestionObj(new Question())
+  }
+
+  const changeActiveTab = (tab) => {
+    setActiveTab(tab)
+  }
+
   return (
     <Container variant='fluid'>
       <Tabs activeKey={activeTab} onSelect={tab => setActiveTab(tab)}>
@@ -41,10 +50,25 @@ const ExamBuilder = () => {
           <ExamOverview user={user} exam={exam} questions={questions}></ExamOverview>
         </Tab>
         <Tab eventKey='examform' title='Exam'>
-          <ExamForm user={user} exam={exam} questions={questions} setQuestions={setQuestions} />
+          <ExamForm
+            user={user}
+            exam={exam}
+            questions={questions}
+            setQuestions={setQuestions}
+            setActiveTab={setActiveTab}
+            questionObj={questionObj}
+            setQuestionObj={setQuestionObj}
+            changeActiveTab={changeActiveTab}
+          />
         </Tab>
         <Tab eventKey='questionform' title='Question'>
-          <QuestionForm questions={questions} setQuestions={setQuestions} setActiveTab={setActiveTab} />
+          <QuestionForm
+            questionObj={questionObj}
+            setQuestionObj={setQuestionObj}
+            questions={questions}
+            setQuestions={setQuestions}
+            setActiveTab={setActiveTab}
+          />
         </Tab>
       </Tabs>
     </Container>

@@ -5,13 +5,13 @@
 import { v4 as uuidv4 } from 'uuid';
 
 class Question {
-  constructor(text = null, answers = [], correctAnswers = [], isRandomized = false) {
-    this.qid = null;
-    this.image = false;
-    this.text = text;
-    this.answers = answers;
-    this.correctAnswers = correctAnswers;
-    this.isRandomized = isRandomized;
+  constructor() {
+    this.qid = null
+    this.image = null
+    this.body = null
+    this.answers = []
+    this.correctAnswers = []
+    this.isRandomized = false
   }
 }
 

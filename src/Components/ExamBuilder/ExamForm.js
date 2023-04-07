@@ -11,10 +11,12 @@ import TimePicker from 'react-bootstrap-time-picker';
 
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
+import greenCheck from '../../assets/svgs/Eo_circle_green_checkmark.svg'
+import redExclamation from '../../assets/svgs/Exclamation_flat_icon.svg'
 
 import { Exam, Question, User } from '../../classes';
 
-const ExamForm = ({ user, exam, questions, setQuestions }) => {
+const ExamForm = ({ user, exam, questions, setQuestions, setActiveTab, questionObj, changeActiveTab }) => {
 
   const [earliestHourStr, earliestHourNum] = ['09:00', 9 * 60 * 60]
   const latestHourStr = '17:00'
@@ -82,6 +84,20 @@ const ExamForm = ({ user, exam, questions, setQuestions }) => {
     }
   }
 
+  const handleQuestionEdit = (question) => {
+    // changeActiveTab('questionform')
+  }
+
+  const isQuestionSane = (question) => {
+    if (question.body === '' ||
+      question.answers.length <= 1 ||
+      question.correctAnswers.length === 0 ||
+      question.correctAnswers.length === question.answers.length) {
+      return false
+    }
+    return true
+  }
+
   const renderQuestions = () => {
     return (
       questions.map((q, idx) => {
@@ -89,19 +105,22 @@ const ExamForm = ({ user, exam, questions, setQuestions }) => {
           <tr key={idx.toString()} id={idx}>
             <td>{idx + 1}</td>
             <td>{q.image === null ? 'No' : 'Yes'}</td>
-            <td>{q.body === null ? 'None' : q.text.toString()}</td>
+            <td>{q.body === '' ? '-' : `"${q.body.toString()}"`}</td>
             <td>
               <ol>
-                {q.answers === [] ? 'None' : q.answers.map((answer) => {
+                {q.answers.length === 0 ? '-' : q.answers.map((answer) => {
                   return (
-                    <li style={q.correctAnswers.includes(answer) ? { color: 'green', fontWeight: 'bold' } : {}}>{answer}</li>
+                    <li style={q.correctAnswers.includes(answer) ? { color: 'green', fontWeight: 'bold' } : {}}>{`"${answer}"`}</li>
                   )
                 })}
               </ol>
             </td>
+            <td>{q.isRandomized === true ? 'Yes' : 'No'}</td>
+            <td>{isQuestionSane(q) ? <img src={greenCheck} width='30px' /> : <img src={redExclamation} width='30px' />}
+            </td>
             <td>
               <ButtonGroup>
-                <Button variant='secondary'>Edit</Button>
+                <Button variant='secondary' onClick={handleQuestionEdit(q)}>Edit</Button>
                 <Button variant='warning'>Discard</Button>
               </ButtonGroup>
             </td>
@@ -181,6 +200,8 @@ const ExamForm = ({ user, exam, questions, setQuestions }) => {
               <th>Image</th>
               <th>Body</th>
               <th>Answers</th>
+              <th>Randomized</th>
+              <th>Sanity</th>
               <th>Actions</th>
             </tr>
           </thead>
