@@ -16,24 +16,34 @@ import { Exam, Question, User } from '../../classes';
 
 import QuestionForm from './QuestionForm.js'
 import ExamForm from './ExamForm';
+import ExamOverview from './ExamOverview.js';
 
 const ExamBuilder = () => {
   const [exam, setExam] = useState(new Exam())
   const [questions, setQuestions] = useState([])
 
-  const [activeTab, setActiveTab] = useState('examform')
+  const [activeTab, setActiveTab] = useState('overview')
 
   const user = new User() // Author
   user.firstname = 'Jim'
   user.surname = 'Kurose'
 
+  const handleQuestionsClear = (e) => {
+    if (window.confirm('Are you sure you want to clear all questions?')) {
+      setQuestions([]);
+    }
+  }
+
   return (
     <Container variant='fluid'>
       <Tabs activeKey={activeTab} onSelect={tab => setActiveTab(tab)}>
-        <Tab eventKey='examform' title='Exam Form'>
-          <ExamForm user={user} exam={exam} />
+        <Tab eventKey='overview' title='Overview' >
+          <ExamOverview user={user} exam={exam} questions={questions}></ExamOverview>
         </Tab>
-        <Tab eventKey='questionform' title='Question Form'>
+        <Tab eventKey='examform' title='Exam'>
+          <ExamForm user={user} exam={exam} questions={questions} setQuestions={setQuestions} />
+        </Tab>
+        <Tab eventKey='questionform' title='Question'>
           <QuestionForm questions={questions} setQuestions={setQuestions} setActiveTab={setActiveTab} />
         </Tab>
       </Tabs>

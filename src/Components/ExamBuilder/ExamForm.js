@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap'
+import { Container, Row, Col, Form, Button, Table, ButtonGroup } from 'react-bootstrap'
 
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -14,7 +14,7 @@ import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 import { Exam, Question, User } from '../../classes';
 
-const ExamForm = ({ user, exam }) => {
+const ExamForm = ({ user, exam, questions, setQuestions }) => {
 
   const [earliestHourStr, earliestHourNum] = ['09:00', 9 * 60 * 60]
   const latestHourStr = '17:00'
@@ -29,7 +29,6 @@ const ExamForm = ({ user, exam }) => {
   const [endTime, setEndTime] = useState(earliestHourNum + minDuration * 60) // internal use
   const [duration, setDuration] = useState(minDuration)
   const [randomized, setRandomized] = useState(false)
-  const [questions, setQuestions] = useState([])
 
   const handleNameChange = (e) => {
     // TODO string check
@@ -74,7 +73,7 @@ const ExamForm = ({ user, exam }) => {
 
   const handleRandomizeToggle = () => {
     // TODO make this work
-    setRandomized((prevState) => !prevState)
+    setRandomized(!randomized)
   }
 
   const handleQuestionsClear = (e) => {
@@ -83,86 +82,120 @@ const ExamForm = ({ user, exam }) => {
     }
   }
 
-  return (
-    <table>
-      <tbody>
-        <tr>
-          <td>Author</td>
-          <td>
-            <Form.Control readOnly className='text-muted' value={`${user.surname}, ${user.firstname}`} type='text' />
-          </td>
-        </tr>
-        <tr>
-          <td>EID</td>
-          <td>
-            <Form.Control readOnly className='text-muted' value={exam.eid} type='text' style={{ fontFamily: 'consolas' }} />
-          </td>
-        </tr>
-        <tr>
-          <td>Subject</td>
-          <td><Form.Control value={name} type='text' onChange={handleNameChange} spellCheck='true' style={{ fontWeight: 'bold' }} /></td>
-          <td>
-            <Button variant='outline-warning' onClick={() => { setName('') }}>Clear</Button>
-          </td>
-        </tr>
-        <tr>
-          <td>Date</td>
-          <td>
-            <div className='form-group'>
-              <DatePicker className='form-control' selected={date} minDate={tomorrow} dateFormat='dd/MM/yyyy' onChange={handleDateChange} />
-            </div>
-          </td>
-          <td>
-            <Button variant='outline-warning' onClick={handleDateReset}>Reset</Button>
-          </td>
-        </tr>
-        <tr>
-          <td>Timeframe</td>
-          <td>
-            <Row>
-              <Col>
-                <TimePicker value={startTime} step={30} start={earliestHourStr} end={latestHourStr} onChange={handleStartTimeChange} />
-              </Col>
-              <Col>
-                <TimePicker value={endTime} step={1} className='text-muted' style={{ pointerEvents: 'none' }} />
-              </Col>
-            </Row>
-          </td>
-          <td>
-            <Button variant='outline-warning' onClick={handleTimeReset}>Reset</Button>
-          </td>
-        </tr>
-        <tr>
-          <td>Duration</td>
-          <td>
-            <Row className='align-items-center'>
-              <Col className='col-4 pe-1'>
-                <Form.Control type='number' value={duration} min={minDuration} max={maxDuration} onChange={handleDurationChange} />
-              </Col>
-              <Col className='ps-1'>
-                <RangeSlider value={duration} min={30} max={180} onChange={handleSliderChange} tooltip='off' />
-              </Col>
-            </Row>
-          </td>
-          <td>
+  const renderQuestions = () => {
+    return (
+      questions.map((q, idx) => {
+        return (
+          <tr key={idx.toString()} id={idx}>
+            <td>{idx + 1}</td>
+            <td>{q.image === null ? 'No' : 'Yes'}</td>
+            <td>{q.body === null ? 'None' : q.text.toString()}</td>
+            <td>
+              <ol>
+                {q.answers === [] ? 'None' : q.answers.map((answer) => {
+                  return (
+                    <li style={q.correctAnswers.includes(answer) ? { color: 'green', fontWeight: 'bold' } : {}}>{answer}</li>
+                  )
+                })}
+              </ol>
+            </td>
+            <td>
+              <ButtonGroup>
+                <Button variant='secondary'>Edit</Button>
+                <Button variant='warning'>Discard</Button>
+              </ButtonGroup>
+            </td>
+          </tr>
+        )
+      })
+    )
+  }
 
-          </td>
-        </tr>
-        <tr>
-          <td>Questions</td>
-          <td>{questions.length}</td>
-          <td>
-            <Button variant='outline-danger' onClick={handleQuestionsClear}>Clear</Button>
-          </td>
-        </tr>
-        <tr>
-          <td>Randomize?</td>
-          <td>
-            <BootstrapSwitchButton offlabel='No' onlabel='Yes' checked={false} onChange={handleRandomizeToggle} />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  return (
+    <Row>
+      <Col className='col-12'>
+        <Table responsive>
+          <tbody>
+            <tr>
+              <td>Subject</td>
+              <td><Form.Control value={name} type='text' onChange={handleNameChange} spellCheck='true' style={{ fontWeight: 'bold' }} /></td>
+              <td>
+                <Button variant='secondary' onClick={() => { setName('') }}>Clear</Button>
+              </td>
+            </tr>
+            <tr>
+              <td>Date</td>
+              <td>
+                <div className='form-group'>
+                  <DatePicker className='form-control' selected={date} minDate={tomorrow} dateFormat='dd/MM/yyyy' onChange={handleDateChange} />
+                </div>
+              </td>
+              <td>
+                <Button variant='secondary' onClick={handleDateReset}>Reset</Button>
+              </td>
+            </tr>
+            <tr>
+              <td>Timeframe<br />&<br />Duration</td>
+              <td>
+                <Row>
+                  <Col>
+                    <TimePicker value={startTime} step={30} start={earliestHourStr} end={latestHourStr} onChange={handleStartTimeChange} />
+                  </Col>
+                  <Col>
+                    <TimePicker value={endTime} step={1} className='text-muted' style={{ pointerEvents: 'none' }} />
+                  </Col>
+                </Row>
+                <Row className='align-items-center'>
+                  <Col className='col-4 pe-1'>
+                    <Form.Control type='number' value={duration} min={minDuration} max={maxDuration} onChange={handleDurationChange} />
+                  </Col>
+                  <Col className='ps-1'>
+                    <RangeSlider value={duration} min={30} max={180} onChange={handleSliderChange} tooltip='off' />
+                  </Col>
+                </Row>
+              </td>
+              <td>
+                <Button variant='secondary' onClick={handleTimeReset}>Reset</Button>
+              </td>
+            </tr>
+            <tr>
+              <td>Randomize?</td>
+              <td>
+                <BootstrapSwitchButton offlabel='No' onlabel='Yes' checked={false} onChange={handleRandomizeToggle} />
+              </td>
+            </tr>
+            <tr>
+              <td>Questions</td>
+              <td>{questions.length}</td>
+              <td>
+                <Button variant='danger' onClick={handleQuestionsClear}>Clear</Button>
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+        <div style={{ height: '125px' }} />
+        <Table responsive>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Image</th>
+              <th>Body</th>
+              <th>Answers</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderQuestions()}
+          </tbody>
+        </Table>
+      </Col>
+      <Col className='col-12 d-flex justify-content-end'>
+        <ButtonGroup>
+          <Button variant='warning'>Discard</Button>
+          <Button variant='primary' onClick={() => { }}>Save</Button>
+        </ButtonGroup>
+      </Col>
+    </Row>
   )
 }
 
