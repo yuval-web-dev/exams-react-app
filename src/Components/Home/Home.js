@@ -10,11 +10,11 @@ const Home = () => {
       <Link to='/'>
         <Button>Home</Button>
       </Link>
-      <Link to='/apitester'>
+      <Link to='/tester'>
         <Button>API Tester</Button>
       </Link>
-      <Link to='/exambuilder'>
-        <Button>Exam Builder</Button>
+      <Link to='/editor'>
+        <Button>Exam Editor</Button>
       </Link>
     </Container>
   )

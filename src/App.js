@@ -30,9 +30,8 @@ const App = () => {
   return (
     <Routes>
       <Route path='/' element={<Components.Home />} />
-      <Route path='/exambuilder' element={<Components.ExamBuilder />} />
       <Route path='/editor' element={<Components.ExamEditor user={user} />} />
-      <Route path='/apitester' element={< Components.ApiTester />} />
+      <Route path='/tester' element={< Components.ApiTester />} />
       <Route path='/*' element={< Components.NotFound />} />
     </Routes>
   )
