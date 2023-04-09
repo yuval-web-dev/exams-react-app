@@ -3,9 +3,9 @@ import { Row, Col, Form, Button, Image, ButtonGroup, Table } from 'react-bootstr
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import equal from 'fast-deep-equal'
 
-import placeholder from '../../assets/placeholder.png'
-import greenCheck from '../../assets/svgs/green-checkmark-icon.svg'
-import redCross from '../../assets/svgs/red-x-icon.svg'
+import placeholder from '../../assets/png/placeholder.png'
+import greenCheck from '../../assets/svg/green-checkmark-icon.svg'
+import redCross from '../../assets/svg/red-x-icon.svg'
 import { Question } from '../../classes'
 
 
@@ -58,7 +58,7 @@ const QuestionForm = ({ onSave, onDiscard }) => {
 
   const handleAnswerToggleCorrect = (answerToToggle) => {
     if (corrects.includes(answerToToggle)) {
-      let newCorrectAnswers = corrects.filter((answer) => answer !== answerToToggle);
+      const newCorrectAnswers = corrects.filter((answer) => answer !== answerToToggle);
       setCorrects(newCorrectAnswers);
     }
     else {
@@ -88,10 +88,38 @@ const QuestionForm = ({ onSave, onDiscard }) => {
     resetForm()
   }
 
-  const handleAnswerOnChange = (idx, newAnswer) => {
-    let newQuestionAnswers = [...answers]
-    newQuestionAnswers[idx] = newAnswer
-    setAnswers(newQuestionAnswers)
+  const handleAnswerChange = (idx, newAnswer) => {
+    let oldAnswer = answers[idx]
+    let newAnswers = [...answers]
+    newAnswers[idx] = newAnswer
+    setAnswers(newAnswers)
+
+    const oldCorrectIdx = corrects.findIndex((answer) => answer === oldAnswer)
+    if (oldCorrectIdx !== -1) {
+      let newCorrects = [...corrects]
+      newCorrects[oldCorrectIdx] = newAnswer
+      setCorrects(newCorrects)
+    }
+  }
+
+  const handleMoveUp = (answer, idx) => {
+    if (idx > 0) {
+      let newAnswers = [...answers]
+      const replaced = newAnswers[idx - 1]
+      newAnswers[idx - 1] = answer
+      newAnswers[idx] = replaced
+      setAnswers(newAnswers)
+    }
+  }
+
+  const handleMoveDown = (answer, idx) => {
+    if (idx < (answers.length - 1)) {
+      let newAnswers = [...answers]
+      const replaced = newAnswers[idx + 1]
+      newAnswers[idx + 1] = answer
+      newAnswers[idx] = replaced
+      setAnswers(newAnswers)
+    }
   }
 
   const renderAnswers = () => {
@@ -99,10 +127,10 @@ const QuestionForm = ({ onSave, onDiscard }) => {
       answers.map((answer, idx) => {
         return (
           <tr key={idx.toString()} id={idx}>
+            <td>{idx + 1}</td>
+
             <td>
-            </td>
-            <td>
-              <Form.Control type='text' value={answer} onChange={e => handleAnswerOnChange = (idx, e?.target?.value)} />
+              <Form.Control type='text' value={answer} onChange={e => handleAnswerChange(idx, e?.target?.value)} />
             </td>
             <td>
               <Button
@@ -112,6 +140,10 @@ const QuestionForm = ({ onSave, onDiscard }) => {
               </Button>
             </td>
             <td>
+              <ButtonGroup>
+                <Button variant='light' onClick={() => handleMoveUp(answer, idx)}>⯅</Button>
+                <Button variant='light' onClick={() => handleMoveDown(answer, idx)}>⯆</Button>
+              </ButtonGroup>
               <Button variant='light' onClick={e => handleAnswerDiscard(idx, answer)}>Discard</Button>
             </td>
           </tr>
@@ -121,9 +153,9 @@ const QuestionForm = ({ onSave, onDiscard }) => {
   }
 
   return (
-    <Row className='border'>
-      <Col>
-        <Table>
+    <Row>
+      <Col xs={12}>
+        <Table responsive className='align-middle'>
           <tbody>
             <tr>
               <td>Image</td>
@@ -194,11 +226,24 @@ const QuestionForm = ({ onSave, onDiscard }) => {
                   onChange={e => setIsRandomized((prevState) => !prevState)} />
               </td>
             </tr>
+
+          </tbody>
+        </Table>
+      </Col>
+      <Col xs={12}>
+        <Table hover responsive className='align-middle'>
+          <thead>
+            <th>#</th>
+            <th>Body</th>
+            <th>Correct</th>
+            <th>Actions</th>
+          </thead>
+          <tbody>
             {renderAnswers()}
           </tbody>
         </Table>
       </Col>
-      <Col className='col-12 d-flex justify-content-end'>
+      <Col xs={12}>
         <ButtonGroup>
           <Button variant='warning' onClick={e => handleQuestionDiscard()}>Discard</Button>
           <Button variant='primary' onClick={e => handleQuestionSave()}>Save</Button>

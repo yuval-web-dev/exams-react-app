@@ -6,10 +6,14 @@ import DatePicker from 'react-datepicker'; import 'react-datepicker/dist/react-d
 import RangeSlider from 'react-bootstrap-range-slider';
 
 import consts from './consts.js'
-import helpers from './helpers.js'
+
+import isQuestionSane from '../helpers.js'
+
 import { Exam, Question } from "../../classes.js"
 import QuestionForm from '../QuestionForm/QuestionForm.js';
 
+import greenCheck from '../../assets/svg/green-checkmark-icon.svg'
+import redAlert from '../../assets/svg/red-alert-icon.svg'
 
 const ExamForm = () => {
   const [questions, setQuestions] = useState([])
@@ -57,8 +61,37 @@ const ExamForm = () => {
     }
   }
 
+  const handleMoveUp = (question, idx) => {
+    if (idx > 0) {
+      let newQuestions = [...questions]
+      const replaced = newQuestions[idx - 1]
+      newQuestions[idx - 1] = question
+      newQuestions[idx] = replaced
+      setQuestions(newQuestions)
+    }
+  }
+
+  const handleMoveDown = (question, idx) => {
+    if (idx < (questions.length - 1)) {
+      let newQuestions = [...questions]
+      const replaced = newQuestions[idx + 1]
+      newQuestions[idx + 1] = question
+      newQuestions[idx] = replaced
+      setQuestions(newQuestions)
+    }
+  }
+
   const handleQuestionEdit = (question) => {
     // changeActiveTab('questionform')
+    return null
+  }
+
+  const handleQuestionDiscard = (questionToDiscard) => {
+    if (window.confirm('Are you sure?')) {
+      setQuestions(
+        questions.filter((question) => question !== questionToDiscard)
+      )
+    }
   }
 
   const onQuestionFormSave = (newQuestion) => {
@@ -70,11 +103,45 @@ const ExamForm = () => {
     setActiveTab('questions')
   }
 
+  const renderQuestions = () => {
+    return (
+
+      questions.map((q, idx) => {
+        return (
+          <tr key={idx.toString()} id={idx}>
+            <td>{idx + 1}</td>
+            <td>{q.image === null ? 'No' : 'Yes'}</td>
+            <td>{q.body === '' ? '-' : `"${q.body.toString()}"`}</td>
+            <td>
+              <ol>
+                {q.answers.length === 0 ? '-' : q.answers.map((answer) => {
+                  return (
+                    <li style={q.correctAnswers.includes(answer) ? { color: 'green', fontWeight: 'bold' } : {}}>{`"${answer}"`}</li>
+                  )
+                })}
+              </ol>
+            </td>
+            <td>{q.isRandomized === true ? 'Yes' : 'No'}</td>
+            <td>{isQuestionSane(q) ? <img src={greenCheck} width='35px' /> : <img src={redAlert} width='35px' />}</td>
+            <td>
+              <ButtonGroup>
+                <Button variant='light' onClick={() => handleMoveUp(q, idx)}>⯅</Button>
+                <Button variant='light' onClick={() => handleMoveDown(q, idx)}>⯆</Button>
+              </ButtonGroup>
+              <Button variant='primary' onClick={() => handleQuestionEdit(q)}>Edit</Button>
+              <Button variant='light' onClick={() => handleQuestionDiscard(q)}>Discard</Button>
+            </td>
+          </tr>
+        )
+      })
+    )
+  }
+
   return (
     <>
       <Row>
         <Col>
-          <Table responsive>
+          <Table responsive className='align-middle'>
             <tbody>
               <tr>
                 <td>Author</td>
@@ -127,7 +194,20 @@ const ExamForm = () => {
         <Col>
           <Tabs activeKey={activeTab} onSelect={eventKey => setActiveTab(eventKey)}>
             <Tab title='Questions' eventKey='questions'>
-
+              <Table hover responsive className='align-middle'>
+                <thead>
+                  <th>#</th>
+                  <th>Image</th>
+                  <th>Body</th>
+                  <th>Answers</th>
+                  <th>Randomized</th>
+                  <th>Sanity</th>
+                  <th>Actions</th>
+                </thead>
+                <tbody>
+                  {renderQuestions()}
+                </tbody>
+              </Table>
             </Tab>
             <Tab title='Add a Question' eventKey='addQuestion'>
               <QuestionForm onSave={onQuestionFormSave} onDiscard={onQuestionFormDiscard} />
@@ -135,6 +215,7 @@ const ExamForm = () => {
           </Tabs>
         </Col>
       </Row>
+      <Button variant='outline-warning' onClick={() => alert(questions)}>Check Questions</Button>
     </>
   )
 }
