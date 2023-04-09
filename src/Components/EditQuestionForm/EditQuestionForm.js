@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Row, Col, Form, Button, Image, ButtonGroup, Table } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import equal from 'fast-deep-equal'
@@ -9,7 +9,7 @@ import redCross from '../../assets/svg/red-x-icon.svg'
 import { Question } from '../../classes'
 
 
-const QuestionForm = ({ onSave, onDiscard }) => {
+const EditQuestionForm = ({ onSave, onDiscard, question }) => {
   const [body, setBody] = useState('')
   const [image, setImage] = useState(null)
   const [answers, setAnswers] = useState([])
@@ -19,13 +19,15 @@ const QuestionForm = ({ onSave, onDiscard }) => {
   const imageInputRef = useRef(null);
   const answerFormRef = useRef(null);
 
-  const resetForm = () => {
-    setBody('')
-    setImage(null)
-    setAnswers([])
-    setCorrects([])
-    setIsRandomized(false)
-  }
+  useEffect(() => {
+    if (question !== null) {
+      setBody(question.body)
+      setImage(question.image)
+      setAnswers(question.answers)
+      setCorrects(question.correctAnswers)
+      setIsRandomized(question.isRandomized)
+    }
+  }, [question])
 
   const handleImageChange = (e) => {
     if (e.target.files.length === 1) {
@@ -66,12 +68,10 @@ const QuestionForm = ({ onSave, onDiscard }) => {
     }
   }
 
-
   const handleQuestionDiscard = () => {
     // TODO popup window: "are you sure?"
 
     onDiscard()
-    resetForm()
   }
 
   const handleQuestionSave = () => {
@@ -85,7 +85,6 @@ const QuestionForm = ({ onSave, onDiscard }) => {
     newQuestion.isRandomized = isRandomized
 
     onSave(newQuestion)
-    resetForm()
   }
 
   const handleAnswerChange = (idx, newAnswer) => {
@@ -254,4 +253,4 @@ const QuestionForm = ({ onSave, onDiscard }) => {
   )
 }
 
-export default QuestionForm
+export default EditQuestionForm

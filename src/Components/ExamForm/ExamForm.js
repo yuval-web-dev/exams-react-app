@@ -1,19 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Row, Col, Table, Button, ButtonGroup, Form, Tabs, Tab } from 'react-bootstrap'
+import React, { useState, useEffect } from 'react'
+import { Row, Col, Table, Button, ButtonGroup, Form, Tabs, Tab, Modal, Image, Nav } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
-import TimePicker from 'react-bootstrap-time-picker';
-import DatePicker from 'react-datepicker'; import 'react-datepicker/dist/react-datepicker.css';
-import RangeSlider from 'react-bootstrap-range-slider';
+import TimePicker from 'react-bootstrap-time-picker'
+import DatePicker from 'react-datepicker'; import 'react-datepicker/dist/react-datepicker.css'
+import RangeSlider from 'react-bootstrap-range-slider'
 
 import consts from './consts.js'
 
 import isQuestionSane from '../helpers.js'
 
 import { Exam, Question } from "../../classes.js"
-import QuestionForm from '../QuestionForm/QuestionForm.js';
+
+import QuestionForm from '../QuestionForm/QuestionForm.js'
+import EditQuestionForm from '../EditQuestionForm/EditQuestionForm.js'
 
 import greenCheck from '../../assets/svg/green-checkmark-icon.svg'
 import redAlert from '../../assets/svg/red-alert-icon.svg'
+
 
 const ExamForm = () => {
   const [questions, setQuestions] = useState([])
@@ -24,7 +27,12 @@ const ExamForm = () => {
   const [duration, setDuration] = useState(consts.minDuration)
   const [isRandomized, setIsRandomized] = useState(false)
 
+  const [questionToEdit, setQuestionToEdit] = useState(null)
+
   const [activeTab, setActiveTab] = useState('questions')
+
+  const [imagePreview, setImagePreview] = useState(null)
+  const [showImagePreview, setShowImagePreview] = useState(false)
 
   // UseEffect hook:
   const useEffectFunc = () => { }
@@ -82,8 +90,8 @@ const ExamForm = () => {
   }
 
   const handleQuestionEdit = (question) => {
-    // changeActiveTab('questionform')
-    return null
+    setQuestionToEdit(question)
+    setActiveTab('editQuestion')
   }
 
   const handleQuestionDiscard = (questionToDiscard) => {
@@ -103,14 +111,31 @@ const ExamForm = () => {
     setActiveTab('questions')
   }
 
+  const onEditQuestionFormSave = (modifiedQuestion) => {
+    const oldQuestionIdx = questions.indexOf(questionToEdit)
+    let newQuestions = [...questions]
+    newQuestions[oldQuestionIdx] = modifiedQuestion
+    setQuestions(newQuestions)
+    setActiveTab('questions')
+  }
+
+  const onEditQuestionFormDiscard = () => {
+    setActiveTab('questions')
+  }
+
+  const handleImagePreview = (e, image) => {
+    e.preventDefault()
+    setImagePreview(image)
+    setShowImagePreview(true)
+  }
+
   const renderQuestions = () => {
     return (
-
       questions.map((q, idx) => {
         return (
           <tr key={idx.toString()} id={idx}>
             <td>{idx + 1}</td>
-            <td>{q.image === null ? 'No' : 'Yes'}</td>
+            <td>{q.image === null ? '-' : <Nav.Link style={{ color: '#007bff' }} onClick={(e) => handleImagePreview(e, q.image)}>{q.image.name}</Nav.Link>}</td>
             <td>{q.body === '' ? '-' : `"${q.body.toString()}"`}</td>
             <td>
               <ol>
@@ -212,10 +237,29 @@ const ExamForm = () => {
             <Tab title='Add a Question' eventKey='addQuestion'>
               <QuestionForm onSave={onQuestionFormSave} onDiscard={onQuestionFormDiscard} />
             </Tab>
+            <Tab title='Edit Existing Question' eventKey='editQuestion' disabled >
+              <EditQuestionForm onSave={onEditQuestionFormSave} onDiscard={onEditQuestionFormDiscard} question={questionToEdit} />
+            </Tab>
           </Tabs>
         </Col>
       </Row>
-      <Button variant='outline-warning' onClick={() => alert(questions)}>Check Questions</Button>
+
+
+      <Modal show={showImagePreview}>
+        <Modal.Header>
+          <Modal.Title>{imagePreview?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Image
+            style={{ width: '100%' }}
+            src={imagePreview === null ? null : URL.createObjectURL(imagePreview)}></Image>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => setShowImagePreview(false)}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Button variant='outline-warning' onClick={() => alert(questions[0].body)}>Check Questions</Button>
     </>
   )
 }
