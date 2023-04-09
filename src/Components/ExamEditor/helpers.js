@@ -6,10 +6,13 @@ import redAlert from '../../assets/svgs/red-alert-icon.svg'
 
 
 const isQuestionSane = (question) => {
-  if (question.body === '' ||
+  if (
+    question.body === '' ||
     question.answers.length <= 1 ||
     question.correctAnswers.length === 0 ||
-    question.correctAnswers.length === question.answers.length) {
+    question.correctAnswers.length === question.answers.length
+
+  ) {
     return false
   }
   return true

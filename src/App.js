@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import * as Components from './Components'
+import * as Components from './components'
 import { User } from './classes'
 
 
