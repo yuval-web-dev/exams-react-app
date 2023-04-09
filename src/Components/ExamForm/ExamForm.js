@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Container, Row, Col, Table, Button, ButtonGroup, Form, Tabs, Tab } from 'react-bootstrap'
+import { Row, Col, Table, Button, ButtonGroup, Form, Tabs, Tab } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import TimePicker from 'react-bootstrap-time-picker';
 import DatePicker from 'react-datepicker'; import 'react-datepicker/dist/react-datepicker.css';
@@ -11,7 +11,7 @@ import { Exam, Question } from "../../classes.js"
 import QuestionForm from '../QuestionForm/QuestionForm.js';
 
 
-const ExamEditor = ({ user }) => {
+const ExamForm = () => {
   const [questions, setQuestions] = useState([])
   const [subject, setSubject] = useState('')
   const [date, setDate] = useState(null)
@@ -71,18 +71,19 @@ const ExamEditor = ({ user }) => {
   }
 
   return (
-    <Container>
+    <>
       <Row>
         <Col>
           <Table responsive>
             <tbody>
               <tr>
                 <td>Author</td>
-                <td>{`${user.surname}, ${user.firstname}`}</td>
+                {/* <td>{`${user.surname}, ${user.firstname}`}</td> */}
+                <td>Surname, Firstname</td>
               </tr>
               <tr>
                 <td>Exam ID</td>
-                <td>someid...</td>
+                <td>uid</td>
                 {/* <td style={{ fontFamily: 'consolas' }}>{`${exam.eid}`}</td> */}
               </tr>
               <tr>
@@ -134,8 +135,8 @@ const ExamEditor = ({ user }) => {
           </Tabs>
         </Col>
       </Row>
-    </Container>
+    </>
   )
 }
 
-export default ExamEditor
+export default ExamForm

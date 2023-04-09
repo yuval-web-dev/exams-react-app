@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import * as Components from './components'
+import * as pages from './pages'
 import { User } from './classes'
 
 
@@ -29,10 +29,11 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path='/' element={<Components.Home />} />
-      <Route path='/editor' element={<Components.ExamEditor user={user} />} />
-      <Route path='/tester' element={< Components.ApiTester />} />
-      <Route path='/*' element={< Components.NotFound />} />
+      <Route path='/' element={<pages.home />} />
+      <Route path='/edit' element={<pages.editor />} />
+      <Route path='/test' element={<pages.tester />} />
+      <Route path='/about' element={<pages.about />} />
+      <Route path='/*' element={< pages.notFound />} />
     </Routes>
   )
 }

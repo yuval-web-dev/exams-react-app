@@ -121,7 +121,7 @@ const QuestionForm = ({ onSave, onDiscard }) => {
   }
 
   return (
-    <Row>
+    <Row className='border'>
       <Col>
         <Table>
           <tbody>

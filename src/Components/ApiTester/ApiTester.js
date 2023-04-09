@@ -15,9 +15,8 @@ const ApiTester = () => {
   }
 
   return (
-    <Container variant='fluid'>
-      <h1>API Tester</h1>
-      <Row className='d-flex flex-column'>
+    <>
+      <Row>
         <Col>
           <input multiple type='file' accept='image/*' onChange={InputOnChangeHandler}></input>
         </Col>
@@ -25,7 +24,7 @@ const ApiTester = () => {
           <Button onClick={ButtonOnClickHandler}>Submit Uploads</Button>
         </Col>
       </Row>
-    </Container >
+    </>
   )
 }
 
