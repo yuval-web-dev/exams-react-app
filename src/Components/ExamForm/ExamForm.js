@@ -259,7 +259,7 @@ const ExamForm = () => {
         </Modal.Footer>
       </Modal>
 
-      <Button variant='outline-warning' onClick={() => alert(questions[0].body)}>Check Questions</Button>
+      <Button variant='outline-warning' onClick={() => alert(questions[0].body)}>TEST</Button>
     </>
   )
 }

@@ -16,8 +16,9 @@ const QuestionForm = ({ onSave, onDiscard }) => {
   const [corrects, setCorrects] = useState([])
   const [isRandomized, setIsRandomized] = useState(false)
 
-  const imageInputRef = useRef(null);
-  const answerFormRef = useRef(null);
+  const jsonInputRef = useRef(null)
+  const imageInputRef = useRef(null)
+  const answerFormRef = useRef(null)
 
   const resetForm = () => {
     setBody('')
@@ -65,7 +66,6 @@ const QuestionForm = ({ onSave, onDiscard }) => {
       setCorrects([...corrects, answerToToggle])
     }
   }
-
 
   const handleQuestionDiscard = () => {
     // TODO popup window: "are you sure?"
@@ -122,6 +122,43 @@ const QuestionForm = ({ onSave, onDiscard }) => {
     }
   }
 
+  const handleJsonUpload = (file) => {
+    if (file.type !== 'application/json') {
+      alert('not JSON!')
+      return
+    }
+    const reader = new FileReader()
+
+    reader.onload = function (e) {
+      const json = JSON.parse(e?.target?.result)
+      const keys = Object.keys(json)
+      const possibleKeys = ['body', 'answers', 'corrects', 'isRandomized']
+      if (!keys.every(key => (possibleKeys.includes(key)))) {
+        alert('bad JSON')
+        return
+      }
+      if (json.hasOwnProperty('body')) {
+        setBody(json.body)
+      }
+
+      if (json.hasOwnProperty('answers')) {
+        setAnswers(json.answers)
+      }
+
+      if (json.hasOwnProperty('corrects')) {
+        setCorrects(json.corrects)
+      }
+
+      if (json.hasOwnProperty('isRandomized')) {
+        setIsRandomized(json.isRandomized)
+      }
+    }
+    reader.readAsText(file)
+
+    jsonInputRef.current.value = ''
+
+  }
+
   const renderAnswers = () => {
     return (
       answers.map((answer, idx) => {
@@ -157,6 +194,19 @@ const QuestionForm = ({ onSave, onDiscard }) => {
       <Col xs={12}>
         <Table responsive className='align-middle'>
           <tbody>
+            <tr>
+              <td>From JSON</td>
+              <td>
+                <Form>
+                  <Form.Control
+                    ref={jsonInputRef}
+                    type='file'
+                    accept='.json'
+                    onChange={e => handleJsonUpload(e?.target?.files[0])}
+                  />
+                </Form>
+              </td>
+            </tr>
             <tr>
               <td>Image</td>
               <td>
