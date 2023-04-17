@@ -10,7 +10,7 @@ const editor = () => {
   return (
     <>
       <AppNav />
-      <Container fluid >
+      <Container >
         <ExamForm />
       </Container>
     </>

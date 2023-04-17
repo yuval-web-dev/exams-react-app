@@ -169,6 +169,18 @@ const ExamForm = () => {
           <Table responsive className='align-middle'>
             <tbody>
               <tr>
+                <td>Import from JSON</td>
+                <td>
+
+                </td>
+              </tr>
+              <tr>
+                <td>Export to JSON</td>
+                <td>
+
+                </td>
+              </tr>
+              <tr>
                 <td>Author</td>
                 {/* <td>{`${user.surname}, ${user.firstname}`}</td> */}
                 <td>Surname, Firstname</td>
@@ -258,8 +270,6 @@ const ExamForm = () => {
           <Button onClick={() => setShowImagePreview(false)}>Close</Button>
         </Modal.Footer>
       </Modal>
-
-      <Button variant='outline-warning' onClick={() => alert(questions[0].body)}>TEST</Button>
     </>
   )
 }

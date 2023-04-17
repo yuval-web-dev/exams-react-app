@@ -8,6 +8,7 @@ import greenCheck from '../../assets/svg/green-checkmark-icon.svg'
 import redCross from '../../assets/svg/red-x-icon.svg'
 import { Question } from '../../classes'
 
+// TODO merge QuestionForm and EditQuestionForm!
 
 const QuestionForm = ({ onSave, onDiscard }) => {
   const [body, setBody] = useState('')
@@ -15,6 +16,9 @@ const QuestionForm = ({ onSave, onDiscard }) => {
   const [answers, setAnswers] = useState([])
   const [corrects, setCorrects] = useState([])
   const [isRandomized, setIsRandomized] = useState(false)
+
+  const [jsonImport, setJsonImportFile] = useState(null)
+  const [jsonExportName, setJsonExportName] = useState('')
 
   const jsonInputRef = useRef(null)
   const imageInputRef = useRef(null)
@@ -26,11 +30,19 @@ const QuestionForm = ({ onSave, onDiscard }) => {
     setAnswers([])
     setCorrects([])
     setIsRandomized(false)
+
+    setJsonImportFile(null)
+    setJsonExportName('')
+
+    jsonInputRef.current.value = ''
+    imageInputRef.current.value = ''
+    answerFormRef.current.value = ''
   }
 
   const handleImageChange = (e) => {
     if (e.target.files.length === 1) {
       setImage(e.target.files[0])
+      imageInputRef.current.value = ''
     }
   }
 
@@ -122,41 +134,63 @@ const QuestionForm = ({ onSave, onDiscard }) => {
     }
   }
 
-  const handleJsonUpload = (file) => {
-    if (file.type !== 'application/json') {
+  const handleJsonChange = (newFile) => {
+    if (!newFile) {
+      return
+    }
+    if (newFile.type !== 'application/json') {
       alert('not JSON!')
       return
     }
+    setJsonImportFile(newFile)
+  }
+
+  const handleJsonImport = () => {
     const reader = new FileReader()
 
     reader.onload = function (e) {
-      const json = JSON.parse(e?.target?.result)
-      const keys = Object.keys(json)
+      const jsonParsed = JSON.parse(e.target.result)
+      const keys = Object.keys(jsonParsed)
       const possibleKeys = ['body', 'answers', 'corrects', 'isRandomized']
       if (!keys.every(key => (possibleKeys.includes(key)))) {
-        alert('bad JSON')
+        alert('bad JSON!')
         return
       }
-      if (json.hasOwnProperty('body')) {
-        setBody(json.body)
+      if (jsonParsed.hasOwnProperty('body')) {
+        setBody(jsonParsed.body)
       }
 
-      if (json.hasOwnProperty('answers')) {
-        setAnswers(json.answers)
+      if (jsonParsed.hasOwnProperty('answers')) {
+        setAnswers(jsonParsed.answers)
       }
 
-      if (json.hasOwnProperty('corrects')) {
-        setCorrects(json.corrects)
+      if (jsonParsed.hasOwnProperty('corrects')) {
+        setCorrects(jsonParsed.corrects)
       }
 
-      if (json.hasOwnProperty('isRandomized')) {
-        setIsRandomized(json.isRandomized)
+      if (jsonParsed.hasOwnProperty('isRandomized')) {
+        setIsRandomized(jsonParsed.isRandomized)
       }
     }
-    reader.readAsText(file)
+    reader.readAsText(jsonImport)
+  }
 
-    jsonInputRef.current.value = ''
-
+  const handleJsonExport = () => {
+    const data = {
+      body,
+      answers,
+      corrects,
+      isRandomized
+    }
+    const json = JSON.stringify(data)
+    const element = document.createElement('a')
+    element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
+    // element.setAttribute('download', `${jsonName === '' ? 'question' : jsonName}.json`)
+    element.setAttribute('download', `${jsonExportName === '' ? 'untitled_question' : jsonExportName}.json`)
+    element.style.display = 'none'
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
   }
 
   const renderAnswers = () => {
@@ -202,9 +236,30 @@ const QuestionForm = ({ onSave, onDiscard }) => {
                     ref={jsonInputRef}
                     type='file'
                     accept='.json'
-                    onChange={e => handleJsonUpload(e?.target?.files[0])}
-                  />
+                    multiple={false}
+                    onChange={(e) => handleJsonChange(e?.target?.files[0])} />
                 </Form>
+              </td>
+              <td>
+                <Button
+                  disabled={jsonImport === null}
+                  onClick={() => handleJsonImport()}>Import</Button>
+              </td>
+            </tr>
+            <tr>
+              <td>To JSON</td>
+              <td>
+                <Form.Control
+                  value={jsonExportName}
+                  // This pattern should allow only alnum chars, underscores, and hyphens,
+                  //  with the condition that the string must start with a letter and end with an alnum chars:
+                  pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
+                  placeholder='Name the JSON export file...'
+                  onChange={(e) => setJsonExportName(e?.target?.value)}
+                />
+              </td>
+              <td>
+                <Button onClick={() => handleJsonExport()}>Export</Button>
               </td>
             </tr>
             <tr>
@@ -218,11 +273,11 @@ const QuestionForm = ({ onSave, onDiscard }) => {
                   onClick={e => imageInputRef.current.click()} />
                 <input
                   type='file'
+                  accept='image/png, image/jpeg, image/gif, image/webp'
                   ref={imageInputRef}
                   style={{ display: 'none' }}
                   onChange={e => handleImageChange(e)} />
               </td>
-              <td />
               <td>
                 <Button
                   variant='light'
@@ -239,7 +294,6 @@ const QuestionForm = ({ onSave, onDiscard }) => {
                   pattern='[A-Za-z0-9]+'
                   onChange={e => setBody(e?.target?.value)} />
               </td>
-              <td />
               <td>
                 <Button
                   variant='light'
@@ -255,7 +309,6 @@ const QuestionForm = ({ onSave, onDiscard }) => {
                   spellCheck='true'
                   pattern='[A-Za-z0-9]+' />
               </td>
-              <td></td>
               <td>
                 <ButtonGroup>
                   <Button
@@ -277,7 +330,6 @@ const QuestionForm = ({ onSave, onDiscard }) => {
                   onChange={e => setIsRandomized((prevState) => !prevState)} />
               </td>
             </tr>
-
           </tbody>
         </Table>
       </Col>

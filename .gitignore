@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 temp.txt
 /src/Components/Home/temp.txt
+
+questions_db
