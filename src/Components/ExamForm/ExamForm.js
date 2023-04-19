@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react'
-import { Row, Col, Table, Button, ButtonGroup, Form, Tabs, Tab, Modal, Image, Nav } from 'react-bootstrap'
+import { Row, Col, Table, Button, ButtonGroup, Form, Tabs, Tab, Nav } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import TimePicker from 'react-bootstrap-time-picker'
 import DatePicker from 'react-datepicker'; import 'react-datepicker/dist/react-datepicker.css'
 import RangeSlider from 'react-bootstrap-range-slider'
 
-import consts from './consts.js'
 
+// Components
+import QuestionForm from '../QuestionForm/QuestionForm.js'
+import ImagePreview from '../ImagePreview/ImagePreview.js'
+
+// Javascript
+import consts from './consts.js'
 import isQuestionSane from '../helpers.js'
 
-import { Exam, Question } from "../../classes.js"
-
-import QuestionForm from '../QuestionForm/QuestionForm.js'
-import EditQuestionForm from '../EditQuestionForm/EditQuestionForm.js'
-
+// Assets
 import greenCheck from '../../assets/svg/green-checkmark-icon.svg'
 import redAlert from '../../assets/svg/red-alert-icon.svg'
 
 
 const ExamForm = () => {
+  // Form value states
   const [questions, setQuestions] = useState([])
   const [subject, setSubject] = useState('')
   const [date, setDate] = useState(null)
@@ -27,18 +29,21 @@ const ExamForm = () => {
   const [duration, setDuration] = useState(consts.minDuration)
   const [isRandomized, setIsRandomized] = useState(false)
 
+  // Bootstrap Tabs component states
   const [questionToEdit, setQuestionToEdit] = useState(null)
+  const [activeTab, setActiveTab] = useState('all')
 
-  const [activeTab, setActiveTab] = useState('questions')
-
-  const [imagePreview, setImagePreview] = useState(null)
+  // ImagePreview component states (to be sent as props)
+  const [selectedQuestionImage, setSelectedQuestionImage] = useState(null)
   const [showImagePreview, setShowImagePreview] = useState(false)
 
-  // UseEffect hook:
+  // UseEffect hook
   const useEffectFunc = () => { }
   let useEffectDependancyArr = []
   useEffect(useEffectFunc, useEffectDependancyArr)
 
+
+  // Event handlers
   const handleStartTimeChange = (newStartTime) => {
     setStartTime(newStartTime)
     setEndTime(newStartTime + (duration * 60))
@@ -91,7 +96,7 @@ const ExamForm = () => {
 
   const handleQuestionEdit = (question) => {
     setQuestionToEdit(question)
-    setActiveTab('editQuestion')
+    setActiveTab('form')
   }
 
   const handleQuestionDiscard = (questionToDiscard) => {
@@ -102,40 +107,41 @@ const ExamForm = () => {
     }
   }
 
-  const onQuestionFormSave = (newQuestion) => {
-    setQuestions([...questions, newQuestion])
-    setActiveTab('questions')
+  const handleQuestionFormSave = (newQuestion, isEditing) => {
+    if (isEditing === true) {
+      const oldQuestionIdx = questions.indexOf(questionToEdit)
+      let newQuestions = [...questions]
+      newQuestions[oldQuestionIdx] = newQuestion
+      setQuestions(newQuestions)
+      setActiveTab('all')
+    }
+    else {
+      setQuestions([...questions, newQuestion])
+      setActiveTab('all')
+    }
   }
 
-  const onQuestionFormDiscard = () => {
-    setActiveTab('questions')
+  const handleQuestionFormDiscard = () => {
+    setActiveTab('all')
   }
 
-  const onEditQuestionFormSave = (modifiedQuestion) => {
-    const oldQuestionIdx = questions.indexOf(questionToEdit)
-    let newQuestions = [...questions]
-    newQuestions[oldQuestionIdx] = modifiedQuestion
-    setQuestions(newQuestions)
-    setActiveTab('questions')
-  }
-
-  const onEditQuestionFormDiscard = () => {
-    setActiveTab('questions')
-  }
-
-  const handleImagePreview = (e, image) => {
-    e.preventDefault()
-    setImagePreview(image)
+  const handleImageLinkClick = (image) => {
+    setSelectedQuestionImage(image)
     setShowImagePreview(true)
   }
 
+  const handleImagePreviewClose = () => {
+    setShowImagePreview(false)
+  }
+
+  // Renderers
   const renderQuestions = () => {
     return (
       questions.map((q, idx) => {
         return (
           <tr key={idx.toString()} id={idx}>
             <td>{idx + 1}</td>
-            <td>{q.image === null ? '-' : <Nav.Link style={{ color: '#007bff' }} onClick={(e) => handleImagePreview(e, q.image)}>{q.image.name}</Nav.Link>}</td>
+            <td>{q.image === null ? '-' : <Nav.Link style={{ color: '#007bff' }} onClick={() => handleImageLinkClick(q.image)}>{q.image.name}</Nav.Link>}</td>
             <td>{q.body === '' ? '-' : `"${q.body.toString()}"`}</td>
             <td>
               <ol>
@@ -161,6 +167,8 @@ const ExamForm = () => {
       })
     )
   }
+
+
 
   return (
     <>
@@ -230,7 +238,7 @@ const ExamForm = () => {
       <Row>
         <Col>
           <Tabs activeKey={activeTab} onSelect={eventKey => setActiveTab(eventKey)}>
-            <Tab title='Questions' eventKey='questions'>
+            <Tab title='All Questions' eventKey='all'>
               <Table hover responsive className='align-middle'>
                 <thead>
                   <th>#</th>
@@ -246,30 +254,15 @@ const ExamForm = () => {
                 </tbody>
               </Table>
             </Tab>
-            <Tab title='Add a Question' eventKey='addQuestion'>
-              <QuestionForm onSave={onQuestionFormSave} onDiscard={onQuestionFormDiscard} />
-            </Tab>
-            <Tab title='Edit Existing Question' eventKey='editQuestion' disabled >
-              <EditQuestionForm onSave={onEditQuestionFormSave} onDiscard={onEditQuestionFormDiscard} question={questionToEdit} />
+            <Tab title='Question Form' eventKey='form'>
+              <QuestionForm onSave={handleQuestionFormSave} onDiscard={handleQuestionFormDiscard} question={questionToEdit} />
             </Tab>
           </Tabs>
         </Col>
       </Row>
 
 
-      <Modal show={showImagePreview}>
-        <Modal.Header>
-          <Modal.Title>{imagePreview?.name}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Image
-            style={{ width: '100%' }}
-            src={imagePreview === null ? null : URL.createObjectURL(imagePreview)}></Image>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={() => setShowImagePreview(false)}>Close</Button>
-        </Modal.Footer>
-      </Modal>
+      <ImagePreview image={selectedQuestionImage} show={showImagePreview} onClose={handleImagePreviewClose} />
     </>
   )
 }

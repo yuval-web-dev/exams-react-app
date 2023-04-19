@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Row, Col, Form, Button, Image, ButtonGroup, Table } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import equal from 'fast-deep-equal'
@@ -10,7 +10,10 @@ import { Question } from '../../classes'
 
 // TODO merge QuestionForm and EditQuestionForm!
 
-const QuestionForm = ({ onSave, onDiscard }) => {
+const QuestionForm = ({ onSave, onDiscard, question }) => {
+  // This will be true if we were redirected to this form by clicking 'Edit' on one of the questions in the 'all' tab
+  const [isEditing, setIsEditing] = useState(false)
+
   const [body, setBody] = useState('')
   const [image, setImage] = useState(null)
   const [answers, setAnswers] = useState([])
@@ -24,7 +27,20 @@ const QuestionForm = ({ onSave, onDiscard }) => {
   const imageInputRef = useRef(null)
   const answerFormRef = useRef(null)
 
+  useEffect(() => {
+    if (question !== null) {
+      setIsEditing(true)
+      setBody(question.body)
+      setImage(question.image)
+      setAnswers(question.answers)
+      setCorrects(question.correctAnswers)
+      setIsRandomized(question.isRandomized)
+    }
+  }, [question])
+
   const resetForm = () => {
+    setIsEditing(false)
+
     setBody('')
     setImage(null)
     setAnswers([])
@@ -96,7 +112,7 @@ const QuestionForm = ({ onSave, onDiscard }) => {
     newQuestion.correctAnswers = corrects
     newQuestion.isRandomized = isRandomized
 
-    onSave(newQuestion)
+    onSave(newQuestion, isEditing)
     resetForm()
   }
 
