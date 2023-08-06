@@ -1,9 +1,7 @@
 import React from 'react'
-import { Container } from 'react-bootstrap'
+import { Container, Row, Col } from 'react-bootstrap'
 
-import ExamForm from '../../components/ExamForm/ExamForm.js'
-import AppNav from '../../components/AppNav/AppNav.js'
-
+import { ClosedExamForm, MetadataForm, AppNav } from '../../components'
 
 const editor = () => {
 
@@ -11,7 +9,11 @@ const editor = () => {
     <>
       <AppNav />
       <Container >
-        <ExamForm />
+        <Row>
+          <Col md={4}><MetadataForm /></Col>
+          <Col md={8}><ClosedExamForm /></Col>
+        </Row>
+
       </Container>
     </>
   )

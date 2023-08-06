@@ -1,33 +1,38 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Row, Col, Form, Button, Image, ButtonGroup, Table } from 'react-bootstrap'
+import React, { useState, useRef, useEffect } from 'react'
+import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
-import equal from 'fast-deep-equal'
 
+// Javascript
+import { Question } from '../../classes'
+import { saveImageToCache, getImageFromCache } from '../helpers.js'
+import consts from './consts.js'
+
+// Assets
 import placeholder from '../../assets/png/placeholder.png'
 import greenCheck from '../../assets/svg/green-checkmark-icon.svg'
 import redCross from '../../assets/svg/red-x-icon.svg'
-import { Question } from '../../classes'
-
-// TODO merge QuestionForm and EditQuestionForm!
 
 const QuestionForm = ({ onSave, onDiscard, question }) => {
-  // This will be true if we were redirected to this form by clicking 'Edit' on one of the questions in the 'all' tab
-  const [isEditing, setIsEditing] = useState(false)
+  // States
+  const [isEditing, setIsEditing] = useState(false) // 'true' if the user was redirected here by clicking 'Edit' in the 'all' tab.
+  const [jsonImport, setJsonImport] = useState(null) // The actual JSON file uploaded via input
+  const [jsonExport, setJsonExport] = useState('') // The name of the to-be exported JSON file
 
+  // Form values states
   const [body, setBody] = useState('')
-  const [image, setImage] = useState(null)
-  const [answers, setAnswers] = useState([])
-  const [corrects, setCorrects] = useState([])
+  const [image, setImage] = useState(null) // file
+  const [imageUrl, setImageUrl] = useState(null)
+  const [answers, setAnswers] = useState([]) // [string, string, ...]
+  const [corrects, setCorrects] = useState([]) // [string, string, ...]
   const [isRandomized, setIsRandomized] = useState(false)
 
-  const [jsonImport, setJsonImportFile] = useState(null)
-  const [jsonExportName, setJsonExportName] = useState('')
-
+  // Refs
   const jsonInputRef = useRef(null)
   const imageInputRef = useRef(null)
   const answerFormRef = useRef(null)
 
-  useEffect(() => {
+  // UseEffect
+  const effect = () => {
     if (question !== null) {
       setIsEditing(true)
       setBody(question.body)
@@ -36,30 +41,21 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
       setCorrects(question.correctAnswers)
       setIsRandomized(question.isRandomized)
     }
-  }, [question])
-
-  const resetForm = () => {
-    setIsEditing(false)
-
-    setBody('')
-    setImage(null)
-    setAnswers([])
-    setCorrects([])
-    setIsRandomized(false)
-
-    setJsonImportFile(null)
-    setJsonExportName('')
-
-    jsonInputRef.current.value = ''
-    imageInputRef.current.value = ''
-    answerFormRef.current.value = ''
   }
+  const dependancy = [question]
+  useEffect(effect, dependancy)
 
-  const handleImageChange = (e) => {
-    if (e.target.files.length === 1) {
-      setImage(e.target.files[0])
-      imageInputRef.current.value = ''
-    }
+  // Handlers
+  const handleImageChange = async (newImage) => {
+    // Set the states
+    setImage(newImage)
+    setImageUrl(URL.createObjectURL(newImage))
+
+    // Save image to cache
+    await saveImageToCache(newImage)
+
+    // Update the input to be empty to allow same file consecutive upload
+    imageInputRef.current.value = ''
   }
 
   const handleImageClear = () => {
@@ -97,23 +93,21 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
 
   const handleQuestionDiscard = () => {
     // TODO popup window: "are you sure?"
-
     onDiscard()
-    resetForm()
+    cleanForm()
   }
 
   const handleQuestionSave = () => {
     // TODO sanity check
-
     const newQuestion = new Question()
     newQuestion.image = image
     newQuestion.body = body
     newQuestion.answers = answers
     newQuestion.correctAnswers = corrects
-    newQuestion.isRandomized = isRandomized
+    newQuestion.shuffled = isRandomized
 
     onSave(newQuestion, isEditing)
-    resetForm()
+    cleanForm()
   }
 
   const handleAnswerChange = (idx, newAnswer) => {
@@ -151,23 +145,27 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   }
 
   const handleJsonChange = (newFile) => {
-    if (!newFile) {
+    const allowedTypes = ['application/json']
+    if (newFile === undefined) {
       return
     }
-    if (newFile.type !== 'application/json') {
-      alert('not JSON!')
-      return
+    else if (!allowedTypes.includes(newFile?.type)) {
+      alert(`Allowed file types: ${[...allowedTypes]}`)
+      setJsonImport(null)
     }
-    setJsonImportFile(newFile)
+    else {
+      setJsonImport(newFile)
+    }
+    jsonInputRef.current.value = ''
   }
 
   const handleJsonImport = () => {
     const reader = new FileReader()
 
-    reader.onload = function (e) {
+    reader.onload = async (e) => {
       const jsonParsed = JSON.parse(e.target.result)
       const keys = Object.keys(jsonParsed)
-      const possibleKeys = ['body', 'answers', 'corrects', 'isRandomized']
+      const possibleKeys = ['body', 'image', 'answers', 'corrects', 'isRandomized']
       if (!keys.every(key => (possibleKeys.includes(key)))) {
         alert('bad JSON!')
         return
@@ -175,7 +173,27 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
       if (jsonParsed.hasOwnProperty('body')) {
         setBody(jsonParsed.body)
       }
+      if (jsonParsed.hasOwnProperty('image')) {
+        const imageName = jsonParsed.image
+        const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
 
+        if (storedImageBlob === null) {
+          alert(`Could not find '${imageName}' in cache`)
+        }
+        else {
+          // const storedImageData = URL.createObjectURL(storedImageBlob)
+          // const storedImage = new Image()
+          // storedImage.onload = () => {
+          //   setImageUrl(storedImage)
+          // }
+          // storedImage.src = storedImageData
+          // setImageUrl(storedImageData)
+          const storedImageData = URL.createObjectURL(storedImageBlob)
+          const storedImage = new Image()
+          storedImage.src = storedImageData
+          setImageUrl(storedImage)
+        }
+      }
       if (jsonParsed.hasOwnProperty('answers')) {
         setAnswers(jsonParsed.answers)
       }
@@ -189,11 +207,14 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
       }
     }
     reader.readAsText(jsonImport)
+
+    setJsonImport(null)
   }
 
   const handleJsonExport = () => {
     const data = {
       body,
+      image: image.name,
       answers,
       corrects,
       isRandomized
@@ -202,13 +223,14 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
     const element = document.createElement('a')
     element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
     // element.setAttribute('download', `${jsonName === '' ? 'question' : jsonName}.json`)
-    element.setAttribute('download', `${jsonExportName === '' ? 'untitled_question' : jsonExportName}.json`)
+    element.setAttribute('download', `${jsonExport === '' ? 'untitled_question' : jsonExport}.json`)
     element.style.display = 'none'
     document.body.appendChild(element)
     element.click()
     document.body.removeChild(element)
   }
 
+  // Renderers
   const renderAnswers = () => {
     return (
       answers.map((answer, idx) => {
@@ -239,10 +261,28 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
     )
   }
 
+  // Cleaners
+  const cleanForm = () => {
+    setIsEditing(false)
+
+    setBody('')
+    setImage(null)
+    setAnswers([])
+    setCorrects([])
+    setIsRandomized(false)
+
+    setJsonImport(null)
+    setJsonExport('')
+
+    jsonInputRef.current.value = ''
+    imageInputRef.current.value = ''
+    answerFormRef.current.value = ''
+  }
+
   return (
     <Row>
       <Col xs={12}>
-        <Table responsive className='align-middle'>
+        <Table responsive borderless className='align-middle'>
           <tbody>
             <tr>
               <td>From JSON</td>
@@ -253,7 +293,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
                     type='file'
                     accept='.json'
                     multiple={false}
-                    onChange={(e) => handleJsonChange(e?.target?.files[0])} />
+                    onChange={e => handleJsonChange(e?.target?.files[0])} />
                 </Form>
               </td>
               <td>
@@ -266,12 +306,12 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
               <td>To JSON</td>
               <td>
                 <Form.Control
-                  value={jsonExportName}
+                  value={jsonExport}
                   // This pattern should allow only alnum chars, underscores, and hyphens,
                   //  with the condition that the string must start with a letter and end with an alnum chars:
                   pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
                   placeholder='Name the JSON export file...'
-                  onChange={(e) => setJsonExportName(e?.target?.value)}
+                  onChange={e => setJsonExport(e?.target?.value)}
                 />
               </td>
               <td>
@@ -281,18 +321,24 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
             <tr>
               <td>Image</td>
               <td>
-                <Image
-                  src={image === null ? placeholder : URL.createObjectURL(image)}
+                <BootstrapImage
+                  // src={image === null ? placeholder : URL.createObjectURL(image)}
+                  src={image === null ? placeholder : imageUrl}
                   style={{ height: '200px', width: '400px', objectFit: 'cover' }}
                   className='img-fluid border border-2'
                   alt='image depicting the question'
                   onClick={e => imageInputRef.current.click()} />
                 <input
                   type='file'
-                  accept='image/png, image/jpeg, image/gif, image/webp'
+                  accept={consts.acceptedImageTypes}
                   ref={imageInputRef}
                   style={{ display: 'none' }}
-                  onChange={e => handleImageChange(e)} />
+                  onChange={async e => {
+                    // Check prevents possible crash when user does not select any file in dialog
+                    if (e?.target?.files?.length === 1) {
+                      handleImageChange(e?.target?.files[0])
+                    }
+                  }} />
               </td>
               <td>
                 <Button
@@ -313,7 +359,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
               <td>
                 <Button
                   variant='light'
-                  onClick={e => setBody('')}>Clear</Button>
+                  onClick={() => setBody('')}>Clear</Button>
               </td>
             </tr>
             <tr>
@@ -332,7 +378,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
                     onClick={e => answerFormRef.current.value = ''}>Clear</Button>
                   <Button
                     variant='primary'
-                    onClick={e => handleAnswerAdd()}>Add</Button>
+                    onClick={handleAnswerAdd}>Add</Button>
                 </ButtonGroup>
               </td>
             </tr>
@@ -343,7 +389,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
                   checked={isRandomized}
                   offlabel='No'
                   onlabel='Yes'
-                  onChange={e => setIsRandomized((prevState) => !prevState)} />
+                  onChange={() => setIsRandomized(!isRandomized)} />
               </td>
             </tr>
           </tbody>
@@ -352,10 +398,12 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
       <Col xs={12}>
         <Table hover responsive className='align-middle'>
           <thead>
-            <th>#</th>
-            <th>Body</th>
-            <th>Correct</th>
-            <th>Actions</th>
+            <tr>
+              <th>#</th>
+              <th>Body</th>
+              <th>Correct</th>
+              <th>Actions</th>
+            </tr>
           </thead>
           <tbody>
             {renderAnswers()}
@@ -364,10 +412,13 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
       </Col>
       <Col xs={12}>
         <ButtonGroup>
-          <Button variant='warning' onClick={e => handleQuestionDiscard()}>Discard</Button>
-          <Button variant='primary' onClick={e => handleQuestionSave()}>Save</Button>
+          <Button variant='warning' onClick={handleQuestionDiscard}>Discard</Button>
+          <Button variant='primary' onClick={handleQuestionSave}>Save</Button>
         </ButtonGroup>
       </Col>
+      <Button variant='outline-danger' onClick={() => {
+        alert(image)
+      }}>Test</Button>
     </Row>
   )
 }
