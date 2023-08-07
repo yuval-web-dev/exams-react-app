@@ -2,20 +2,19 @@ import React, { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import * as pages from './pages'
-import { User } from './classes'
 
 
 const App = () => {
 
-  const [user, setUser] = useState(new User())
+  // const [user, setUser] = useState(new User())
 
   // A function that describes what side effects to perform,
   //  such as fetching data from an API or adding an event listener.
   const useEffectFunc = () => {
-    const loggeddUser = new User() // Author
-    loggeddUser.firstname = 'Jim'
-    loggeddUser.surname = 'Kurose'
-    setUser(loggeddUser)
+    // const loggeddUser = new User() // Author
+    // loggeddUser.firstname = 'Jim'
+    // loggeddUser.surname = 'Kurose'
+    // setUser(loggeddUser)
   }
 
   // controls when the side effect should run.

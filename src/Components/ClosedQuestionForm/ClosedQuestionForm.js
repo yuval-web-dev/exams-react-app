@@ -3,14 +3,12 @@ import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table } f
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 // Javascript
-import { ClosedQuestion } from '../../classes'
+import { ClosedQuestion } from '../../classes.ts'
 import { saveImageToCache, getImageFromCache } from '../helpers.js'
 import consts from './consts.js'
 
 // Assets
-import placeholder from '../../assets/png/placeholder.png'
-import greenCheck from '../../assets/svg/green-checkmark-icon.svg'
-import redCross from '../../assets/svg/red-x-icon.svg'
+import { green, red } from '../../assets/svg'
 
 const QuestionForm = ({ onSave, onDiscard, question }) => {
   // States
@@ -19,37 +17,39 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   const [jsonExport, setJsonExport] = useState('') // The name of the to-be exported JSON file
 
   // Form values states
+  const [type, setType] = useState('text')
   const [body, setBody] = useState('')
-  const [img, setImg] = useState({ img: File = null, alt: string = null }) // file
-  const [imageUrl, setImageUrl] = useState(null)
+  const [imgFile, setImgFile] = useState(null) // file
+  const [imgAlt, setImgAlt] = useState('')
+  // const [imageUrl, setImageUrl] = useState(null)
   const [answers, setAnswers] = useState([])
   const [correct, setCorrect] = useState(null)
   const [shuffle, setShuffle] = useState(false)
 
   // Refs
   const jsonInputRef = useRef(null)
-  const imageInputRef = useRef(null)
+  const imgInputRef = useRef(null)
   const answerFormRef = useRef(null)
 
   // UseEffect
-  const effect = () => {
-    if (question !== null) {
-      setIsEditing(true)
-      setBody(question.body)
-      setImg(question.image)
-      setAnswers(question.answers)
-      setCorrect(question.correctAnswers)
-      setShuffle(question.isRandomized)
-    }
-  }
-  const dependancy = [question]
-  useEffect(effect, dependancy)
+  // const effect = () => {
+  //   if (question !== null) {
+  //     setIsEditing(true)
+  //     setBody(question.body)
+  //     setImg(question.image)
+  //     setAnswers(question.answers)
+  //     setCorrect(question.correctAnswers)
+  //     setShuffle(question.isRandomized)
+  //   }
+  // }
+  // const dependancy = [question]
+  // useEffect(effect, dependancy)
 
   // Handlers
   const handleImageChange = async (e) => {
     // Set the states
     const newImage = e.target.files[0]
-    setImg(newImage)
+    setImgFile(newImage)
     // setImageUrl(URL.createObjectURL(newImage))
 
     // // Save image to cache
@@ -60,36 +60,32 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   }
 
   const handleImageClear = () => {
-    setImg(null)
-    // imageInputRef.current.value = ''
+    setImgFile(null)
+    imgInputRef.current.value = ''
   }
 
   const handleAnswerAdd = () => {
     const newAnswer = answerFormRef.current.value.trim()
-    if (newAnswer !== '') {
-      setAnswers([...answers, newAnswer])
-      answerFormRef.current.value = ''
+    if (answers.includes(newAnswer)) {
+      // TODO add a modal to inform answer already exists
     }
+    else {
+      setAnswers([...answers, newAnswer])
+    }
+    answerFormRef.current.value = ''
   }
 
   const handleAnswerDiscard = (idx, answerToDiscard) => {
     const newAnswers = [...answers]
     newAnswers.splice(idx, 1)
     setAnswers(newAnswers)
-    if (correct.includes(answerToDiscard)) {
-      const newCorrectAnswers = correct.filter((answer) => answer !== answerToDiscard);
-      setCorrect(newCorrectAnswers);
+    if (correct === answerToDiscard) {
+      setCorrect(null)
     }
   }
 
   const handleAnswerToggleCorrect = (answerToToggle) => {
-    if (correct.includes(answerToToggle)) {
-      const newCorrectAnswers = correct.filter((answer) => answer !== answerToToggle);
-      setCorrect(newCorrectAnswers);
-    }
-    else {
-      setCorrect([...correct, answerToToggle])
-    }
+    setCorrect(answerToToggle)
   }
 
   const handleQuestionDiscard = () => {
@@ -99,16 +95,16 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   }
 
   const handleQuestionSave = () => {
-    // TODO sanity check
-    const q = new ClosedQuestion(
-      img != null ? { img: bodyImg, alt: bodyImgAlt } : bodyText,
-      answers,
-      correct,
-      shuffle
-    )
+    // // TODO sanity check
+    // const q = new ClosedQuestion(
+    //   type === 'image' ? { img: imgFile, alt: imgAlt } : body,
+    //   answers,
+    //   correct,
+    //   shuffle
+    // )
 
-    onSave(newQuestion, isEditing)
-    cleanForm()
+    // onSave(newQuestion, isEditing)
+    // cleanForm()
   }
 
   const handleAnswerChange = (idx, newAnswer) => {
@@ -161,74 +157,74 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   }
 
   const handleJsonImport = () => {
-    const reader = new FileReader()
+    // const reader = new FileReader()
 
-    reader.onload = async (e) => {
-      const jsonParsed = JSON.parse(e.target.result)
-      const keys = Object.keys(jsonParsed)
-      const possibleKeys = ['body', 'image', 'answers', 'corrects', 'isRandomized']
-      if (!keys.every(key => (possibleKeys.includes(key)))) {
-        alert('bad JSON!')
-        return
-      }
-      if (jsonParsed.hasOwnProperty('body')) {
-        setBody(jsonParsed.body)
-      }
-      if (jsonParsed.hasOwnProperty('image')) {
-        const imageName = jsonParsed.image
-        const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
+    // reader.onload = async (e) => {
+    //   const jsonParsed = JSON.parse(e.target.result)
+    //   const keys = Object.keys(jsonParsed)
+    //   const possibleKeys = ['body', 'image', 'answers', 'corrects', 'isRandomized']
+    //   if (!keys.every(key => (possibleKeys.includes(key)))) {
+    //     alert('bad JSON!')
+    //     return
+    //   }
+    //   if (jsonParsed.hasOwnProperty('body')) {
+    //     setBody(jsonParsed.body)
+    //   }
+    //   if (jsonParsed.hasOwnProperty('image')) {
+    //     const imageName = jsonParsed.image
+    //     const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
 
-        if (storedImageBlob === null) {
-          alert(`Could not find '${imageName}' in cache`)
-        }
-        else {
-          // const storedImageData = URL.createObjectURL(storedImageBlob)
-          // const storedImage = new Image()
-          // storedImage.onload = () => {
-          //   setImageUrl(storedImage)
-          // }
-          // storedImage.src = storedImageData
-          // setImageUrl(storedImageData)
-          const storedImageData = URL.createObjectURL(storedImageBlob)
-          const storedImage = new Image()
-          storedImage.src = storedImageData
-          setImageUrl(storedImage)
-        }
-      }
-      if (jsonParsed.hasOwnProperty('answers')) {
-        setAnswers(jsonParsed.answers)
-      }
+    //     if (storedImageBlob === null) {
+    //       alert(`Could not find '${imageName}' in cache`)
+    //     }
+    //     else {
+    //       // const storedImageData = URL.createObjectURL(storedImageBlob)
+    //       // const storedImage = new Image()
+    //       // storedImage.onload = () => {
+    //       //   setImageUrl(storedImage)
+    //       // }
+    //       // storedImage.src = storedImageData
+    //       // setImageUrl(storedImageData)
+    //       const storedImageData = URL.createObjectURL(storedImageBlob)
+    //       const storedImage = new Image()
+    //       storedImage.src = storedImageData
+    //       setImageUrl(storedImage)
+    //     }
+    //   }
+    //   if (jsonParsed.hasOwnProperty('answers')) {
+    //     setAnswers(jsonParsed.answers)
+    //   }
 
-      if (jsonParsed.hasOwnProperty('corrects')) {
-        setCorrect(jsonParsed.corrects)
-      }
+    //   if (jsonParsed.hasOwnProperty('corrects')) {
+    //     setCorrect(jsonParsed.corrects)
+    //   }
 
-      if (jsonParsed.hasOwnProperty('isRandomized')) {
-        setShuffle(jsonParsed.isRandomized)
-      }
-    }
-    reader.readAsText(jsonImport)
+    //   if (jsonParsed.hasOwnProperty('isRandomized')) {
+    //     setShuffle(jsonParsed.isRandomized)
+    //   }
+    // }
+    // reader.readAsText(jsonImport)
 
-    setJsonImport(null)
+    // setJsonImport(null)
   }
 
   const handleJsonExport = () => {
-    const data = {
-      body,
-      image: img.name,
-      answers,
-      corrects: correct,
-      isRandomized: shuffle
-    }
-    const json = JSON.stringify(data)
-    const element = document.createElement('a')
-    element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
-    // element.setAttribute('download', `${jsonName === '' ? 'question' : jsonName}.json`)
-    element.setAttribute('download', `${jsonExport === '' ? 'untitled_question' : jsonExport}.json`)
-    element.style.display = 'none'
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
+    // const data = {
+    //   body,
+    //   image: img.name,
+    //   answers,
+    //   corrects: correct,
+    //   isRandomized: shuffle
+    // }
+    // const json = JSON.stringify(data)
+    // const element = document.createElement('a')
+    // element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
+    // // element.setAttribute('download', `${jsonName === '' ? 'question' : jsonName}.json`)
+    // element.setAttribute('download', `${jsonExport === '' ? 'untitled_question' : jsonExport}.json`)
+    // element.style.display = 'none'
+    // document.body.appendChild(element)
+    // element.click()
+    // document.body.removeChild(element)
   }
 
   // Renderers
@@ -238,15 +234,18 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
         return (
           <tr key={idx.toString()} id={idx}>
             <td>{idx + 1}</td>
-
             <td>
-              <Form.Control type='text' value={answer} onChange={e => handleAnswerChange(idx, e?.target?.value)} />
+              {/* <Form.Control type='text' value={answer} onChange={e => handleAnswerChange(idx, e?.target?.value)} /> */}
+              {answers[idx]}
             </td>
             <td>
               <Button
                 variant='light'
-                onClick={() => handleAnswerToggleCorrect(answer)}>
-                <img src={correct.includes(answer) ? greenCheck : redCross} height='30px' />
+                onClick={() => handleAnswerToggleCorrect(answer)}
+                disabled={(correct === answer) ? true : false}>
+                <img
+                  src={correct === answer ? green : red}
+                  height='30px' />
               </Button>
             </td>
             <td>
@@ -254,7 +253,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
                 <Button variant='light' onClick={() => handleMoveUp(answer, idx)}>⯅</Button>
                 <Button variant='light' onClick={() => handleMoveDown(answer, idx)}>⯆</Button>
               </ButtonGroup>
-              <Button variant='light' onClick={e => handleAnswerDiscard(idx, answer)}>Discard</Button>
+              <Button variant='light' onClick={() => handleAnswerDiscard(idx, answer)}>Discard</Button>
             </td>
           </tr>
         )
@@ -264,20 +263,20 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
 
   // Cleaners
   const cleanForm = () => {
-    setIsEditing(false)
+    // setIsEditing(false)
 
-    setBody('')
-    setImg(null)
-    setAnswers([])
-    setCorrect([])
-    setShuffle(false)
+    // setBody('')
+    // setImg(null)
+    // setAnswers([])
+    // setCorrect([])
+    // setShuffle(false)
 
-    setJsonImport(null)
-    setJsonExport('')
+    // setJsonImport(null)
+    // setJsonExport('')
 
-    jsonInputRef.current.value = ''
-    imageInputRef.current.value = ''
-    answerFormRef.current.value = ''
+    // jsonInputRef.current.value = ''
+    // imageInputRef.current.value = ''
+    // answerFormRef.current.value = ''
   }
 
   return (
@@ -324,6 +323,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
               <td>
                 <Form>
                   <Form.Control
+                    ref={imgInputRef}
                     type='file'
                     accept='image/*'
                     multiple={false}
@@ -333,7 +333,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
               <td>
                 <Button
                   variant='light'
-                  onClick={e => handleImageClear()}>Clear</Button>
+                  onClick={handleImageClear}>Clear</Button>
               </td>
             </tr>
             <tr>

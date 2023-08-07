@@ -134,7 +134,7 @@ const MetadataForm = () => {
         <Col>
           <Table responsive borderless className='align-middle'>
             <tbody>
-              <tr>
+              {/* <tr>
                 <td>From JSON</td>
                 <td>
                   <Form>
@@ -167,8 +167,8 @@ const MetadataForm = () => {
                 <td>
                   <Button onClick={() => handleJsonExport()}>Export</Button>
                 </td>
-              </tr>
-              <tr>
+              </tr> */}
+              {/* <tr>
                 <td>Type</td>
                 <td>
                   <BootstrapSwitchButton
@@ -179,17 +179,17 @@ const MetadataForm = () => {
                     width={100}
                     onChange={handleExamTypeChange} />
                 </td>
-              </tr>
-              <tr>
+              </tr> */}
+              {/* <tr>
                 <td>Author</td>
-                {/* <td>{`${user.surname}, ${user.firstname}`}</td> */}
+                <td>{`${user.surname}, ${user.firstname}`}</td>
                 <td>Surname, Firstname</td>
               </tr>
               <tr>
                 <td>Exam ID</td>
                 <td>uid</td>
-                {/* <td style={{ fontFamily: 'consolas' }}>{`${exam.eid}`}</td> */}
-              </tr>
+                <td style={{ fontFamily: 'consolas' }}>{`${exam.eid}`}</td>
+              </tr> */}
               <tr>
                 <td>Subject</td>
                 <td><Form.Control type='text' onChange={e => setSubject(e?.target?.value)} spellCheck='true' style={{ fontWeight: 'bold' }} /></td>
@@ -216,8 +216,19 @@ const MetadataForm = () => {
                 <td>Time Slot</td>
                 <td>
                   <Row>
-                    <Col><TimePicker value={startTime} step={30} start={consts.earliestHourStr} end={consts.latestHourStr} onChange={newTime => handleStartTimeChange(newTime)} /></Col>
-                    <Col><TimePicker value={endTime} step={1} style={{ pointerEvents: 'none' }} /></Col>
+                    <Col>
+                      <TimePicker
+                        value={startTime}
+                        step={30}
+                        start={consts.earliestHourStr}
+                        end={consts.latestHourStr}
+                        onChange={newTime => handleStartTimeChange(newTime)} />
+                    </Col>
+                    <Col>
+                      <TimePicker
+                        value={endTime}
+                        style={{ pointerEvents: 'none' }} />
+                    </Col>
                   </Row>
                 </td>
                 <td><Button variant='light' onClick={() => handleTimeReset()}>Reset</Button></td>
