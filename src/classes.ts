@@ -3,17 +3,17 @@ import { v4 as uuidv4 } from 'uuid'
 class ClosedQuestion {
   id: string = uuidv4()
   constructor(
-    body: string | { image: File, alt: string }, // either text question or image question
-    answers: string[],
-    correct: string,
-    shuffled: boolean
+    public body: string | File, // either text question or image question
+    public answers: string[],
+    public correct: string,
+    public shuffled: boolean
   ) { }
 }
 
 class OpenQuestion {
   id: string = uuidv4()
   constructor(
-    body: string | { image: File, alt: string }, // either text question or image question
+    public body: string | File // either text question or image question
   ) { }
 }
 

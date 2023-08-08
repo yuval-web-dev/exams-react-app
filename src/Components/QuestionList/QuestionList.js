@@ -1,10 +1,7 @@
 import React, { useState } from 'react'
 import { Table, Button, ButtonGroup, Nav } from 'react-bootstrap'
 
-import { green, red } from '../../assets/svg'
-
-const QuestionList = () => {
-  const [questions, setQuestions] = useState([])
+const QuestionList = ({ questions, setQuestions }) => {
   const [selectedQuestionImage, setSelectedQuestionImage] = useState(null)
 
   const [showImagePreview, setShowImagePreview] = useState(false)
@@ -23,32 +20,50 @@ const QuestionList = () => {
   //   }
   // }
 
-  const renderQuestions = () => {
+  const renderAnswers = (question) => {
     return (
-      questions.map((q, idx) => {
+      <ol>{
+        question.answers.map(answer => {
+          return (
+            <li style={answer === question.correct ? { color: 'green', fontWeight: 'bold' } : {}}>
+              {answer}
+            </li>
+          )
+        })
+      }
+      </ol>
+    )
+  }
+
+
+
+  const renderQuestions = (questions) => {
+    return (
+      questions.map((question, idx) => {
         return (
-          <tr key={idx.toString()} id={idx}>
-            <td>{idx + 1}</td>
-            <td>{q.image === null ? '-' : <Nav.Link style={{ color: '#007bff' }} onClick={() => handleImageLinkClick(q.image)}>{q.image.name}</Nav.Link>}</td>
-            <td>{q.body === '' ? '-' : `"${q.body.toString()}"`}</td>
+          <tr key={question.id}>
             <td>
-              <ol>
-                {q.answers.length === 0 ? '-' : q.answers.map((answer) => {
-                  return (
-                    <li style={q.correctAnswers.includes(answer) ? { color: 'green', fontWeight: 'bold' } : {}}>{`"${answer}"`}</li>
-                  )
-                })}
-              </ol>
+              {idx + 1}
             </td>
-            <td>{q.isRandomized === true ? 'Yes' : 'No'}</td>
-            {/* <td>{isQuestionSane(q) ? <img src={green} width='35px' /> : <img src={red} width='35px' />}</td> */}
+            <td>
+              {typeof question.body === 'string' ? 'Text' : 'Image'}
+            </td>
+            <td>
+              {typeof question.body === 'string' ? question.body : <Nav><Nav.Link eventKey=''>{question.body.name}</Nav.Link></Nav>}
+            </td>
+            <td>
+              {renderAnswers(question)}
+            </td>
+            <td>
+              {question.shuffled ? 'Yes' : 'No'}
+            </td>
             <td>
               <ButtonGroup>
-                <Button variant='light' onClick={() => handleMoveUp(q, idx)}>⯅</Button>
-                <Button variant='light' onClick={() => handleMoveDown(q, idx)}>⯆</Button>
+                <Button variant='light' onClick={() => handleMoveUp(question, idx)}>⯅</Button>
+                <Button variant='light' onClick={() => handleMoveDown(question, idx)}>⯆</Button>
               </ButtonGroup>
-              <Button variant='primary' onClick={() => handleQuestionEdit(q)}>Edit</Button>
-              <Button variant='light' onClick={() => handleQuestionDiscard(q)}>Discard</Button>
+              <Button variant='primary' onClick={() => handleQuestionEdit(question)}>Edit</Button>
+              <Button variant='light' onClick={() => handleQuestionDiscard(question)}>Discard</Button>
             </td>
           </tr>
         )
@@ -103,12 +118,11 @@ const QuestionList = () => {
           <th>Body</th>
           <th>Answers</th>
           <th>Shuffled</th>
-          {/* <th>Sanity</th> */}
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {renderQuestions()}
+        {renderQuestions(questions)}
       </tbody>
     </Table>
   )

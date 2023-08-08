@@ -8,8 +8,14 @@ import QuestionForm from '../../components/ClosedQuestionForm/ClosedQuestionForm
 const Editor = () => {
   const [activeKey, setActiveKey] = useState('metadata')
 
+  const [questions, setQuestions] = useState([])
+
   const onTabSelect = (selectedTab) => {
     setActiveKey(selectedTab)
+  }
+
+  const onQuestionFormSave = (newQuestion) => {
+    setQuestions([...questions, newQuestion])
   }
 
   return (
@@ -27,13 +33,13 @@ const Editor = () => {
           <Tab
             title='All Questions'
             eventKey='questions'>
-            <QuestionList />
+            <QuestionList questions={questions} setQuestions={setQuestions} />
           </Tab>
 
           <Tab
             title='New Question'
             eventKey='new question'>
-            <QuestionForm />
+            <QuestionForm onSave={onQuestionFormSave} />
           </Tab>
         </Tabs>
       </Container>

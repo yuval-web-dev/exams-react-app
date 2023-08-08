@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table } from 'react-bootstrap'
+import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table, Container } from 'react-bootstrap'
 import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 
 // Javascript
@@ -10,7 +10,7 @@ import consts from './consts.js'
 // Assets
 import { green, red } from '../../assets/svg'
 
-const QuestionForm = ({ onSave, onDiscard, question }) => {
+const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   // States
   const [isEditing, setIsEditing] = useState(false) // 'true' if the user was redirected here by clicking 'Edit' in the 'all' tab.
   const [jsonImport, setJsonImport] = useState(null) // The actual JSON file uploaded via input
@@ -18,9 +18,9 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
 
   // Form values states
   const [type, setType] = useState('text')
-  const [body, setBody] = useState('')
-  const [imgFile, setImgFile] = useState(null) // file
-  const [imgAlt, setImgAlt] = useState('')
+  const [text, setText] = useState('')
+  const [image, setImage] = useState(null)
+
   // const [imageUrl, setImageUrl] = useState(null)
   const [answers, setAnswers] = useState([])
   const [correct, setCorrect] = useState(null)
@@ -28,7 +28,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
 
   // Refs
   const jsonInputRef = useRef(null)
-  const imgInputRef = useRef(null)
+  const imageInputRef = useRef(null)
   const answerFormRef = useRef(null)
 
   // UseEffect
@@ -49,7 +49,7 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   const handleImageChange = async (e) => {
     // Set the states
     const newImage = e.target.files[0]
-    setImgFile(newImage)
+    setImage(newImage)
     // setImageUrl(URL.createObjectURL(newImage))
 
     // // Save image to cache
@@ -60,8 +60,8 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   }
 
   const handleImageClear = () => {
-    setImgFile(null)
-    imgInputRef.current.value = ''
+    setImage(null)
+    imageInputRef.current.value = ''
   }
 
   const handleAnswerAdd = () => {
@@ -91,19 +91,32 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
   const handleQuestionDiscard = () => {
     // TODO popup window: "are you sure?"
     onDiscard()
-    cleanForm()
+    // cleanForm()
   }
 
   const handleQuestionSave = () => {
-    // // TODO sanity check
-    // const q = new ClosedQuestion(
-    //   type === 'image' ? { img: imgFile, alt: imgAlt } : body,
-    //   answers,
-    //   correct,
-    //   shuffle
-    // )
+    // sanity check
+    if (answers.length < 2) {
+      // popup modal
+      return
+    }
+    if (type === 'text' && correct === null) {
+      // popup modal
+      return
+    }
+    if (type === 'image' && image === null) {
+      // popup modal
+      return
+    }
 
-    // onSave(newQuestion, isEditing)
+    const newQuestion = new ClosedQuestion(
+      type === 'text' ? text : image,
+      answers,
+      correct,
+      shuffle
+    )
+
+    onSave(newQuestion)
     // cleanForm()
   }
 
@@ -141,93 +154,92 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
     }
   }
 
-  const handleJsonChange = (newFile) => {
-    const allowedTypes = ['application/json']
-    if (newFile === undefined) {
-      return
-    }
-    else if (!allowedTypes.includes(newFile?.type)) {
-      alert(`Allowed file types: ${[...allowedTypes]}`)
-      setJsonImport(null)
-    }
-    else {
-      setJsonImport(newFile)
-    }
-    jsonInputRef.current.value = ''
-  }
+  // const handleJsonChange = (newFile) => {
+  //   const allowedTypes = ['application/json']
+  //   if (newFile === undefined) {
+  //     return
+  //   }
+  //   else if (!allowedTypes.includes(newFile?.type)) {
+  //     alert(`Allowed file types: ${[...allowedTypes]}`)
+  //     setJsonImport(null)
+  //   }
+  //   else {
+  //     setJsonImport(newFile)
+  //   }
+  //   jsonInputRef.current.value = ''
+  // }
 
-  const handleJsonImport = () => {
-    // const reader = new FileReader()
+  // const handleJsonImport = () => {
+  //   // const reader = new FileReader()
 
-    // reader.onload = async (e) => {
-    //   const jsonParsed = JSON.parse(e.target.result)
-    //   const keys = Object.keys(jsonParsed)
-    //   const possibleKeys = ['body', 'image', 'answers', 'corrects', 'isRandomized']
-    //   if (!keys.every(key => (possibleKeys.includes(key)))) {
-    //     alert('bad JSON!')
-    //     return
-    //   }
-    //   if (jsonParsed.hasOwnProperty('body')) {
-    //     setBody(jsonParsed.body)
-    //   }
-    //   if (jsonParsed.hasOwnProperty('image')) {
-    //     const imageName = jsonParsed.image
-    //     const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
+  //   // reader.onload = async (e) => {
+  //   //   const jsonParsed = JSON.parse(e.target.result)
+  //   //   const keys = Object.keys(jsonParsed)
+  //   //   const possibleKeys = ['body', 'image', 'answers', 'corrects', 'isRandomized']
+  //   //   if (!keys.every(key => (possibleKeys.includes(key)))) {
+  //   //     alert('bad JSON!')
+  //   //     return
+  //   //   }
+  //   //   if (jsonParsed.hasOwnProperty('body')) {
+  //   //     setBody(jsonParsed.body)
+  //   //   }
+  //   //   if (jsonParsed.hasOwnProperty('image')) {
+  //   //     const imageName = jsonParsed.image
+  //   //     const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
 
-    //     if (storedImageBlob === null) {
-    //       alert(`Could not find '${imageName}' in cache`)
-    //     }
-    //     else {
-    //       // const storedImageData = URL.createObjectURL(storedImageBlob)
-    //       // const storedImage = new Image()
-    //       // storedImage.onload = () => {
-    //       //   setImageUrl(storedImage)
-    //       // }
-    //       // storedImage.src = storedImageData
-    //       // setImageUrl(storedImageData)
-    //       const storedImageData = URL.createObjectURL(storedImageBlob)
-    //       const storedImage = new Image()
-    //       storedImage.src = storedImageData
-    //       setImageUrl(storedImage)
-    //     }
-    //   }
-    //   if (jsonParsed.hasOwnProperty('answers')) {
-    //     setAnswers(jsonParsed.answers)
-    //   }
+  //   //     if (storedImageBlob === null) {
+  //   //       alert(`Could not find '${imageName}' in cache`)
+  //   //     }
+  //   //     else {
+  //   //       // const storedImageData = URL.createObjectURL(storedImageBlob)
+  //   //       // const storedImage = new Image()
+  //   //       // storedImage.onload = () => {
+  //   //       //   setImageUrl(storedImage)
+  //   //       // }
+  //   //       // storedImage.src = storedImageData
+  //   //       // setImageUrl(storedImageData)
+  //   //       const storedImageData = URL.createObjectURL(storedImageBlob)
+  //   //       const storedImage = new Image()
+  //   //       storedImage.src = storedImageData
+  //   //       setImageUrl(storedImage)
+  //   //     }
+  //   //   }
+  //   //   if (jsonParsed.hasOwnProperty('answers')) {
+  //   //     setAnswers(jsonParsed.answers)
+  //   //   }
 
-    //   if (jsonParsed.hasOwnProperty('corrects')) {
-    //     setCorrect(jsonParsed.corrects)
-    //   }
+  //   //   if (jsonParsed.hasOwnProperty('corrects')) {
+  //   //     setCorrect(jsonParsed.corrects)
+  //   //   }
 
-    //   if (jsonParsed.hasOwnProperty('isRandomized')) {
-    //     setShuffle(jsonParsed.isRandomized)
-    //   }
-    // }
-    // reader.readAsText(jsonImport)
+  //   //   if (jsonParsed.hasOwnProperty('isRandomized')) {
+  //   //     setShuffle(jsonParsed.isRandomized)
+  //   //   }
+  //   // }
+  //   // reader.readAsText(jsonImport)
 
-    // setJsonImport(null)
-  }
+  //   // setJsonImport(null)
+  // }
 
-  const handleJsonExport = () => {
-    // const data = {
-    //   body,
-    //   image: img.name,
-    //   answers,
-    //   corrects: correct,
-    //   isRandomized: shuffle
-    // }
-    // const json = JSON.stringify(data)
-    // const element = document.createElement('a')
-    // element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
-    // // element.setAttribute('download', `${jsonName === '' ? 'question' : jsonName}.json`)
-    // element.setAttribute('download', `${jsonExport === '' ? 'untitled_question' : jsonExport}.json`)
-    // element.style.display = 'none'
-    // document.body.appendChild(element)
-    // element.click()
-    // document.body.removeChild(element)
-  }
+  // const handleJsonExport = () => {
+  //   // const data = {
+  //   //   body,
+  //   //   image: img.name,
+  //   //   answers,
+  //   //   corrects: correct,
+  //   //   isRandomized: shuffle
+  //   // }
+  //   // const json = JSON.stringify(data)
+  //   // const element = document.createElement('a')
+  //   // element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
+  //   // // element.setAttribute('download', `${jsonName === '' ? 'question' : jsonName}.json`)
+  //   // element.setAttribute('download', `${jsonExport === '' ? 'untitled_question' : jsonExport}.json`)
+  //   // element.style.display = 'none'
+  //   // document.body.appendChild(element)
+  //   // element.click()
+  //   // document.body.removeChild(element)
+  // }
 
-  // Renderers
   const renderAnswers = () => {
     return (
       answers.map((answer, idx) => {
@@ -261,7 +273,6 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
     )
   }
 
-  // Cleaners
   const cleanForm = () => {
     // setIsEditing(false)
 
@@ -279,135 +290,216 @@ const QuestionForm = ({ onSave, onDiscard, question }) => {
     // answerFormRef.current.value = ''
   }
 
+  const ImageInput = () => (
+    <Form.Control
+      ref={imageInputRef}
+      type='file'
+      accept='image/*'
+      multiple={false}
+      onChange={handleImageChange} />
+  )
+
+  const ImageClearButton = () => (
+    <Button
+      variant='light'
+      onClick={handleImageClear}>Clear</Button>
+  )
+
+  const TextInput = () => (
+    <Form.Control
+      type='text'
+      spellCheck='true'
+      pattern='[A-Za-z0-9]+'
+      onChange={(e) => { setText(e.target.value) }} />
+  )
+
+  const TextClearButton = () => (
+    <Button
+      variant='light'
+      onClick={() => { setText('') }}>Clear</Button>
+  )
+
+  const onTypeChange = () => {
+    if (type === 'text') { // from text to image
+      setType('image')
+      setText('')
+    }
+    else { // from image to text
+      setType('text')
+      setImage(null)
+    }
+  }
+
   return (
-    <Row>
-      <Col xl={12}>
-        <Table responsive borderless className='align-middle'>
-          <tbody>
-            {/* <tr>
-              <td>From JSON</td>
-              <td>
-                <Form>
-                  <Form.Control
-                    ref={jsonInputRef}
-                    type='file'
-                    accept='.json'
-                    multiple={false}
-                    onChange={e => handleJsonChange(e?.target?.files[0])} />
-                </Form>
-              </td>
-              <td>
-                <Button
-                  disabled={jsonImport === null}
-                  onClick={() => handleJsonImport()}>Import</Button>
-              </td>
-            </tr>
-            <tr>
-              <td>To JSON</td>
-              <td>
-                <Form.Control
-                  value={jsonExport}
-                  // This pattern should allow only alnum chars, underscores, and hyphens,
-                  //  with the condition that the string must start with a letter and end with an alnum chars:
-                  pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
-                  placeholder='Name the JSON export file...'
-                  onChange={e => setJsonExport(e?.target?.value)}
-                />
-              </td>
-              <td>
-                <Button onClick={() => handleJsonExport()}>Export</Button>
-              </td>
-            </tr> */}
-            <tr>
-              <td>Image</td>
-              <td>
-                <Form>
-                  <Form.Control
-                    ref={imgInputRef}
-                    type='file'
-                    accept='image/*'
-                    multiple={false}
-                    onChange={handleImageChange} />
-                </Form>
-              </td>
-              <td>
-                <Button
-                  variant='light'
-                  onClick={handleImageClear}>Clear</Button>
-              </td>
-            </tr>
-            <tr>
-              <td>Body</td>
-              <td>
-                <Form.Control
-                  value={body}
-                  type='text'
-                  spellCheck='true'
-                  pattern='[A-Za-z0-9]+'
-                  onChange={e => setBody(e?.target?.value)} />
-              </td>
-              <td>
-                <Button
-                  variant='light'
-                  onClick={() => setBody('')}>Clear</Button>
-              </td>
-            </tr>
-            <tr>
-              <td>New Answer</td>
-              <td>
-                <Form.Control
-                  ref={answerFormRef}
-                  type='text'
-                  spellCheck='true'
-                  pattern='[A-Za-z0-9]+' />
-              </td>
-              <td>
-                <ButtonGroup>
-                  <Button
-                    variant='light'
-                    onClick={e => answerFormRef.current.value = ''}>Clear</Button>
-                  <Button
-                    variant='primary'
-                    onClick={handleAnswerAdd}>Add</Button>
-                </ButtonGroup>
-              </td>
-            </tr>
-            <tr>
-              <td>Shuffle Answers</td>
-              <td>
-                <BootstrapSwitchButton
-                  checked={shuffle}
-                  offlabel='No'
-                  onlabel='Yes'
-                  onChange={() => setShuffle(!shuffle)} />
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Col>
-      <Col xs={12}>
-        <Table hover responsive className='align-middle'>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Body</th>
-              <th>Correct</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {renderAnswers()}
-          </tbody>
-        </Table>
-      </Col>
-      <Col xs={12}>
-        <ButtonGroup>
-          <Button variant='warning' onClick={handleQuestionDiscard}>Discard</Button>
-          <Button variant='primary' onClick={handleQuestionSave}>Save</Button>
-        </ButtonGroup>
-      </Col>
-    </Row>
+    // <Row>
+    //   <Col>
+    //     <Table borderless>
+    //       <tbody>
+    //         {/* <tr>
+    //           <td>From JSON</td>
+    //           <td>
+    //             <Form>
+    //               <Form.Control
+    //                 ref={jsonInputRef}
+    //                 type='file'
+    //                 accept='.json'
+    //                 multiple={false}
+    //                 onChange={e => handleJsonChange(e?.target?.files[0])} />
+    //             </Form>
+    //           </td>
+    //           <td>
+    //             <Button
+    //               disabled={jsonImport === null}
+    //               onClick={() => handleJsonImport()}>Import</Button>
+    //           </td>
+    //         </tr>
+    //         <tr>
+    //           <td>To JSON</td>
+    //           <td>
+    //             <Form.Control
+    //               value={jsonExport}
+    //               // This pattern should allow only alnum chars, underscores, and hyphens,
+    //               //  with the condition that the string must start with a letter and end with an alnum chars:
+    //               pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
+    //               placeholder='Name the JSON export file...'
+    //               onChange={e => setJsonExport(e?.target?.value)}
+    //             />
+    //           </td>
+    //           <td>
+    //             <Button onClick={() => handleJsonExport()}>Export</Button>
+    //           </td>
+    //         </tr> */}
+    //         <tr>
+    //           <td>
+    //             Question Type
+    //           </td>
+    //           <td>
+    //             <BootstrapSwitchButton
+    //               onstyle='light'
+    //               width={100}
+    //               offlabel={'Text'}
+    //               onlabel={'Image'}
+    //               onChange={onTypeChange} />
+    //           </td>
+    //         </tr>
+    //         {type === 'text' ? TextInput() : ImageInput()}
+    //         <tr>
+    //           <td>New Answer</td>
+    //           <td>
+    //             <Form.Control
+    //               ref={answerFormRef}
+    //               type='text'
+    //               spellCheck='true'
+    //               pattern='[A-Za-z0-9]+' />
+    //           </td>
+    //           <td>
+    //             <ButtonGroup>
+    //               <Button
+    //                 variant='light'
+    //                 onClick={e => answerFormRef.current.value = ''}>Clear</Button>
+    //               <Button
+    //                 variant='primary'
+    //                 onClick={handleAnswerAdd}>Add</Button>
+    //             </ButtonGroup>
+    //           </td>
+    //         </tr>
+    //         <tr>
+    //           <td>Shuffle Answers</td>
+    //           <td>
+    //             <BootstrapSwitchButton
+    //               checked={shuffle}
+    //               offlabel='No'
+    //               onlabel='Yes'
+    //               onChange={() => setShuffle(!shuffle)} />
+    //           </td>
+    //         </tr>
+    //       </tbody>
+    //     </Table>
+    //   </Col>
+    //   <Col xs={12}>
+    <Container>
+      <Row>
+        <Col xs={2}>Question Type</Col>
+        <Col xs={8}>
+          <BootstrapSwitchButton
+            onstyle='light'
+            width={100}
+            offlabel={'Text'}
+            onlabel={'Image'}
+            onChange={onTypeChange} />
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={2}>Body</Col>
+        <Col xs={8}>
+          {type === 'text' ? TextInput() : ImageInput()}
+        </Col>
+        <Col xs={2} >
+          {type === 'text' ? TextClearButton() : ImageClearButton()}
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={2}>New Answer</Col>
+        <Col xs={8}>
+          <Form.Control
+            ref={answerFormRef}
+            type='text'
+            spellCheck='true'
+            pattern='[A-Za-z0-9]+' />
+        </Col>
+        <Col xs={2}>
+          <ButtonGroup>
+            <Button
+              variant='light'
+              onClick={e => answerFormRef.current.value = ''}>Clear</Button>
+            <Button
+              variant='primary'
+              onClick={handleAnswerAdd}>Add</Button>
+          </ButtonGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={2}>
+          Shuffle Answers
+        </Col>
+        <Col md={8}>
+          <BootstrapSwitchButton
+            checked={shuffle}
+            offlabel='No'
+            onlabel='Yes'
+            onChange={() => setShuffle(!shuffle)} />
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          <Table hover responsive className='align-middle'>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Body</th>
+                <th>Correct</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {renderAnswers()}
+            </tbody>
+          </Table>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          <ButtonGroup>
+            <Button variant='warning' onClick={handleQuestionDiscard}>Discard</Button>
+            <Button variant='primary' onClick={handleQuestionSave}>Save</Button>
+          </ButtonGroup>
+        </Col>
+      </Row>
+
+
+
+    </Container>
   )
 }
 
-export default QuestionForm
+export default ClosedQuestionForm
