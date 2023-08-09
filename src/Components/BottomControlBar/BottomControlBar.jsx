@@ -1,5 +1,5 @@
-import React from 'react'
-import { Row, Col, ButtonGroup, Button } from 'react-bootstrap'
+import React from "react"
+import { Row, Col, ButtonGroup, Button } from "react-bootstrap"
 
 const BottomControlBar = ({ onDiscard, onSave }) => (
   <Row className="mt-3 border-top">

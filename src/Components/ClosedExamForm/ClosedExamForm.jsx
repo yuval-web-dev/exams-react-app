@@ -7,12 +7,12 @@ import RangeSlider from 'react-bootstrap-range-slider'
 
 
 // Components
-import QuestionForm from '../ClosedQuestionForm/ClosedQuestionForm.js'
-import ImagePreview from '../ImagePreview/ImagePreview.js'
+import QuestionForm from '../ClosedQuestionForm/ClosedQuestionForm'
+import ImagePreview from '../ImagePreview/ImagePreview'
 
 // Javascript
-import consts from './consts.js'
-import isQuestionSane from '../helpers.js'
+import consts from './consts'
+import isQuestionSane from '../helpers'
 
 // Assets
 import greenCheck from '../../assets/svg/green-checkmark-icon.svg'

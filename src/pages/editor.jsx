@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Container, Tabs, Tab } from 'react-bootstrap'
 
-import { QuestionList, MetadataForm, AppNav } from '../../components'
-import QuestionForm from '../../components/ClosedQuestionForm/ClosedQuestionForm'
+import { QuestionList, MetadataForm, Navs } from '../components'
+
+import QuestionForm from '../components/ClosedQuestionForm/ClosedQuestionForm'
 
 
 const Editor = () => {
@@ -20,7 +21,7 @@ const Editor = () => {
 
   return (
     <React.Fragment>
-      <AppNav />
+      <Navs.TopNavbar />
       <Container>
         <Tabs
           activeKey={activeKey}
@@ -43,6 +44,7 @@ const Editor = () => {
           </Tab>
         </Tabs>
       </Container>
+      <Navs.BottomNavbar />
     </React.Fragment>
   )
 }

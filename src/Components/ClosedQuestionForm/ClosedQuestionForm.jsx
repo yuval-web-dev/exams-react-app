@@ -4,9 +4,9 @@ import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 // Javascript
 import { ClosedQuestion } from "../../classes.ts"
-import { saveImageToCache, getImageFromCache } from "../helpers.js"
-import consts from "./consts.js"
-import { BottomControlBar } from "../../components"
+import { saveImageToCache, getImageFromCache } from "../helpers"
+import consts from "./consts"
+import { BottomControlBar } from "../index"
 
 // Assets
 import { green, red } from "../../assets/svg"

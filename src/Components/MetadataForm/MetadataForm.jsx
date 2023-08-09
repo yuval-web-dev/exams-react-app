@@ -1,24 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Container, Row, Col, Form, Button } from 'react-bootstrap'
-import BootstrapSwitchButton from 'bootstrap-switch-button-react'
-import TimePicker from 'react-bootstrap-time-picker'
-import DatePicker from 'react-datepicker'; import 'react-datepicker/dist/react-datepicker.css'
-import RangeSlider from 'react-bootstrap-range-slider'
+import React, { useState, useRef, useEffect } from "react"
+import { Container, Row, Col, Form, Button } from "react-bootstrap"
+import BootstrapSwitchButton from "bootstrap-switch-button-react"
+import TimePicker from "react-bootstrap-time-picker"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
+import RangeSlider from "react-bootstrap-range-slider"
 
-import BottomControlBar from '../BottomControlBar/BottomControlBar.js';
+import BottomControlBar from "../BottomControlBar/BottomControlBar"
 
 // Javascript
-import consts from './consts.js'
+import consts from "./consts.js"
 
 
 const MetadataForm = () => {
   // States
   const [jsonImport, setJsonImport] = useState(null) // The actual JSON file uploaded via input
-  const [jsonExport, setJsonExport] = useState('') // The name of the to-be exported JSON file
+  const [jsonExport, setJsonExport] = useState("") // The name of the to-be exported JSON file
 
   // Form values states
-  // const [type, setType] = useState('closed') // TODO implement this
-  const [subject, setSubject] = useState('')
+  // const [type, setType] = useState("closed") // TODO implement this
+  const [subject, setSubject] = useState("")
   const [date, setDate] = useState(consts.tomorrow)
   const [start, setStart] = useState(consts.minHour)
   const [duration, setDuration] = useState(consts.minDur)
@@ -33,7 +34,7 @@ const MetadataForm = () => {
 
   // Event handlers
   const handleExamTypeChange = (isChecked) => {
-    // const newType = isChecked ? 'closed' : 'open'
+    // const newType = isChecked ? "closed" : "open"
     // setType(newType)
     // console.log(newType)
   }
@@ -44,7 +45,7 @@ const MetadataForm = () => {
   }
 
   const handleJsonChange = (newFile) => {
-    const allowedTypes = ['application/json']
+    const allowedTypes = ["application/json"]
     if (newFile === undefined) {
       return
     }
@@ -55,14 +56,14 @@ const MetadataForm = () => {
     else {
       setJsonImport(newFile)
     }
-    jsonInputRef.current.value = ''
+    jsonInputRef.current.value = ""
   }
 
   const handleJsonImport = () => {
     // const reader = new FileReader()
 
     // reader.onload = function (e) {
-    //   const allowedKeys = ['questions', 'subject', 'date', 'startTime', 'duration', 'isRandomized']
+    //   const allowedKeys = ["questions", "subject", "date", "startTime", "duration", "isRandomized"]
 
     //   const jsonParsed = JSON.parse(e.target.result)
     //   const keys = Object.keys(jsonParsed)
@@ -71,19 +72,19 @@ const MetadataForm = () => {
     //     alert(`Allowed JSON keys: ${[...allowedKeys]}`)
     //     return
     //   }
-    //   if (jsonParsed.hasOwnProperty('questions')) {
+    //   if (jsonParsed.hasOwnProperty("questions")) {
     //     setQuestions(jsonParsed.questions)
     //   }
-    //   if (jsonParsed.hasOwnProperty('subject')) {
+    //   if (jsonParsed.hasOwnProperty("subject")) {
     //     setSubject(jsonParsed.subject)
     //   }
-    //   if (jsonParsed.hasOwnProperty('date')) {
+    //   if (jsonParsed.hasOwnProperty("date")) {
     //     setDate(jsonParsed.date)
     //   }
-    //   if (jsonParsed.hasOwnProperty('startTime')) {
+    //   if (jsonParsed.hasOwnProperty("startTime")) {
     //     setStart(jsonParsed.startTime)
     //   }
-    //   if (jsonParsed.hasOwnProperty('duration')) {
+    //   if (jsonParsed.hasOwnProperty("duration")) {
     //     setDuration(jsonParsed.subject)
     //   }
     // }
@@ -99,10 +100,10 @@ const MetadataForm = () => {
     //   duration
     // }
     // const json = JSON.stringify(data)
-    // const element = document.createElement('a')
-    // element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
-    // element.setAttribute('download', `${jsonExport === '' ? 'untitled_exam' : jsonExport}.json`)
-    // element.style.display = 'none'
+    // const element = document.createElement("a")
+    // element.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(json))
+    // element.setAttribute("download", `${jsonExport === "" ? "untitled_exam" : jsonExport}.json`)
+    // element.style.display = "none"
     // document.body.appendChild(element)
     // element.click()
     // document.body.removeChild(element)
@@ -190,17 +191,17 @@ const MetadataForm = () => {
       </Col>
       <Col xs={consts.col2Width}>
         <Row className={rowClass}>
-          <Col xs='9'>
+          <Col xs="9">
             <RangeSlider
-              size='lg'
+              size="lg"
               value={duration}
               step={30}
               min={30}
               max={180}
-              tooltip='off'
+              tooltip="off"
               onChange={e => setDuration(e.target.value)} />
           </Col>
-          <Col xs='3'>
+          <Col xs="3">
             {duration} Minutes
           </Col>
         </Row>
@@ -244,8 +245,8 @@ export default MetadataForm
                   <Form>
                     <Form.Control
                       ref={jsonInputRef}
-                      type='file'
-                      accept='.json'
+                      type="file"
+                      accept=".json"
                       multiple={false}
                       onChange={e => handleJsonChange(e?.target?.files[0])} />
                   </Form>
@@ -264,7 +265,7 @@ export default MetadataForm
                     // This pattern should allow only alnum chars, underscores, and hyphens,
                     //  with the condition that the string must start with a letter and end with an alnum chars:
                     pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
-                    placeholder='Name the JSON export file...'
+                    placeholder="Name the JSON export file..."
                     onChange={e => setJsonExport(e?.target?.value)}
                   />
                 </td>
@@ -277,9 +278,9 @@ export default MetadataForm
                 <td>
                   <BootstrapSwitchButton
                     checked={true}
-                    onstyle='light'
-                    onlabel='Closed'
-                    offlabel='Open'
+                    onstyle="light"
+                    onlabel="Closed"
+                    offlabel="Open"
                     width={100}
                     onChange={handleExamTypeChange} />
                 </td>
@@ -292,5 +293,5 @@ export default MetadataForm
               <tr>
                 <td>Exam ID</td>
                 <td>uid</td>
-                <td style={{ fontFamily: 'consolas' }}>{`${exam.eid}`}</td>
+                <td style={{ fontFamily: "consolas" }}>{`${exam.eid}`}</td>
               </tr> */}
