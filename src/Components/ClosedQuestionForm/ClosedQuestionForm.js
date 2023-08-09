@@ -1,25 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table, Container } from 'react-bootstrap'
-import BootstrapSwitchButton from 'bootstrap-switch-button-react'
+import React, { useState, useRef, useEffect } from "react"
+import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table, Container } from "react-bootstrap"
+import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 // Javascript
-import { ClosedQuestion } from '../../classes.ts'
-import { saveImageToCache, getImageFromCache } from '../helpers.js'
-import consts from './consts.js'
-import { BottomControlBar } from '../../components'
+import { ClosedQuestion } from "../../classes.ts"
+import { saveImageToCache, getImageFromCache } from "../helpers.js"
+import consts from "./consts.js"
+import { BottomControlBar } from "../../components"
 
 // Assets
-import { green, red } from '../../assets/svg'
+import { green, red } from "../../assets/svg"
 
 const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   // States
-  const [isEditing, setIsEditing] = useState(false) // 'true' if the user was redirected here by clicking 'Edit' in the 'all' tab.
+  const [isEditing, setIsEditing] = useState(false) // "true" if the user was redirected here by clicking "Edit" in the "all" tab.
   const [jsonImport, setJsonImport] = useState(null) // The actual JSON file uploaded via input
-  const [jsonExport, setJsonExport] = useState('') // The name of the to-be exported JSON file
+  const [jsonExport, setJsonExport] = useState("") // The name of the to-be exported JSON file
 
   // Form values states
-  const [type, setType] = useState('text')
-  const [text, setText] = useState('')
+  const [type, setType] = useState("text")
+  const [text, setText] = useState("")
   const [image, setImage] = useState(null)
 
   // const [imageUrl, setImageUrl] = useState(null)
@@ -57,12 +57,12 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
     // await saveImageToCache(newImage)
 
     // // Update the input to be empty to allow same file consecutive upload
-    // imageInputRef.current.value = ''
+    // imageInputRef.current.value = ""
   }
 
   const handleImageClear = () => {
     setImage(null)
-    imageInputRef.current.value = ''
+    imageInputRef.current.value = ""
   }
 
   const testStringPattern = (s, pattern) => {
@@ -98,10 +98,6 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
     }
   }
 
-  const handleAnswerToggleCorrect = (answerToToggle) => {
-    setCorrect(answerToToggle)
-  }
-
   const handleQuestionDiscard = () => {
     // TODO popup window: "are you sure?"
     // onDiscard()
@@ -114,17 +110,17 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
       // popup modal
       return
     }
-    if (type === 'text' && correct === null) {
+    if (type === "text" && correct === null) {
       // popup modal
       return
     }
-    if (type === 'image' && image === null) {
+    if (type === "image" && image === null) {
       // popup modal
       return
     }
 
     const newQuestion = new ClosedQuestion(
-      type === 'text' ? text : image,
+      type === "text" ? text : image,
       answers,
       correct,
       shuffle
@@ -155,7 +151,7 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   }
 
   // const handleJsonChange = (newFile) => {
-  //   const allowedTypes = ['application/json']
+  //   const allowedTypes = ["application/json"]
   //   if (newFile === undefined) {
   //     return
   //   }
@@ -166,7 +162,7 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   //   else {
   //     setJsonImport(newFile)
   //   }
-  //   jsonInputRef.current.value = ''
+  //   jsonInputRef.current.value = ""
   // }
 
   // const handleJsonImport = () => {
@@ -175,20 +171,20 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   //   // reader.onload = async (e) => {
   //   //   const jsonParsed = JSON.parse(e.target.result)
   //   //   const keys = Object.keys(jsonParsed)
-  //   //   const possibleKeys = ['body', 'image', 'answers', 'corrects', 'isRandomized']
+  //   //   const possibleKeys = ["body", "image", "answers", "corrects", "isRandomized"]
   //   //   if (!keys.every(key => (possibleKeys.includes(key)))) {
-  //   //     alert('bad JSON!')
+  //   //     alert("bad JSON!")
   //   //     return
   //   //   }
-  //   //   if (jsonParsed.hasOwnProperty('body')) {
+  //   //   if (jsonParsed.hasOwnProperty("body")) {
   //   //     setBody(jsonParsed.body)
   //   //   }
-  //   //   if (jsonParsed.hasOwnProperty('image')) {
+  //   //   if (jsonParsed.hasOwnProperty("image")) {
   //   //     const imageName = jsonParsed.image
   //   //     const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
 
   //   //     if (storedImageBlob === null) {
-  //   //       alert(`Could not find '${imageName}' in cache`)
+  //   //       alert(`Could not find "${imageName}" in cache`)
   //   //     }
   //   //     else {
   //   //       // const storedImageData = URL.createObjectURL(storedImageBlob)
@@ -204,15 +200,15 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   //   //       setImageUrl(storedImage)
   //   //     }
   //   //   }
-  //   //   if (jsonParsed.hasOwnProperty('answers')) {
+  //   //   if (jsonParsed.hasOwnProperty("answers")) {
   //   //     setAnswers(jsonParsed.answers)
   //   //   }
 
-  //   //   if (jsonParsed.hasOwnProperty('corrects')) {
+  //   //   if (jsonParsed.hasOwnProperty("corrects")) {
   //   //     setCorrect(jsonParsed.corrects)
   //   //   }
 
-  //   //   if (jsonParsed.hasOwnProperty('isRandomized')) {
+  //   //   if (jsonParsed.hasOwnProperty("isRandomized")) {
   //   //     setShuffle(jsonParsed.isRandomized)
   //   //   }
   //   // }
@@ -230,102 +226,126 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   //   //   isRandomized: shuffle
   //   // }
   //   // const json = JSON.stringify(data)
-  //   // const element = document.createElement('a')
-  //   // element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(json))
-  //   // // element.setAttribute('download', `${jsonName === '' ? 'question' : jsonName}.json`)
-  //   // element.setAttribute('download', `${jsonExport === '' ? 'untitled_question' : jsonExport}.json`)
-  //   // element.style.display = 'none'
+  //   // const element = document.createElement("a")
+  //   // element.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(json))
+  //   // // element.setAttribute("download", `${jsonName === "" ? "question" : jsonName}.json`)
+  //   // element.setAttribute("download", `${jsonExport === "" ? "untitled_question" : jsonExport}.json`)
+  //   // element.style.display = "none"
   //   // document.body.appendChild(element)
   //   // element.click()
   //   // document.body.removeChild(element)
   // }
 
-  const renderAnswers = () => {
-    return (
-      answers.map((answer, idx) => {
-        return (
-          <tr key={idx.toString()} id={idx}>
-            <td>{idx + 1}</td>
-            <td>
-              {/* <Form.Control type='text' value={answer} onChange={e => handleAnswerChange(idx, e?.target?.value)} /> */}
-              {answers[idx]}
-            </td>
-            <td>
-              <Button
-                variant='light'
-                onClick={() => handleAnswerToggleCorrect(answer)}
-                disabled={(correct === answer) ? true : false}>
-                <img
-                  src={correct === answer ? green : red}
-                  height='30px' />
-              </Button>
-            </td>
-            <td>
-              <ButtonGroup>
-                <Button variant='light' onClick={() => handleMoveUp(answer, idx)}>⯅</Button>
-                <Button variant='light' onClick={() => handleMoveDown(answer, idx)}>⯆</Button>
-              </ButtonGroup>
-              <Button variant='light' onClick={() => handleAnswerDiscard(idx, answer)}>Discard</Button>
-            </td>
-          </tr>
-        )
-      })
-    )
+  const style = {
+    correct: { backgroundColor: `rgba(80, 224, 120, 0.1)` },
+    wrong: { backgroundColor: `rgba(224, 80, 80, 0.1)` }
   }
+
+  const buttonVariant = "outline-light"
+
+  const AnswersTable = () => (
+    <Table
+      hover={true}
+      responsive={true}>
+      <tbody>
+        {answers.map((answer, idx) => {
+          return (
+            <tr
+              key={answer}
+              style={answer === correct ? style.correct : style.wrong}>
+              <td>
+                <Button
+                  variant={buttonVariant}
+                  onClick={() => setCorrect(answer)}>
+                  <img
+                    src={correct === answer ? green : red}
+                    height="30px" />
+                </Button>
+              </td>
+              <td className="w-100">
+                {answer}
+              </td>
+              <td>
+                <ButtonGroup>
+                  <Button
+                    variant={buttonVariant}
+                    onClick={() => handleMoveUp(answer, idx)}>
+                    ⯅
+                  </Button>
+                  <Button
+                    variant={buttonVariant}
+                    onClick={() => handleMoveDown(answer, idx)}>
+                    ⯆
+                  </Button>
+                  <Button
+                    variant={buttonVariant}
+                    onClick={() => handleAnswerDiscard(idx, answer)}>
+                    Discard
+                  </Button>
+                </ButtonGroup>
+              </td>
+            </tr>
+          )
+        })}
+      </tbody>
+
+    </Table>
+  )
 
   const cleanForm = () => {
     // setIsEditing(false)
 
-    // setBody('')
+    // setBody("")
     // setImg(null)
     // setAnswers([])
     // setCorrect([])
     // setShuffle(false)
 
     // setJsonImport(null)
-    // setJsonExport('')
+    // setJsonExport("")
 
-    // jsonInputRef.current.value = ''
-    // imageInputRef.current.value = ''
-    // answerFormRef.current.value = ''
+    // jsonInputRef.current.value = ""
+    // imageInputRef.current.value = ""
+    // answerFormRef.current.value = ""
   }
 
   const ImageInput = () => (
     <Form.Control
       ref={imageInputRef}
-      type='file'
-      accept='image/*'
+      type="file"
+      accept="image/*"
       multiple={false}
       onChange={handleImageChange} />
   )
 
   const ImageClearButton = () => (
     <Button
-      variant='light'
+      variant="light"
       onClick={handleImageClear}>Clear</Button>
   )
 
   const TextInput = () => (
     <Form.Control
-      type='text'
-      spellCheck='true'
-      pattern='[A-Za-z0-9]+'
-      onChange={(e) => { setText(e.target.value) }} />
+      required={true}
+      type="text"
+      spellCheck={true}
+      pattern={consts.answerPattern}
+      onChange={e => setText(e.target.value)} />
   )
 
   const TextClearButton = () => (
     <Button
-      variant='light'
-      onClick={() => { setText('') }}>Clear</Button>
+      variant="light"
+      onClick={() => { setText("") }}>Clear</Button>
   )
 
   const onTypeChange = () => {
-    if (type === 'text') { // from text to image
-      setType('image')
-      setText('')
+    if (type === "text") { // from text to image
+      setType("image")
+      setText("")
     }
     else { // from image to text
-      setType('text')
+      setType("text")
       setImage(null)
     }
   }
@@ -335,10 +355,13 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   const TypeAndBodyRow = () => (
     <Row className={rowClass}>
       <Col md={consts.col1}>
-        Type
+        Body
       </Col>
       <Col xs={consts.col2}>
         <Row className={rowClass}>
+          <Col xs={10}>
+            {type === "text" ? TextInput() : ImageInput()}
+          </Col>
           <Col xs={2}>
             <BootstrapSwitchButton
               onstyle="light"
@@ -346,9 +369,6 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
               offlabel="Text"
               onlabel="Image"
               onChange={onTypeChange} />
-          </Col>
-          <Col xs={10}>
-            {type === 'text' ? TextInput() : ImageInput()}
           </Col>
         </Row>
       </Col>
@@ -375,8 +395,9 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
             <Col xs={2}>
               <Button
                 type="submit"
-                variant="outline-primary">
-                __Insert__
+                variant="outline-primary"
+                style={{ width: 100 }}>
+                Insert
               </Button>
             </Col>
           </Row>
@@ -398,34 +419,24 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
     </Row>
   )
 
-  const AnswerList = () => (
-    <Row>
-      <Col md={12}>
-        <Table hover responsive className='align-middle'>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Body</th>
-              <th>Correct</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {renderAnswers()}
-          </tbody>
-        </Table>
+  const AnswersListRow = () => (
+    <Row >
+      <Col xs={consts.col1}>
+        Answers
+      </Col>
+      <Col xs={consts.col2}>
+        {AnswersTable()}
       </Col>
     </Row>
+
   )
-
-
 
   return (
     <Container>
       {TypeAndBodyRow()}
-      {ShuffleRow()}
       {NewAnswerRow()}
-      {AnswerList()}
+      {AnswersListRow()}
+      {ShuffleRow()}
       <BottomControlBar
         onDiscard={handleQuestionDiscard}
         onSave={handleQuestionSave} />
@@ -454,8 +465,8 @@ export default ClosedQuestionForm
     //             <Form>
     //               <Form.Control
     //                 ref={jsonInputRef}
-    //                 type='file'
-    //                 accept='.json'
+    //                 type="file"
+    //                 accept=".json"
     //                 multiple={false}
     //                 onChange={e => handleJsonChange(e?.target?.files[0])} />
     //             </Form>
@@ -474,7 +485,7 @@ export default ClosedQuestionForm
     //               // This pattern should allow only alnum chars, underscores, and hyphens,
     //               //  with the condition that the string must start with a letter and end with an alnum chars:
     //               pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
-    //               placeholder='Name the JSON export file...'
+    //               placeholder="Name the JSON export file..."
     //               onChange={e => setJsonExport(e?.target?.value)}
     //             />
     //           </td>
@@ -488,30 +499,30 @@ export default ClosedQuestionForm
     //           </td>
     //           <td>
     //             <BootstrapSwitchButton
-    //               onstyle='light'
+    //               onstyle="light"
     //               width={100}
-    //               offlabel={'Text'}
-    //               onlabel={'Image'}
+    //               offlabel={"Text"}
+    //               onlabel={"Image"}
     //               onChange={onTypeChange} />
     //           </td>
     //         </tr>
-    //         {type === 'text' ? TextInput() : ImageInput()}
+    //         {type === "text" ? TextInput() : ImageInput()}
     //         <tr>
     //           <td>New Answer</td>
     //           <td>
     //             <Form.Control
     //               ref={answerFormRef}
-    //               type='text'
-    //               spellCheck='true'
-    //               pattern='[A-Za-z0-9]+' />
+    //               type="text"
+    //               spellCheck="true"
+    //               pattern="[A-Za-z0-9]+" />
     //           </td>
     //           <td>
     //             <ButtonGroup>
     //               <Button
-    //                 variant='light'
-    //                 onClick={e => answerFormRef.current.value = ''}>Clear</Button>
+    //                 variant="light"
+    //                 onClick={e => answerFormRef.current.value = ""}>Clear</Button>
     //               <Button
-    //                 variant='primary'
+    //                 variant="primary"
     //                 onClick={handleAnswerAdd}>Add</Button>
     //             </ButtonGroup>
     //           </td>
@@ -521,8 +532,8 @@ export default ClosedQuestionForm
     //           <td>
     //             <BootstrapSwitchButton
     //               checked={shuffle}
-    //               offlabel='No'
-    //               onlabel='Yes'
+    //               offlabel="No"
+    //               onlabel="Yes"
     //               onChange={() => setShuffle(!shuffle)} />
     //           </td>
     //         </tr>

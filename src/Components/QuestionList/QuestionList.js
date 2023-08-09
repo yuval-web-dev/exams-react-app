@@ -41,7 +41,7 @@ const QuestionList = ({ questions, setQuestions }) => {
     return (
       questions.map((question, idx) => {
         return (
-          <tr key={question.id}>
+          <tr key={idx}>
             <td>
               {idx + 1}
             </td>
