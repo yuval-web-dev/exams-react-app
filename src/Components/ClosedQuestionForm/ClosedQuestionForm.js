@@ -6,6 +6,7 @@ import BootstrapSwitchButton from 'bootstrap-switch-button-react'
 import { ClosedQuestion } from '../../classes.ts'
 import { saveImageToCache, getImageFromCache } from '../helpers.js'
 import consts from './consts.js'
+import { BottomControlBar } from '../../components'
 
 // Assets
 import { green, red } from '../../assets/svg'
@@ -64,15 +65,28 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
     imageInputRef.current.value = ''
   }
 
-  const handleAnswerAdd = () => {
+  const testStringPattern = (s, pattern) => {
+    const patternRegex = new RegExp(pattern)
+    return patternRegex.test(s)
+  }
+
+  const handleAddAnswer = () => {
     const newAnswer = answerFormRef.current.value.trim()
+    if (testStringPattern(newAnswer) === false) {
+      return
+    }
+    if (newAnswer === "") {
+      return
+    }
     if (answers.includes(newAnswer)) {
       // TODO add a modal to inform answer already exists
+      return
     }
     else {
       setAnswers([...answers, newAnswer])
+      answerFormRef.current.value = ""
     }
-    answerFormRef.current.value = ''
+
   }
 
   const handleAnswerDiscard = (idx, answerToDiscard) => {
@@ -90,7 +104,7 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
 
   const handleQuestionDiscard = () => {
     // TODO popup window: "are you sure?"
-    onDiscard()
+    // onDiscard()
     // cleanForm()
   }
 
@@ -118,20 +132,6 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
 
     onSave(newQuestion)
     // cleanForm()
-  }
-
-  const handleAnswerChange = (idx, newAnswer) => {
-    let oldAnswer = answers[idx]
-    let newAnswers = [...answers]
-    newAnswers[idx] = newAnswer
-    setAnswers(newAnswers)
-
-    const oldCorrectIdx = correct.findIndex((answer) => answer === oldAnswer)
-    if (oldCorrectIdx !== -1) {
-      let newCorrects = [...correct]
-      newCorrects[oldCorrectIdx] = newAnswer
-      setCorrect(newCorrects)
-    }
   }
 
   const handleMoveUp = (answer, idx) => {
@@ -330,7 +330,120 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
     }
   }
 
+  const rowClass = "align-items-center"
+
+  const TypeAndBodyRow = () => (
+    <Row className={rowClass}>
+      <Col md={consts.col1}>
+        Type
+      </Col>
+      <Col xs={consts.col2}>
+        <Row className={rowClass}>
+          <Col xs={2}>
+            <BootstrapSwitchButton
+              onstyle="light"
+              width={100}
+              offlabel="Text"
+              onlabel="Image"
+              onChange={onTypeChange} />
+          </Col>
+          <Col xs={10}>
+            {type === 'text' ? TextInput() : ImageInput()}
+          </Col>
+        </Row>
+      </Col>
+    </Row>
+  )
+
+  const NewAnswerRow = () => (
+    <Row className={rowClass}>
+      <Col xs={consts.col1}>
+        New Answer
+      </Col>
+      <Col xs={consts.col2}>
+        <Form onSubmit={e => { e.preventDefault(); handleAddAnswer(answerFormRef.current.value) }}>
+          <Row className={rowClass}>
+            <Col xs={10}>
+              <Form.Control
+                required={true}
+                ref={answerFormRef}
+                type="text"
+                spellCheck={true}
+                pattern="[A-Za-z0-9]+"
+              />
+            </Col>
+            <Col xs={2}>
+              <Button
+                type="submit"
+                variant="outline-primary">
+                __Insert__
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      </Col>
+    </Row>
+  )
+
+  const ShuffleRow = () => (
+    <Row className={rowClass}>
+      <Col xs={consts.col1}>
+        Shuffle
+      </Col>
+      <Col xs={consts.col2}>
+        <BootstrapSwitchButton
+          checked={shuffle}
+          onChange={() => setShuffle(!shuffle)} />
+      </Col>
+    </Row>
+  )
+
+  const AnswerList = () => (
+    <Row>
+      <Col md={12}>
+        <Table hover responsive className='align-middle'>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Body</th>
+              <th>Correct</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderAnswers()}
+          </tbody>
+        </Table>
+      </Col>
+    </Row>
+  )
+
+
+
   return (
+    <Container>
+      {TypeAndBodyRow()}
+      {ShuffleRow()}
+      {NewAnswerRow()}
+      {AnswerList()}
+      <BottomControlBar
+        onDiscard={handleQuestionDiscard}
+        onSave={handleQuestionSave} />
+    </Container>
+  )
+}
+
+export default ClosedQuestionForm
+
+
+
+
+
+
+
+
+
+
     // <Row>
     //   <Col>
     //     <Table borderless>
@@ -417,89 +530,3 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
     //     </Table>
     //   </Col>
     //   <Col xs={12}>
-    <Container>
-      <Row>
-        <Col xs={2}>Question Type</Col>
-        <Col xs={8}>
-          <BootstrapSwitchButton
-            onstyle='light'
-            width={100}
-            offlabel={'Text'}
-            onlabel={'Image'}
-            onChange={onTypeChange} />
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={2}>Body</Col>
-        <Col xs={8}>
-          {type === 'text' ? TextInput() : ImageInput()}
-        </Col>
-        <Col xs={2} >
-          {type === 'text' ? TextClearButton() : ImageClearButton()}
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={2}>New Answer</Col>
-        <Col xs={8}>
-          <Form.Control
-            ref={answerFormRef}
-            type='text'
-            spellCheck='true'
-            pattern='[A-Za-z0-9]+' />
-        </Col>
-        <Col xs={2}>
-          <ButtonGroup>
-            <Button
-              variant='light'
-              onClick={e => answerFormRef.current.value = ''}>Clear</Button>
-            <Button
-              variant='primary'
-              onClick={handleAnswerAdd}>Add</Button>
-          </ButtonGroup>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={2}>
-          Shuffle Answers
-        </Col>
-        <Col md={8}>
-          <BootstrapSwitchButton
-            checked={shuffle}
-            offlabel='No'
-            onlabel='Yes'
-            onChange={() => setShuffle(!shuffle)} />
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12}>
-          <Table hover responsive className='align-middle'>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Body</th>
-                <th>Correct</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {renderAnswers()}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12}>
-          <ButtonGroup>
-            <Button variant='warning' onClick={handleQuestionDiscard}>Discard</Button>
-            <Button variant='primary' onClick={handleQuestionSave}>Save</Button>
-          </ButtonGroup>
-        </Col>
-      </Row>
-
-
-
-    </Container>
-  )
-}
-
-export default ClosedQuestionForm
