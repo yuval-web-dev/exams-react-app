@@ -1,4 +1,4 @@
-# Academic Exam Application
+# Exams React App
 
 <!-- {project logo}
 
