@@ -17,17 +17,23 @@ class OpenQuestion {
   ) { }
 }
 
-class Exam {
-  id: string = uuidv4()
-  modifiable = true
-
+class Metadata {
   constructor(
     public subject: string,
     public author: { firstname: string, surname: string },
     public start: Date,
     public duration: number,
-    public questions: ClosedQuestion[] | OpenQuestion[],
     public shuffled: boolean
+  ) { }
+}
+
+class Exam {
+  id: string = uuidv4()
+  modifiable = true
+
+  constructor(
+    public metadata: Metadata,
+    public questions: ClosedQuestion[] | OpenQuestion[]
   ) { }
 }
 
@@ -35,4 +41,5 @@ export {
   ClosedQuestion,
   OpenQuestion,
   Exam,
+  Metadata
 }

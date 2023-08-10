@@ -1,40 +1,53 @@
-import React, { useState, useRef } from 'react'
-import { Navbar, Accordion, Container, Row, Col, Modal, ButtonGroup, Button } from 'react-bootstrap'
+import React, { useState, useRef } from "react"
+import { Navbar, Accordion, Container, Row, Col, Modal, ButtonGroup, Button } from "react-bootstrap"
 
-import { BottomControlBar, QuestionList, MetadataForm, Navs } from '../components'
+import { BottomControlBar, QuestionList, MetadataForm, SiteNavbar } from "../components"
 
-import QuestionForm from '../components/ClosedQuestionForm/ClosedQuestionForm'
+import QuestionForm from "../components/ClosedQuestionForm/ClosedQuestionForm"
 
+import * as utils from "../utils"
+import { Exam } from "../classes.ts"
 
 const Editor = () => {
   const defaultStates = {
     metadata: null,
-    questions: [],
+    quests: [],
     questModalShow: false
   }
-  const [metadata, setMetadata] = useState(defaultStates.metadata)
-  const [questions, setQuestions] = useState(defaultStates.questions)
+  const [quests, setQuests] = useState(defaultStates.quests)
   const [questModalShow, setQuestModalShow] = useState(defaultStates.questModalShow)
 
   const questFormRef = useRef()
+  const metaFormRef = useRef()
 
-  const onQuestionFormSave = (newQuestion) => {
-    setQuestions([...questions, newQuestion])
-  }
-
-  const handleModalSave = () => {
+  const handleQuestModalSave = () => {
     if (questFormRef.current.error()) {
-      alert("Please fill the form as intended.")
+      alert("Please fill question form as intended.")
       return
     }
-    const newQuestion = questFormRef.current.yieldObj()
-    setQuestions([...questions, newQuestion])
+    const questObj = questFormRef.current.yieldObj()
+    setQuests([...quests, questObj])
     setQuestModalShow(false)
   }
 
-  const rowClass = "border"
+  const handleExamSave = () => {
+    if (metaFormRef.current.error()) {
+      alert("Please fill required metadata fields.")
+      return
+    }
+    if (quests.length === 0) {
+      alert("Please add at least one question.")
+    }
+    const metaObj = metaFormRef.current.yieldObj()
+    const examObj = new Exam(
+      metaObj,
+      quests
+    )
+    console.log(examObj)
+  }
 
-  const questionModal = () => (
+
+  const QuestModal = () => (
     <Modal
       show={questModalShow}
       size="lg">
@@ -54,7 +67,7 @@ const Editor = () => {
         </Button>
         <Button
           variant="primary"
-          onClick={handleModalSave}>
+          onClick={handleQuestModalSave}>
           Save
         </Button>
       </Modal.Footer>
@@ -65,24 +78,24 @@ const Editor = () => {
 
   return (
     <React.Fragment>
-      <Navs.TopNavbar />
-      {questionModal()}
+      <SiteNavbar.Top />
+      {QuestModal()}
       <Container>
         <h1>New Exam</h1>
         <Accordion defaultActiveKey={["0", "1"]} alwaysOpen>
           <Accordion.Item eventKey="0">
             <Accordion.Header>Metadata</Accordion.Header>
             <Accordion.Body>
-              <MetadataForm />
+              <MetadataForm ref={metaFormRef} />
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="1">
             <Accordion.Header>Questions</Accordion.Header>
             <Accordion.Body>
               <Row>
-                <Col xs="12">
-                  <Button
-                    variant="light"
+                <Col className="d-flex">
+                  <Button className="me-auto"
+                    variant="primary"
                     size="sm"
                     onClick={() => { setQuestModalShow(true) }}>
                     Create
@@ -93,24 +106,33 @@ const Editor = () => {
                     onClick={() => { }}>
                     from API
                   </Button>
-                </Col>
-                <Col xs={12}>
-                  <QuestionList
-                    questions={questions}
-                    setQuestions={setQuestions}
-                    defaultState={defaultStates.questions} />
+                  <Button variant="light"
+                    size="sm"
+                    onClick={() => { }}>
+                    from JSON
+                  </Button>
                 </Col>
               </Row>
+              <Row>
+                <Col xs={12}>
+                  <QuestionList
+                    questions={quests}
+                    setQuestions={setQuests}
+                    defaultState={defaultStates.quests} />
+                </Col></Row>
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
         <Navbar sticky="bottom" className="justify-content-end">
-          <Button variant="secondary">Cancel</Button>
-          <Button variant="primary">Save</Button>
+          <Button
+            variant="secondary"
+            onClick={() => { }}>Cancel</Button>
+          <Button
+            variant="primary"
+            onClick={handleExamSave}>Save</Button>
         </Navbar>
       </Container>
-
-      <Navs.BottomNavbar />
+      <SiteNavbar.Bottom />
     </React.Fragment>
   )
 }

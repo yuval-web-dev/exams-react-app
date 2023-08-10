@@ -1,36 +1,51 @@
-import React, { useState, useRef, useEffect } from "react"
-import { Container, Row, Col, Form, Button } from "react-bootstrap"
+import React, { useState, useImperativeHandle, forwardRef } from "react"
+import { Container, Row, Col, Form } from "react-bootstrap"
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 import TimePicker from "react-bootstrap-time-picker"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import RangeSlider from "react-bootstrap-range-slider"
 
-import BottomControlBar from "../BottomControlBar/BottomControlBar"
-
-// Javascript
 import consts from "./consts.js"
 
-
-const MetadataForm = () => {
-  // States
-  const [jsonImport, setJsonImport] = useState(null) // The actual JSON file uploaded via input
-  const [jsonExport, setJsonExport] = useState("") // The name of the to-be exported JSON file
-
-  // Form values states
-  // const [type, setType] = useState("closed") // TODO implement this
-  const [subject, setSubject] = useState("")
-  const [date, setDate] = useState(consts.tomorrow)
-  const [start, setStart] = useState(consts.minHour)
-  const [duration, setDuration] = useState(consts.minDur)
-  const [shuffle, setShuffle] = useState(false)
+import { Metadata } from "../../classes.ts"
 
 
+const MetadataForm = forwardRef(({ }, ref) => {
+  useImperativeHandle(ref, () => ({
+    error() {
+      return subject === defaultStates.subject
+    },
+    yieldObj() {
+      const cdate = new Date(date)
+      cdate.setHours(0, 0, 0, 0)
+      cdate.setSeconds(startHr)
+      return new Metadata(
+        subject,
+        {},
+        cdate,
+        Number(duration),
+        shuffle
+      )
+    }
+  }))
 
+  const today = new Date()
+  const tomorrow = today.setDate(today.getDate() + 1)
 
+  const defaultStates = {
+    subject: "",
+    date: tomorrow,
+    startHr: 9 * 60 * 60,
+    duration: 30,
+    shuffle: false
+  }
 
-  // Refs
-  const jsonInputRef = useRef(null)
+  const [subject, setSubject] = useState(defaultStates.subject)
+  const [date, setDate] = useState(defaultStates.date) // Millis
+  const [startHr, setStart] = useState(defaultStates.startHr) // Secs
+  const [duration, setDuration] = useState(defaultStates.duration)
+  const [shuffle, setShuffle] = useState(defaultStates.shuffle)
 
   // Event handlers
   const handleExamTypeChange = (isChecked) => {
@@ -45,18 +60,18 @@ const MetadataForm = () => {
   }
 
   const handleJsonChange = (newFile) => {
-    const allowedTypes = ["application/json"]
-    if (newFile === undefined) {
-      return
-    }
-    else if (!allowedTypes.includes(newFile?.type)) {
-      alert(`Allowed file types: ${[...allowedTypes]}`)
-      setJsonImport(null)
-    }
-    else {
-      setJsonImport(newFile)
-    }
-    jsonInputRef.current.value = ""
+    // const allowedTypes = ["application/json"]
+    // if (newFile === undefined) {
+    //   return
+    // }
+    // else if (!allowedTypes.includes(newFile?.type)) {
+    //   alert(`Allowed file types: ${[...allowedTypes]}`)
+    //   setJsonImport(null)
+    // }
+    // else {
+    //   setJsonImport(newFile)
+    // }
+    // jsonInputRef.current.value = ""
   }
 
   const handleJsonImport = () => {
@@ -157,7 +172,7 @@ const MetadataForm = () => {
               </Col>
               <Col xs={10}>
                 <TimePicker
-                  value={start}
+                  value={startHr}
                   format={24}
                   step={30}
                   start={consts.minHourRepr}
@@ -173,7 +188,7 @@ const MetadataForm = () => {
               </Col>
               <Col xs={10}>
                 <TimePicker
-                  value={start + (duration * 60)}
+                  value={startHr + (duration * 60)}
                   format={24}
                   style={{ color: "grey", pointerEvents: "none" }} />
               </Col>
@@ -231,64 +246,6 @@ const MetadataForm = () => {
       {ShuffleRow()}
     </Container >
   )
-}
+})
 
 export default MetadataForm
-
-
-{/* <tr>
-                <td>From JSON</td>
-                <td>
-                  <Form>
-                    <Form.Control
-                      ref={jsonInputRef}
-                      type="file"
-                      accept=".json"
-                      multiple={false}
-                      onChange={e => handleJsonChange(e?.target?.files[0])} />
-                  </Form>
-                </td>
-                <td>
-                  <Button
-                    disabled={jsonImport === null}
-                    onClick={() => handleJsonImport()}>Import</Button>
-                </td>
-              </tr>
-              <tr>
-                <td>To JSON</td>
-                <td>
-                  <Form.Control
-                    value={jsonExport}
-                    // This pattern should allow only alnum chars, underscores, and hyphens,
-                    //  with the condition that the string must start with a letter and end with an alnum chars:
-                    pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
-                    placeholder="Name the JSON export file..."
-                    onChange={e => setJsonExport(e?.target?.value)}
-                  />
-                </td>
-                <td>
-                  <Button onClick={() => handleJsonExport()}>Export</Button>
-                </td>
-              </tr> */}
-{/* <tr>
-                <td>Type</td>
-                <td>
-                  <BootstrapSwitchButton
-                    checked={true}
-                    onstyle="light"
-                    onlabel="Closed"
-                    offlabel="Open"
-                    width={100}
-                    onChange={handleExamTypeChange} />
-                </td>
-              </tr> */}
-{/* <tr>
-                <td>Author</td>
-                <td>{`${user.surname}, ${user.firstname}`}</td>
-                <td>Surname, Firstname</td>
-              </tr>
-              <tr>
-                <td>Exam ID</td>
-                <td>uid</td>
-                <td style={{ fontFamily: "consolas" }}>{`${exam.eid}`}</td>
-              </tr> */}

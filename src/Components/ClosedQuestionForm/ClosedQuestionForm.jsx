@@ -3,14 +3,14 @@ import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table, Co
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 import { ClosedQuestion } from "../../classes.ts"
-import { saveImageToCache, getImageFromCache } from "../helpers"
+import { saveToCache, fetchFromCache } from "../../utils/cache.js"
 import consts from "./consts"
 import { BottomControlBar } from "../index"
 
 import { green, red } from "../../assets/svg"
 
 
-const ClosedQuestionForm = forwardRef((props = {}, ref) => {
+const ClosedQuestionForm = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
     error() {
       return (

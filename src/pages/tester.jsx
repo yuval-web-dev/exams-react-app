@@ -1,15 +1,11 @@
 import React from 'react'
 
-import { Navs, ApiTester } from '../components'
+import { ApiTester } from '../components'
 
 
 const tester = () => {
   return (
-    <React.Fragment>
-      <Navs.TopNavbar />
-      <ApiTester />
-      <Navs.BottomNavbar />
-    </React.Fragment>
+    <ApiTester />
   )
 }
 
