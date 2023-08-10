@@ -1,53 +1,61 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useImperativeHandle, forwardRef } from "react"
 import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table, Container } from "react-bootstrap"
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
-// Javascript
 import { ClosedQuestion } from "../../classes.ts"
 import { saveImageToCache, getImageFromCache } from "../helpers"
 import consts from "./consts"
 import { BottomControlBar } from "../index"
 
-// Assets
 import { green, red } from "../../assets/svg"
 
-const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
-  // States
-  const [isEditing, setIsEditing] = useState(false) // "true" if the user was redirected here by clicking "Edit" in the "all" tab.
-  const [jsonImport, setJsonImport] = useState(null) // The actual JSON file uploaded via input
-  const [jsonExport, setJsonExport] = useState("") // The name of the to-be exported JSON file
 
-  // Form values states
-  const [type, setType] = useState("text")
-  const [text, setText] = useState("")
-  const [image, setImage] = useState(null)
+const ClosedQuestionForm = forwardRef((props = {}, ref) => {
+  useImperativeHandle(ref, () => ({
+    error() {
+      return (
+        (type === "text" && text === defaultStates.text) ||
+        (type === "image" && image === defaultStates.image) ||
+        (answers === defaultStates.answers) ||
+        (answers.length < 2) ||
+        (correct === defaultStates.correct)
+      )
+    },
+    yieldObj() {
+      return new ClosedQuestion(
+        type === "text" ? text : image,
+        answers,
+        correct,
+        shuffle
+      )
+    }
+  }))
 
-  // const [imageUrl, setImageUrl] = useState(null)
-  const [answers, setAnswers] = useState([])
-  const [correct, setCorrect] = useState(null)
-  const [shuffle, setShuffle] = useState(false)
+  const defaultStates = {
+    type: "text",
+    text: "",
+    image: null,
+    answers: [],
+    correct: "",
+    shuffle: false
+  }
 
-  // Refs
-  const jsonInputRef = useRef(null)
-  const imageInputRef = useRef(null)
-  const answerFormRef = useRef(null)
+  const defaultRefs = {
+    imageInput: null,
+    answerForm: null
+  }
 
-  // UseEffect
-  // const effect = () => {
-  //   if (question !== null) {
-  //     setIsEditing(true)
-  //     setBody(question.body)
-  //     setImg(question.image)
-  //     setAnswers(question.answers)
-  //     setCorrect(question.correctAnswers)
-  //     setShuffle(question.isRandomized)
-  //   }
-  // }
-  // const dependancy = [question]
-  // useEffect(effect, dependancy)
+  const [type, setType] = useState(defaultStates.type)
+  const [text, setText] = useState(defaultStates.text)
+  const [image, setImage] = useState(defaultStates.image)
+  const [answers, setAnswers] = useState(defaultStates.answers)
+  const [correct, setCorrect] = useState(defaultStates.correct)
+  const [shuffle, setShuffle] = useState(defaultStates.shuffle)
 
-  // Handlers
-  const handleImageChange = async (e) => {
+  const imageInputRef = useRef(defaultRefs.imageInput)
+  const answerFormRef = useRef(defaultRefs.answerForm)
+
+  const handleImageUpload = async (e) => {
     // Set the states
     const newImage = e.target.files[0]
     setImage(newImage)
@@ -60,17 +68,12 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
     // imageInputRef.current.value = ""
   }
 
-  const handleImageClear = () => {
-    setImage(null)
-    imageInputRef.current.value = ""
-  }
-
   const testStringPattern = (s, pattern) => {
     const patternRegex = new RegExp(pattern)
     return patternRegex.test(s)
   }
 
-  const handleAddAnswer = () => {
+  const handleAnswerAdd = () => {
     const newAnswer = answerFormRef.current.value.trim()
     if (testStringPattern(newAnswer) === false) {
       return
@@ -86,48 +89,13 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
       setAnswers([...answers, newAnswer])
       answerFormRef.current.value = ""
     }
-
   }
 
-  const handleAnswerDiscard = (idx, answerToDiscard) => {
-    const newAnswers = [...answers]
-    newAnswers.splice(idx, 1)
-    setAnswers(newAnswers)
-    if (correct === answerToDiscard) {
-      setCorrect(null)
+  const handleAnswerDiscard = (answer) => {
+    setAnswers(answers.filter(i => i !== answer))
+    if (correct === answer) {
+      setCorrect(defaultStates.correct)
     }
-  }
-
-  const handleQuestionDiscard = () => {
-    // TODO popup window: "are you sure?"
-    // onDiscard()
-    // cleanForm()
-  }
-
-  const handleQuestionSave = () => {
-    // sanity check
-    if (answers.length < 2) {
-      // popup modal
-      return
-    }
-    if (type === "text" && correct === null) {
-      // popup modal
-      return
-    }
-    if (type === "image" && image === null) {
-      // popup modal
-      return
-    }
-
-    const newQuestion = new ClosedQuestion(
-      type === "text" ? text : image,
-      answers,
-      correct,
-      shuffle
-    )
-
-    onSave(newQuestion)
-    // cleanForm()
   }
 
   const handleMoveUp = (answer, idx) => {
@@ -236,6 +204,8 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
   //   // document.body.removeChild(element)
   // }
 
+  const rowClass = "align-items-center"
+
   const style = {
     correct: { backgroundColor: `rgba(80, 224, 120, 0.1)` },
     wrong: { backgroundColor: `rgba(224, 80, 80, 0.1)` }
@@ -279,7 +249,7 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
                   </Button>
                   <Button
                     variant={buttonVariant}
-                    onClick={() => handleAnswerDiscard(idx, answer)}>
+                    onClick={() => handleAnswerDiscard(answer)}>
                     Discard
                   </Button>
                 </ButtonGroup>
@@ -288,26 +258,8 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
           )
         })}
       </tbody>
-
     </Table>
   )
-
-  const cleanForm = () => {
-    // setIsEditing(false)
-
-    // setBody("")
-    // setImg(null)
-    // setAnswers([])
-    // setCorrect([])
-    // setShuffle(false)
-
-    // setJsonImport(null)
-    // setJsonExport("")
-
-    // jsonInputRef.current.value = ""
-    // imageInputRef.current.value = ""
-    // answerFormRef.current.value = ""
-  }
 
   const ImageInput = () => (
     <Form.Control
@@ -315,13 +267,7 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
       type="file"
       accept="image/*"
       multiple={false}
-      onChange={handleImageChange} />
-  )
-
-  const ImageClearButton = () => (
-    <Button
-      variant="light"
-      onClick={handleImageClear}>Clear</Button>
+      onChange={handleImageUpload} />
   )
 
   const TextInput = () => (
@@ -333,75 +279,56 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
       onChange={e => setText(e.target.value)} />
   )
 
-  const TextClearButton = () => (
-    <Button
-      variant="light"
-      onClick={() => { setText("") }}>Clear</Button>
-  )
-
-  const onTypeChange = () => {
+  const handleTypeChange = () => {
     if (type === "text") { // from text to image
       setType("image")
-      setText("")
+      setText(defaultStates.text)
     }
     else { // from image to text
       setType("text")
-      setImage(null)
+      setImage(defaultStates.image)
     }
   }
 
-  const rowClass = "align-items-center"
-
-  const TypeAndBodyRow = () => (
+  const BodyRow = () => (
     <Row className={rowClass}>
-      <Col md={consts.col1}>
+      <Col xs={consts.col1}>
         Body
       </Col>
       <Col xs={consts.col2}>
-        <Row className={rowClass}>
-          <Col xs={10}>
-            {type === "text" ? TextInput() : ImageInput()}
-          </Col>
-          <Col xs={2}>
-            <BootstrapSwitchButton
-              onstyle="light"
-              width={100}
-              offlabel="Text"
-              onlabel="Image"
-              onChange={onTypeChange} />
-          </Col>
-        </Row>
+        {type === "text" ? TextInput() : ImageInput()}
+      </Col>
+      <Col xs={consts.col3}>
+        <BootstrapSwitchButton
+          width={100}
+          onstyle="light"
+          offlabel="Text"
+          onlabel="Image"
+          onChange={handleTypeChange} />
       </Col>
     </Row>
   )
 
-  const NewAnswerRow = () => (
+  const AnswerRow = () => (
     <Row className={rowClass}>
       <Col xs={consts.col1}>
-        New Answer
+        Answer
       </Col>
       <Col xs={consts.col2}>
-        <Form onSubmit={e => { e.preventDefault(); handleAddAnswer(answerFormRef.current.value) }}>
-          <Row className={rowClass}>
-            <Col xs={10}>
-              <Form.Control
-                required={true}
-                ref={answerFormRef}
-                type="text"
-                spellCheck={true}
-                pattern="[A-Za-z0-9]+"
-              />
-            </Col>
-            <Col xs={2}>
-              <Button
-                type="submit"
-                variant="outline-primary"
-                style={{ width: 100 }}>
-                Insert
-              </Button>
-            </Col>
-          </Row>
-        </Form>
+        <Form.Control
+          required={true}
+          ref={answerFormRef}
+          type="text"
+          spellCheck={true}
+          pattern="[A-Za-z0-9]+" />
+      </Col>
+      <Col xs={consts.col3}>
+        <Button
+          onClick={handleAnswerAdd}
+          variant="outline-primary"
+          style={{ width: 100 }}>
+          Add
+        </Button>
       </Col>
     </Row>
   )
@@ -421,123 +348,22 @@ const ClosedQuestionForm = ({ onSave, onDiscard, question }) => {
 
   const AnswersListRow = () => (
     <Row >
-      <Col xs={consts.col1}>
-        Answers
-      </Col>
+      <Col xs={consts.col1} />
       <Col xs={consts.col2}>
         {AnswersTable()}
       </Col>
+      <Col xs={consts.col3} />
     </Row>
-
   )
 
   return (
-    <Container>
-      {TypeAndBodyRow()}
-      {NewAnswerRow()}
+    <React.Fragment>
+      {BodyRow()}
+      {AnswerRow()}
       {AnswersListRow()}
       {ShuffleRow()}
-      <BottomControlBar
-        onDiscard={handleQuestionDiscard}
-        onSave={handleQuestionSave} />
-    </Container>
+    </React.Fragment>
   )
-}
+})
 
 export default ClosedQuestionForm
-
-
-
-
-
-
-
-
-
-
-    // <Row>
-    //   <Col>
-    //     <Table borderless>
-    //       <tbody>
-    //         {/* <tr>
-    //           <td>From JSON</td>
-    //           <td>
-    //             <Form>
-    //               <Form.Control
-    //                 ref={jsonInputRef}
-    //                 type="file"
-    //                 accept=".json"
-    //                 multiple={false}
-    //                 onChange={e => handleJsonChange(e?.target?.files[0])} />
-    //             </Form>
-    //           </td>
-    //           <td>
-    //             <Button
-    //               disabled={jsonImport === null}
-    //               onClick={() => handleJsonImport()}>Import</Button>
-    //           </td>
-    //         </tr>
-    //         <tr>
-    //           <td>To JSON</td>
-    //           <td>
-    //             <Form.Control
-    //               value={jsonExport}
-    //               // This pattern should allow only alnum chars, underscores, and hyphens,
-    //               //  with the condition that the string must start with a letter and end with an alnum chars:
-    //               pattern="/^[a-zA-Z][\w-]*[a-zA-Z\d]$/"
-    //               placeholder="Name the JSON export file..."
-    //               onChange={e => setJsonExport(e?.target?.value)}
-    //             />
-    //           </td>
-    //           <td>
-    //             <Button onClick={() => handleJsonExport()}>Export</Button>
-    //           </td>
-    //         </tr> */}
-    //         <tr>
-    //           <td>
-    //             Question Type
-    //           </td>
-    //           <td>
-    //             <BootstrapSwitchButton
-    //               onstyle="light"
-    //               width={100}
-    //               offlabel={"Text"}
-    //               onlabel={"Image"}
-    //               onChange={onTypeChange} />
-    //           </td>
-    //         </tr>
-    //         {type === "text" ? TextInput() : ImageInput()}
-    //         <tr>
-    //           <td>New Answer</td>
-    //           <td>
-    //             <Form.Control
-    //               ref={answerFormRef}
-    //               type="text"
-    //               spellCheck="true"
-    //               pattern="[A-Za-z0-9]+" />
-    //           </td>
-    //           <td>
-    //             <ButtonGroup>
-    //               <Button
-    //                 variant="light"
-    //                 onClick={e => answerFormRef.current.value = ""}>Clear</Button>
-    //               <Button
-    //                 variant="primary"
-    //                 onClick={handleAnswerAdd}>Add</Button>
-    //             </ButtonGroup>
-    //           </td>
-    //         </tr>
-    //         <tr>
-    //           <td>Shuffle Answers</td>
-    //           <td>
-    //             <BootstrapSwitchButton
-    //               checked={shuffle}
-    //               offlabel="No"
-    //               onlabel="Yes"
-    //               onChange={() => setShuffle(!shuffle)} />
-    //           </td>
-    //         </tr>
-    //       </tbody>
-    //     </Table>
-    //   </Col>
-    //   <Col xs={12}>

@@ -1,69 +1,76 @@
-import React, { useState } from 'react'
-import { Table, Button, ButtonGroup, Nav } from 'react-bootstrap'
+import React, { useState } from "react"
+import { Modal, Row, Col, Image, Table, Button, ButtonGroup, Nav } from "react-bootstrap"
 
-const QuestionList = ({ questions, setQuestions }) => {
-  const [selectedQuestionImage, setSelectedQuestionImage] = useState(null)
+import ImageModal from "./ImageModal"
 
-  const [showImagePreview, setShowImagePreview] = useState(false)
-
-  // const sanityCheck = (question) => {
-  //   if (
-  //     question.body === '' ||
-  //     question.answers.length <= 1 ||
-  //     question.correctAnswers.length === 0 ||
-  //     question.correctAnswers.length === question.answers.length
-  //   ) {
-  //     return false
-  //   }
-  //   else {
-  //     return true
-  //   }
-  // }
-
-  const renderAnswers = (question) => {
-    return (
-      <ol>{
-        question.answers.map(answer => {
-          return (
-            <li style={answer === question.correct ? { color: 'green', fontWeight: 'bold' } : {}}>
-              {answer}
-            </li>
-          )
-        })
-      }
-      </ol>
-    )
+const QuestionList = ({ questions, setQuestions, defaultState }) => {
+  const defaultStates = {
+    showImageModal: false,
+    selectedQuest: null
   }
 
+  const [showImageModal, setShowImageModal] = useState(defaultStates.showImageModal)
+  const [selectedQuest, setSelectedQuest] = useState(defaultStates.selectedQuest)
 
+  const mapAnswers = (question) => (
+    <ol>{
+      question.answers.map(answer => {
+        return (
+          <li
+            key={answer}
+            style={answer === question.correct ? { color: "green", fontWeight: "bold" } : {}}>
+            {answer}
+          </li>
+        )
+      })
+    }
+    </ol>
+  )
 
-  const renderQuestions = (questions) => {
+  const handleImageLinkClick = (question) => {
+    setSelectedQuest(question)
+    setShowImageModal(true)
+  }
+
+  const mapQuestions = (questions) => {
     return (
       questions.map((question, idx) => {
+        if (question === undefined) {
+          return
+        }
         return (
           <tr key={idx}>
             <td>
               {idx + 1}
             </td>
             <td>
-              {typeof question.body === 'string' ? 'Text' : 'Image'}
+              {typeof question.body === "string" ? question.body : <Nav><Nav.Link onClick={() => handleImageLinkClick(question)}>{question.body.name}</Nav.Link></Nav>}
             </td>
             <td>
-              {typeof question.body === 'string' ? question.body : <Nav><Nav.Link eventKey=''>{question.body.name}</Nav.Link></Nav>}
+              {mapAnswers(question)}
             </td>
             <td>
-              {renderAnswers(question)}
-            </td>
-            <td>
-              {question.shuffled ? 'Yes' : 'No'}
+              {question.shuffled ? "Yes" : "No"}
             </td>
             <td>
               <ButtonGroup>
-                <Button variant='light' onClick={() => handleMoveUp(question, idx)}>⯅</Button>
-                <Button variant='light' onClick={() => handleMoveDown(question, idx)}>⯆</Button>
+                <Button
+                  variant="light"
+                  onClick={() => handleMoveUp(question, idx)}>
+                  ⯅
+                </Button>
+                <Button
+                  variant="light"
+                  onClick={() => handleMoveDown(question, idx)}>
+                  ⯆
+                </Button>
+                <Button
+                  variant="light"
+                  onClick={() => handleQuestionDiscard(question)}>
+                  Discard
+                </Button>
               </ButtonGroup>
-              <Button variant='primary' onClick={() => handleQuestionEdit(question)}>Edit</Button>
-              <Button variant='light' onClick={() => handleQuestionDiscard(question)}>Discard</Button>
+
             </td>
           </tr>
         )
@@ -91,40 +98,29 @@ const QuestionList = ({ questions, setQuestions }) => {
     }
   }
 
-  const handleQuestionEdit = (question) => {
-    // setQuestionToEdit(question)
-    // setActiveTab('form')
-  }
-
-  const handleQuestionDiscard = (questionToDiscard) => {
-    if (window.confirm('Are you sure?')) {
-      setQuestions(
-        questions.filter((question) => question !== questionToDiscard)
-      )
-    }
-  }
-
-  const handleImageLinkClick = (image) => {
-    setSelectedQuestionImage(image)
-    setShowImagePreview(true)
+  const handleQuestionDiscard = (question) => {
+    setQuestions(questions.filter(i => i !== question))
   }
 
   return (
-    <Table hover responsive className='align-middle'>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Type</th>
-          <th>Body</th>
-          <th>Answers</th>
-          <th>Shuffled</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {renderQuestions(questions)}
-      </tbody>
-    </Table>
+    <React.Fragment>
+      {selectedQuest !== defaultStates.selectedQuest ? <ImageModal image={selectedQuest.body} show={showImageModal} onHide={() => setShowImageModal(false)} /> : null}
+      <Table hover responsive>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Body</th>
+            <th>Answers</th>
+            <th>Shuffled</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {mapQuestions(questions)}
+        </tbody>
+      </Table>
+    </React.Fragment>
+
   )
 }
 

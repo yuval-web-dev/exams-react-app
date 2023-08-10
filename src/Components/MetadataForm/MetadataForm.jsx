@@ -212,7 +212,7 @@ const MetadataForm = () => {
   const ShuffleRow = () => (
     <Row className={rowClass}>
       <Col xs={consts.col1Width}>
-        Shuffle Questions
+        Shuffled
       </Col>
       <Col xs={consts.col2Width}>
         <BootstrapSwitchButton
@@ -229,9 +229,6 @@ const MetadataForm = () => {
       {TimeSlotRow()}
       {DurationRow()}
       {ShuffleRow()}
-      <BottomControlBar
-        onDiscard={() => { }}
-        onSave={() => { }} />
     </Container >
   )
 }
