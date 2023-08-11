@@ -24,8 +24,7 @@ const MetadataForm = forwardRef(({ }, ref) => {
         subject,
         {},
         cdate,
-        Number(duration),
-        shuffle
+        Number(duration)
       )
     }
   }))
@@ -45,93 +44,15 @@ const MetadataForm = forwardRef(({ }, ref) => {
   const [date, setDate] = useState(defaultStates.date) // Millis
   const [startHr, setStart] = useState(defaultStates.startHr) // Secs
   const [duration, setDuration] = useState(defaultStates.duration)
-  const [shuffle, setShuffle] = useState(defaultStates.shuffle)
-
-  // Event handlers
-  const handleExamTypeChange = (isChecked) => {
-    // const newType = isChecked ? "closed" : "open"
-    // setType(newType)
-    // console.log(newType)
-  }
-
-  const handleTimeReset = () => {
-    // setStart(consts.earliestHourNum)
-    // setDuration(consts.minDuration)
-  }
-
-  const handleJsonChange = (newFile) => {
-    // const allowedTypes = ["application/json"]
-    // if (newFile === undefined) {
-    //   return
-    // }
-    // else if (!allowedTypes.includes(newFile?.type)) {
-    //   alert(`Allowed file types: ${[...allowedTypes]}`)
-    //   setJsonImport(null)
-    // }
-    // else {
-    //   setJsonImport(newFile)
-    // }
-    // jsonInputRef.current.value = ""
-  }
-
-  const handleJsonImport = () => {
-    // const reader = new FileReader()
-
-    // reader.onload = function (e) {
-    //   const allowedKeys = ["questions", "subject", "date", "startTime", "duration", "isRandomized"]
-
-    //   const jsonParsed = JSON.parse(e.target.result)
-    //   const keys = Object.keys(jsonParsed)
-
-    //   if (!keys.every(key => (allowedKeys.includes(key)))) {
-    //     alert(`Allowed JSON keys: ${[...allowedKeys]}`)
-    //     return
-    //   }
-    //   if (jsonParsed.hasOwnProperty("questions")) {
-    //     setQuestions(jsonParsed.questions)
-    //   }
-    //   if (jsonParsed.hasOwnProperty("subject")) {
-    //     setSubject(jsonParsed.subject)
-    //   }
-    //   if (jsonParsed.hasOwnProperty("date")) {
-    //     setDate(jsonParsed.date)
-    //   }
-    //   if (jsonParsed.hasOwnProperty("startTime")) {
-    //     setStart(jsonParsed.startTime)
-    //   }
-    //   if (jsonParsed.hasOwnProperty("duration")) {
-    //     setDuration(jsonParsed.subject)
-    //   }
-    // }
-    // reader.readAsText(jsonImport)
-  }
-
-  const handleJsonExport = () => {
-    // const data = {
-    //   questions,
-    //   subject,
-    //   date,
-    //   startTime: start,
-    //   duration
-    // }
-    // const json = JSON.stringify(data)
-    // const element = document.createElement("a")
-    // element.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(json))
-    // element.setAttribute("download", `${jsonExport === "" ? "untitled_exam" : jsonExport}.json`)
-    // element.style.display = "none"
-    // document.body.appendChild(element)
-    // element.click()
-    // document.body.removeChild(element)
-  }
 
   const rowClass = "align-items-center"
 
-  const SubjectRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1Width}>
+  const SubjectForm = () => (
+    <Row className="mb-3">
+      <Col xs="12">
         Subject
       </Col>
-      <Col xs={consts.col2Width}>
+      <Col xs="12">
         <Form.Control
           value={subject}
           type="text"
@@ -141,109 +62,71 @@ const MetadataForm = forwardRef(({ }, ref) => {
     </Row>
   )
 
-  const DateRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1Width}>
-        Date
+  const DateTimeForm = () => (
+    <Row className="my-3">
+      <Col>
+        <Col xs="12">
+          Date
+        </Col>
+        <Col xs="12">
+          <DatePicker
+            value={date}
+            selected={date}
+            className="form-control"
+            minDate={consts.tomorrow}
+            dateFormat={consts.dateFormat}
+            onChange={newDate => setDate(newDate)} />
+        </Col>
       </Col>
-      <Col xs={consts.col2Width}>
-        <DatePicker
-          value={date}
-          selected={date}
-          className="form-control"
-          minDate={consts.tomorrow}
-          dateFormat={consts.dateFormat}
-          onChange={newDate => setDate(newDate)} />
-      </Col>
-    </Row>
-  )
-
-  const TimeSlotRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1Width}>
-        Time Slot
-      </Col>
-      <Col xs={consts.col2Width}>
-        <Row>
-          <Col xs={6}>
-            <Row className={rowClass}>
-              <Col xs={2}>
-                Start
-              </Col>
-              <Col xs={10}>
-                <TimePicker
-                  value={startHr}
-                  format={24}
-                  step={30}
-                  start={consts.minHourRepr}
-                  end={consts.maxHourRepr}
-                  onChange={time => setStart(time)} />
-              </Col>
-            </Row>
-          </Col>
-          <Col xs={6}>
-            <Row className="align-items-center">
-              <Col xs={2}>
-                End
-              </Col>
-              <Col xs={10}>
-                <TimePicker
-                  value={startHr + (duration * 60)}
-                  format={24}
-                  style={{ color: "grey", pointerEvents: "none" }} />
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Col>
-    </Row>
-  )
-
-  const DurationRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1Width}>
-        Duration
-      </Col>
-      <Col xs={consts.col2Width}>
-        <Row className={rowClass}>
-          <Col xs="9">
-            <RangeSlider
-              size="lg"
-              value={duration}
+      <Col className="d-flex">
+        <Col>
+          <Col xs="12">Start</Col>
+          <Col xs="12">
+            <TimePicker
+              value={startHr}
+              format={24}
               step={30}
-              min={30}
-              max={180}
-              tooltip="off"
-              onChange={e => setDuration(e.target.value)} />
+              start={consts.minHourRepr}
+              end={consts.maxHourRepr}
+              onChange={time => setStart(time)} />
           </Col>
-          <Col xs="3">
-            {duration} Minutes
-          </Col>
-        </Row>
+        </Col>
+        <Col>
+          <Row>
+            <Col xs="12">End</Col>
+            <Col xs="12">
+              <TimePicker
+                value={startHr + (duration * 60)}
+                format={24}
+                style={{ color: "grey", pointerEvents: "none" }} />
+            </Col>
+          </Row>
+        </Col>
       </Col>
-    </Row >
+    </Row>
   )
 
-  const ShuffleRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1Width}>
-        Shuffled
-      </Col>
-      <Col xs={consts.col2Width}>
-        <BootstrapSwitchButton
-          checked={shuffle}
-          onChange={() => setShuffle(!shuffle)} />
+  const DurationSlider = () => (
+    <Row className="my-3">
+      <Col xs="12">Duration (Mins)</Col>
+      <Col xs="12">
+        <RangeSlider
+          value={duration}
+          step={30}
+          min={30}
+          max={180}
+          tooltipPlacement="bottom"
+          tooltip="auto"
+          onChange={e => setDuration(e.target.value)} />
       </Col>
     </Row>
   )
 
   return (
     <Container>
-      {SubjectRow()}
-      {DateRow()}
-      {TimeSlotRow()}
-      {DurationRow()}
-      {ShuffleRow()}
+      {SubjectForm()}
+      {DateTimeForm()}
+      {DurationSlider()}
     </Container >
   )
 })
