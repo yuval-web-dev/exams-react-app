@@ -2,8 +2,8 @@ import React, { useState, useRef, useImperativeHandle, forwardRef } from "react"
 import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table, Container } from "react-bootstrap"
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
-import { ClosedQuestion } from "../../classes.ts"
-import { saveToCache, fetchFromCache } from "../../utils/cache.js"
+import { ClosedQuest } from "../../classes.ts"
+import { saveToCache, fetchFromCache } from "../../utils/storage.js"
 import consts from "./consts"
 import { BottomControlBar } from "../index"
 
@@ -22,7 +22,7 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
       )
     },
     yieldObj() {
-      return new ClosedQuestion(
+      return new ClosedQuest(
         type === "text" ? text : image,
         answers,
         correct,

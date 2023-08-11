@@ -5,7 +5,7 @@ import { BottomControlBar, QuestionList, MetadataForm, SiteNavbar } from "../com
 
 import QuestionForm from "../components/ClosedQuestionForm/ClosedQuestionForm"
 
-import * as utils from "../utils"
+import * as storage from "../utils/storage"
 import { Exam } from "../classes.ts"
 
 const Editor = () => {
@@ -43,7 +43,7 @@ const Editor = () => {
       metaObj,
       quests
     )
-    console.log(examObj)
+    storage.save(examObj.id, examObj)
   }
 
 

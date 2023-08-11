@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 
-class ClosedQuestion {
+class ClosedQuest {
   id: string = uuidv4()
   constructor(
     public body: string | File, // either text question or image question
@@ -10,7 +10,7 @@ class ClosedQuestion {
   ) { }
 }
 
-class OpenQuestion {
+class OpenQuest {
   id: string = uuidv4()
   constructor(
     public body: string | File // either text question or image question
@@ -33,13 +33,13 @@ class Exam {
 
   constructor(
     public metadata: Metadata,
-    public questions: ClosedQuestion[] | OpenQuestion[]
+    public quests: ClosedQuest[] | OpenQuest[]
   ) { }
 }
 
 export {
-  ClosedQuestion,
-  OpenQuestion,
+  ClosedQuest,
+  OpenQuest,
   Exam,
   Metadata
 }
