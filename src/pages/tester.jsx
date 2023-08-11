@@ -3,10 +3,10 @@ import React from 'react'
 import { ApiTester } from '../components'
 
 
-const tester = () => {
+const Tester = () => {
   return (
     <ApiTester />
   )
 }
 
-export default tester
+export default Tester

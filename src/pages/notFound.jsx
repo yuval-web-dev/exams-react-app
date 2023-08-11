@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-const notFound = () => {
+const NotFound = () => {
   return (
     <React.Fragment>
       <p>Are you lost?</p>
@@ -14,4 +14,4 @@ const notFound = () => {
   )
 }
 
-export default notFound
+export default NotFound

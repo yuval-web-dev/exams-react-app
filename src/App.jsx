@@ -28,11 +28,11 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path='/' element={<pages.home />} />
-      <Route path='/edit' element={<pages.editor />} />
-      <Route path='/test' element={<pages.tester />} />
-      <Route path='/about' element={<pages.about />} />
-      <Route path='/*' element={< pages.notFound />} />
+      <Route path='/' element={<pages.Home />} />
+      <Route path='/edit' element={<pages.Editor />} />
+      <Route path='/test' element={<pages.Tester />} />
+      <Route path='/about' element={<pages.About />} />
+      <Route path='/*' element={< pages.NotFound />} />
     </Routes>
   )
 }

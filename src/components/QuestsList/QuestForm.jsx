@@ -3,10 +3,16 @@ import { Accordion, Row, Col, Form, Button, ListGroup, Table, ButtonGroup, } fro
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 import { ClosedQuest } from "../../classes.ts"
-import consts from "./consts"
+import consts from "./consts.js"
 
-import { green, red } from "../../assets/svg"
+import { green, red } from "../../assets/svg/index.js"
 
+import QuestForm from './QuestForm'
+
+const testStringPattern = (s, pattern) => {
+  const patternRegex = new RegExp(pattern)
+  return patternRegex.test(s)
+}
 
 const ClosedQuestionForm = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
@@ -59,11 +65,6 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
   const handleImageUpload = async (e) => {
     const newImage = e.target.files[0]
     setImage(newImage)
-  }
-
-  const testStringPattern = (s, pattern) => {
-    const patternRegex = new RegExp(pattern)
-    return patternRegex.test(s)
   }
 
   const handleTypeChange = () => {
@@ -138,60 +139,6 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
       setChecked([...checked, answer])
     }
   }
-
-
-
-
-  const style = {
-    correct: { backgroundColor: `rgba(80, 224, 120, 0.1)` },
-    wrong: { backgroundColor: `rgba(224, 80, 80, 0.1)` }
-  }
-
-  // const AnswersTable = () => (
-  //   <Table
-  //     hover={true}
-  //     responsive={true}>
-  //     <tbody>
-  //       {answers.map((answer, idx) => {
-  //         return (
-  //           <tr key={answer} >
-  //             <td>
-  //               <Button
-  //                 variant={buttonVariant}
-  //                 onClick={() => setCorrect(answer)}>
-  //                 <img
-  //                   src={correct === answer ? green : red}
-  //                   height="25px" />
-  //               </Button>
-  //             </td>
-  //             <td style={answer === correct ? style.correct : style.wrong}>
-  //               {answer}
-  //             </td>
-  //             <td>
-  //               <ButtonGroup>
-  //                 <Button
-  //                   variant={buttonVariant}
-  //                   onClick={() => handleMoveUp(answer, idx)}>
-  //                   ⯅
-  //                 </Button>
-  //                 <Button
-  //                   variant={buttonVariant}
-  //                   onClick={() => handleMoveDown(answer, idx)}>
-  //                   ⯆
-  //                 </Button>
-  //                 <Button
-  //                   variant={buttonVariant}
-  //                   onClick={() => handleAnswerDiscard(answer)}>
-  //                   Discard
-  //                 </Button>
-  //               </ButtonGroup>
-  //             </td>
-  //           </tr>
-  //         )
-  //       })}
-  //     </tbody>
-  //   </Table>
-  // )
 
   const ImageInput = () => (
     <Form.Control
@@ -268,7 +215,6 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
             {AnswersListGroup()}
           </Col>
         </Row>
-
       </Accordion.Body>
     </Accordion.Item>
   )
