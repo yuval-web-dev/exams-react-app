@@ -1,11 +1,9 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from "react"
-import { Row, Col, Form, Button, Image as BootstrapImage, ButtonGroup, Table, Container } from "react-bootstrap"
+import { Accordion, Row, Col, Form, Button, ListGroup, Table, ButtonGroup, } from "react-bootstrap"
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 import { ClosedQuest } from "../../classes.ts"
-import { saveToCache, fetchFromCache } from "../../utils/storage.js"
 import consts from "./consts"
-import { BottomControlBar } from "../index"
 
 import { green, red } from "../../assets/svg"
 
@@ -37,7 +35,8 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
     image: null,
     answers: [],
     correct: "",
-    shuffle: false
+    shuffle: false,
+    checked: []
   }
 
   const defaultRefs = {
@@ -52,25 +51,30 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
   const [correct, setCorrect] = useState(defaultStates.correct)
   const [shuffle, setShuffle] = useState(defaultStates.shuffle)
 
+  const [checked, setChecked] = useState(defaultStates.checked)
+
   const imageInputRef = useRef(defaultRefs.imageInput)
   const answerFormRef = useRef(defaultRefs.answerForm)
 
   const handleImageUpload = async (e) => {
-    // Set the states
     const newImage = e.target.files[0]
     setImage(newImage)
-    // setImageUrl(URL.createObjectURL(newImage))
-
-    // // Save image to cache
-    // await saveImageToCache(newImage)
-
-    // // Update the input to be empty to allow same file consecutive upload
-    // imageInputRef.current.value = ""
   }
 
   const testStringPattern = (s, pattern) => {
     const patternRegex = new RegExp(pattern)
     return patternRegex.test(s)
+  }
+
+  const handleTypeChange = () => {
+    if (type === "text") { // from text to image
+      setType("image")
+      setText(defaultStates.text)
+    }
+    else { // from image to text
+      setType("text")
+      setImage(defaultStates.image)
+    }
   }
 
   const handleAnswerAdd = () => {
@@ -91,175 +95,103 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
     }
   }
 
-  const handleAnswerDiscard = (answer) => {
-    setAnswers(answers.filter(i => i !== answer))
-    if (correct === answer) {
+  const handleSetCorrect = () => {
+    setCorrect(checked[0])
+    setChecked(defaultStates.checked)
+  }
+
+  const handleMoveUp = () => {
+    const idx = answers.indexOf(checked[0])
+    if (idx > 0) {
+      var newAnswers = [...answers]
+      const replaced = newAnswers[idx - 1]
+      newAnswers[idx - 1] = checked[0]
+      newAnswers[idx] = replaced
+      setAnswers(newAnswers)
+    }
+  }
+
+  const handleMoveDown = () => {
+    const idx = answers.indexOf(checked[0])
+    if (idx < (answers.length - 1)) {
+      var newAnswers = [...answers]
+      const replaced = newAnswers[idx + 1]
+      newAnswers[idx + 1] = checked[0]
+      newAnswers[idx] = replaced
+      setAnswers(newAnswers)
+    }
+  }
+
+  const handleRemove = () => {
+    setAnswers(answers.filter(i => !checked.includes(i)))
+    if (checked.includes(correct)) {
       setCorrect(defaultStates.correct)
     }
+    setChecked(defaultStates.checked)
   }
 
-  const handleMoveUp = (answer, idx) => {
-    if (idx > 0) {
-      let newAnswers = [...answers]
-      const replaced = newAnswers[idx - 1]
-      newAnswers[idx - 1] = answer
-      newAnswers[idx] = replaced
-      setAnswers(newAnswers)
+  const handleCheckboxChange = (answer) => {
+    if (checked.includes(answer)) {
+      setChecked(checked.filter(i => i !== answer))
+    }
+    else {
+      setChecked([...checked, answer])
     }
   }
 
-  const handleMoveDown = (answer, idx) => {
-    if (idx < (answers.length - 1)) {
-      let newAnswers = [...answers]
-      const replaced = newAnswers[idx + 1]
-      newAnswers[idx + 1] = answer
-      newAnswers[idx] = replaced
-      setAnswers(newAnswers)
-    }
-  }
 
-  // const handleJsonChange = (newFile) => {
-  //   const allowedTypes = ["application/json"]
-  //   if (newFile === undefined) {
-  //     return
-  //   }
-  //   else if (!allowedTypes.includes(newFile?.type)) {
-  //     alert(`Allowed file types: ${[...allowedTypes]}`)
-  //     setJsonImport(null)
-  //   }
-  //   else {
-  //     setJsonImport(newFile)
-  //   }
-  //   jsonInputRef.current.value = ""
-  // }
 
-  // const handleJsonImport = () => {
-  //   // const reader = new FileReader()
-
-  //   // reader.onload = async (e) => {
-  //   //   const jsonParsed = JSON.parse(e.target.result)
-  //   //   const keys = Object.keys(jsonParsed)
-  //   //   const possibleKeys = ["body", "image", "answers", "corrects", "isRandomized"]
-  //   //   if (!keys.every(key => (possibleKeys.includes(key)))) {
-  //   //     alert("bad JSON!")
-  //   //     return
-  //   //   }
-  //   //   if (jsonParsed.hasOwnProperty("body")) {
-  //   //     setBody(jsonParsed.body)
-  //   //   }
-  //   //   if (jsonParsed.hasOwnProperty("image")) {
-  //   //     const imageName = jsonParsed.image
-  //   //     const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
-
-  //   //     if (storedImageBlob === null) {
-  //   //       alert(`Could not find "${imageName}" in cache`)
-  //   //     }
-  //   //     else {
-  //   //       // const storedImageData = URL.createObjectURL(storedImageBlob)
-  //   //       // const storedImage = new Image()
-  //   //       // storedImage.onload = () => {
-  //   //       //   setImageUrl(storedImage)
-  //   //       // }
-  //   //       // storedImage.src = storedImageData
-  //   //       // setImageUrl(storedImageData)
-  //   //       const storedImageData = URL.createObjectURL(storedImageBlob)
-  //   //       const storedImage = new Image()
-  //   //       storedImage.src = storedImageData
-  //   //       setImageUrl(storedImage)
-  //   //     }
-  //   //   }
-  //   //   if (jsonParsed.hasOwnProperty("answers")) {
-  //   //     setAnswers(jsonParsed.answers)
-  //   //   }
-
-  //   //   if (jsonParsed.hasOwnProperty("corrects")) {
-  //   //     setCorrect(jsonParsed.corrects)
-  //   //   }
-
-  //   //   if (jsonParsed.hasOwnProperty("isRandomized")) {
-  //   //     setShuffle(jsonParsed.isRandomized)
-  //   //   }
-  //   // }
-  //   // reader.readAsText(jsonImport)
-
-  //   // setJsonImport(null)
-  // }
-
-  // const handleJsonExport = () => {
-  //   // const data = {
-  //   //   body,
-  //   //   image: img.name,
-  //   //   answers,
-  //   //   corrects: correct,
-  //   //   isRandomized: shuffle
-  //   // }
-  //   // const json = JSON.stringify(data)
-  //   // const element = document.createElement("a")
-  //   // element.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(json))
-  //   // // element.setAttribute("download", `${jsonName === "" ? "question" : jsonName}.json`)
-  //   // element.setAttribute("download", `${jsonExport === "" ? "untitled_question" : jsonExport}.json`)
-  //   // element.style.display = "none"
-  //   // document.body.appendChild(element)
-  //   // element.click()
-  //   // document.body.removeChild(element)
-  // }
-
-  const rowClass = "align-items-center"
 
   const style = {
     correct: { backgroundColor: `rgba(80, 224, 120, 0.1)` },
     wrong: { backgroundColor: `rgba(224, 80, 80, 0.1)` }
   }
 
-  const buttonVariant = "outline-light"
-
-  const AnswersTable = () => (
-    <Table
-      hover={true}
-      responsive={true}>
-      <tbody>
-        {answers.map((answer, idx) => {
-          return (
-            <tr
-              key={answer}
-              style={answer === correct ? style.correct : style.wrong}>
-              <td>
-                <Button
-                  variant={buttonVariant}
-                  onClick={() => setCorrect(answer)}>
-                  <img
-                    src={correct === answer ? green : red}
-                    height="30px" />
-                </Button>
-              </td>
-              <td className="w-100">
-                {answer}
-              </td>
-              <td>
-                <ButtonGroup>
-                  <Button
-                    variant={buttonVariant}
-                    onClick={() => handleMoveUp(answer, idx)}>
-                    ⯅
-                  </Button>
-                  <Button
-                    variant={buttonVariant}
-                    onClick={() => handleMoveDown(answer, idx)}>
-                    ⯆
-                  </Button>
-                  <Button
-                    variant={buttonVariant}
-                    onClick={() => handleAnswerDiscard(answer)}>
-                    Discard
-                  </Button>
-                </ButtonGroup>
-              </td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </Table>
-  )
+  // const AnswersTable = () => (
+  //   <Table
+  //     hover={true}
+  //     responsive={true}>
+  //     <tbody>
+  //       {answers.map((answer, idx) => {
+  //         return (
+  //           <tr key={answer} >
+  //             <td>
+  //               <Button
+  //                 variant={buttonVariant}
+  //                 onClick={() => setCorrect(answer)}>
+  //                 <img
+  //                   src={correct === answer ? green : red}
+  //                   height="25px" />
+  //               </Button>
+  //             </td>
+  //             <td style={answer === correct ? style.correct : style.wrong}>
+  //               {answer}
+  //             </td>
+  //             <td>
+  //               <ButtonGroup>
+  //                 <Button
+  //                   variant={buttonVariant}
+  //                   onClick={() => handleMoveUp(answer, idx)}>
+  //                   ⯅
+  //                 </Button>
+  //                 <Button
+  //                   variant={buttonVariant}
+  //                   onClick={() => handleMoveDown(answer, idx)}>
+  //                   ⯆
+  //                 </Button>
+  //                 <Button
+  //                   variant={buttonVariant}
+  //                   onClick={() => handleAnswerDiscard(answer)}>
+  //                   Discard
+  //                 </Button>
+  //               </ButtonGroup>
+  //             </td>
+  //           </tr>
+  //         )
+  //       })}
+  //     </tbody>
+  //   </Table>
+  // )
 
   const ImageInput = () => (
     <Form.Control
@@ -272,97 +204,151 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
 
   const TextInput = () => (
     <Form.Control
-      required={true}
+      as="textarea"
       type="text"
-      spellCheck={true}
+      spellCheck
       pattern={consts.answerPattern}
       onChange={e => setText(e.target.value)} />
   )
 
-  const handleTypeChange = () => {
-    if (type === "text") { // from text to image
-      setType("image")
-      setText(defaultStates.text)
-    }
-    else { // from image to text
-      setType("text")
-      setImage(defaultStates.image)
-    }
-  }
+  const BodyAccordItem = () => (
+    <Accordion.Item>
+      <Accordion.Header>Body</Accordion.Header>
+      <Accordion.Body>
+        <Row>
+          <Col xs="12">
+            <Button
+              className="w-25"
+              size="sm"
+              variant={type === "text" ? "light" : "primary"}
+              onClick={handleTypeChange}>
+              {type === "text" ? "Text" : "Image"}
+            </Button>
+          </Col>
+          <Col xs="12">
+            {type === "text" ? TextInput() : ImageInput()}
+          </Col>
+        </Row>
+      </Accordion.Body>
 
-  const BodyRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1}>
-        Body
-      </Col>
-      <Col xs={consts.col2}>
-        {type === "text" ? TextInput() : ImageInput()}
-      </Col>
-      <Col xs={consts.col3}>
-        <BootstrapSwitchButton
-          width={100}
-          onstyle="light"
-          offlabel="Text"
-          onlabel="Image"
-          onChange={handleTypeChange} />
-      </Col>
-    </Row>
+    </Accordion.Item>
   )
 
-  const AnswerRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1}>
-        Answer
-      </Col>
-      <Col xs={consts.col2}>
+  const AnswerForm = () => (
+    <Row>
+      <ButtonGroup as="Col" xs="12">
         <Form.Control
-          required={true}
+          as="textarea"
           ref={answerFormRef}
           type="text"
-          spellCheck={true}
+          spellCheck
           pattern="[A-Za-z0-9]+" />
-      </Col>
-      <Col xs={consts.col3}>
         <Button
+          size="sm"
           onClick={handleAnswerAdd}
-          variant="outline-primary"
-          style={{ width: 100 }}>
+          variant="outline-primary">
           Add
         </Button>
-      </Col>
+      </ButtonGroup>
     </Row>
   )
 
-  const ShuffleRow = () => (
-    <Row className={rowClass}>
-      <Col xs={consts.col1}>
-        Shuffle
-      </Col>
-      <Col xs={consts.col2}>
-        <BootstrapSwitchButton
-          checked={shuffle}
-          onChange={() => setShuffle(!shuffle)} />
-      </Col>
-    </Row>
+  const AnswersAccordItem = () => (
+    <Accordion.Item>
+      <Accordion.Header>Answers</Accordion.Header>
+      <Accordion.Body>
+        <Row>
+          <Col xs="12" className="mb-4">
+            {AnswerForm()}
+          </Col>
+          <Col xs="12">
+            {ActionBar()}
+          </Col>
+          <Col xs="12">
+            {AnswersListGroup()}
+          </Col>
+        </Row>
+
+      </Accordion.Body>
+    </Accordion.Item>
   )
 
-  const AnswersListRow = () => (
-    <Row >
-      <Col xs={consts.col1} />
-      <Col xs={consts.col2}>
-        {AnswersTable()}
-      </Col>
-      <Col xs={consts.col3} />
-    </Row>
+  const ActionBar = () => {
+    // ensures only one answer is checked
+    const disabled = checked.length !== 1 ? true : false
+    return (
+      <Row>
+        <Col className="d-flex justify-content-end">
+          <Button
+            className="me-auto"
+            size="sm"
+            variant={shuffle ? "warning" : "light"}
+            onClick={() => setShuffle(!shuffle)}>
+            {shuffle ? "Shuffled" : "Ordered"}
+          </Button>
+          <Button
+            size="sm"
+            variant="light"
+            disabled={disabled || (checked[0] === correct)}
+            onClick={handleSetCorrect}>
+            Set correct
+          </Button>
+          <Button
+            size="sm"
+            variant="light"
+            disabled={disabled}
+            onClick={handleMoveUp}>
+            Move up
+          </Button>
+          <Button
+            size="sm"
+            variant="light"
+            disabled={disabled}
+            onClick={handleMoveDown}>
+            Move down
+          </Button>
+          <Button
+            size="sm"
+            variant="outline-danger"
+            disabled={checked.length === 0}
+            onClick={handleRemove}>Remove</Button>
+        </Col>
+      </Row>
+    )
+  }
+
+  const AnswersListGroup = () => (
+    <ListGroup>
+      {answers.map((answer, idx) => (
+        <ListGroup.Item
+          key={idx}
+          action
+          variant={answer === correct ? "success" : "danger"}
+          style={{ cursor: "default" }}>
+          <Row>
+            <Col xs="1">
+              <Form.Check
+                type="checkbox"
+                checked={checked.includes(answer)}
+                onChange={() => handleCheckboxChange(answer)} />
+            </Col>
+            <Col xs="1">
+              {idx + 1}
+            </Col>
+            <Col>
+              {answer}
+            </Col>
+          </Row>
+        </ListGroup.Item>
+      ))}
+    </ListGroup>
   )
 
   return (
-    <React.Fragment>
-      {BodyRow()}
-      {AnswerRow()}
-      {AnswersListRow()}
-      {ShuffleRow()}
-    </React.Fragment>
+    <Accordion>
+      {BodyAccordItem()}
+      {AnswersAccordItem()}
+    </Accordion>
   )
 })
 
