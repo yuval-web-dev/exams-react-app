@@ -127,7 +127,7 @@ const QuestsList = forwardRef(({ }, ref) => {
   const handleRemove = () => {
     setQuests(quests.filter(i => !checked.includes(i)))
     setChecked(defaultStates.checked)
-    // checkAllRef.current.checked = false
+    checkAllRef.current.checked = false
   }
 
   const handleCheckboxChange = (quest) => {
@@ -179,71 +179,6 @@ const QuestsList = forwardRef(({ }, ref) => {
         </Button>
       </Modal.Footer>
     </Modal>
-  )
-
-  const ActionsDropdown = () => {
-    const single = checked.length === 1
-    const multiple = checked.length > 0
-    return (
-      <DropdownButton
-        ref={actionsDrpRef}
-        variant="outline-primary"
-        drop="end"
-        title="Actions"
-        disabled={quests.length < 1}
-        autoClose={"outside"}>
-        <Dropdown.Item
-          disabled={!multiple}
-          size="sm"
-          variant="danger"
-          onClick={handleRemove}>
-          Remove
-        </Dropdown.Item>
-        <Dropdown.Item
-          disabled={!multiple}
-          size="sm"
-          onClick={handleExport}>
-          Export JSON
-        </Dropdown.Item>
-        <Dropdown.Item
-          disabled={!single}
-          size="sm"
-          onClick={handleMoveUp}>
-          Move up
-        </Dropdown.Item>
-        <Dropdown.Item
-          disabled={!single}
-          size="sm"
-          variant="light"
-          onClick={handleMoveDown}>
-          Move down
-        </Dropdown.Item>
-
-      </DropdownButton >
-    )
-  }
-
-  const AddDropdown = () => (
-    <DropdownButton
-      variant="outline-primary"
-      drop="down"
-      title="Add">
-      <Dropdown.Item
-        as="button"
-        onClick={() => { setFormShow(true) }}>
-        Create your own
-      </Dropdown.Item>
-      <Dropdown.Item
-        as="button"
-        onClick={() => fileInputRef.current.click()}>
-        From JSON
-      </Dropdown.Item>
-      <Dropdown.Item
-        as="button"
-        onClick={() => { }}>
-        From API
-      </Dropdown.Item>
-    </DropdownButton>
   )
 
   const ActionBar = () => {
