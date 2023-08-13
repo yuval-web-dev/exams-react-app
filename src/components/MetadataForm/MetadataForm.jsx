@@ -1,6 +1,9 @@
 import React, { useState, useImperativeHandle, forwardRef } from "react"
-import { Container, Row, Col, Form } from "react-bootstrap"
-import BootstrapSwitchButton from "bootstrap-switch-button-react"
+import {
+  Container, Row, Col,
+  Form,
+  Button
+} from "react-bootstrap"
 import TimePicker from "react-bootstrap-time-picker"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -44,6 +47,7 @@ const MetadataForm = forwardRef(({ }, ref) => {
   const [date, setDate] = useState(defaultStates.date) // Millis
   const [startHr, setStart] = useState(defaultStates.startHr) // Secs
   const [duration, setDuration] = useState(defaultStates.duration)
+  const [shuffle, setShuffle] = useState(defaultStates.shuffle)
 
   const rowClass = "align-items-center"
 
@@ -73,40 +77,38 @@ const MetadataForm = forwardRef(({ }, ref) => {
             value={date}
             selected={date}
             className="form-control"
-            minDate={consts.tomorrow}
+            minDate={tomorrow}
             dateFormat={consts.dateFormat}
             onChange={newDate => setDate(newDate)} />
         </Col>
       </Col>
-      <Col className="d-flex">
-        <Col>
-          <Col xs="12">Start</Col>
+      <Col>
+        <Col xs="12">Start</Col>
+        <Col xs="12">
+          <TimePicker
+            value={startHr}
+            format={24}
+            step={30}
+            start={consts.minHourRepr}
+            end={consts.maxHourRepr}
+            onChange={time => setStart(time)} />
+        </Col>
+      </Col>
+      <Col>
+        <Row>
+          <Col xs="12">End</Col>
           <Col xs="12">
             <TimePicker
-              value={startHr}
+              value={startHr + (duration * 60)}
               format={24}
-              step={30}
-              start={consts.minHourRepr}
-              end={consts.maxHourRepr}
-              onChange={time => setStart(time)} />
+              style={{ color: "grey", pointerEvents: "none" }} />
           </Col>
-        </Col>
-        <Col>
-          <Row>
-            <Col xs="12">End</Col>
-            <Col xs="12">
-              <TimePicker
-                value={startHr + (duration * 60)}
-                format={24}
-                style={{ color: "grey", pointerEvents: "none" }} />
-            </Col>
-          </Row>
-        </Col>
+        </Row>
       </Col>
     </Row>
   )
 
-  const DurationSlider = () => (
+  const DurationForm = () => (
     <Row className="my-3">
       <Col xs="12">Duration (Mins)</Col>
       <Col xs="12">
@@ -122,11 +124,26 @@ const MetadataForm = forwardRef(({ }, ref) => {
     </Row>
   )
 
+  const ShuffleForm = () => (
+    <Row className="my-3">
+      <Col xs="12">Question Order</Col>
+      <Col xs="12">
+        <Button
+          className="me-auto"
+          variant={shuffle ? "warning" : "light"}
+          onClick={() => setShuffle(!shuffle)}>
+          {shuffle ? "Shuffled" : "Ordered"}
+        </Button>
+      </Col>
+    </Row>
+  )
+
   return (
     <Container>
       {SubjectForm()}
       {DateTimeForm()}
-      {DurationSlider()}
+      {DurationForm()}
+      {ShuffleForm()}
     </Container >
   )
 })

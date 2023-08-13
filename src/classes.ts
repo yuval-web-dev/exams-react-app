@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 class ClosedQuest {
   id: string = uuidv4()
   constructor(
+    public type: "text" | "image",
     public body: string | File, // either text question or image question
     public answers: string[],
     public correct: string,
@@ -13,6 +14,7 @@ class ClosedQuest {
 class OpenQuest {
   id: string = uuidv4()
   constructor(
+    public type: "text" | "image",
     public body: string | File // either text question or image question
   ) { }
 }

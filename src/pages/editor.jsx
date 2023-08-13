@@ -1,9 +1,18 @@
 import React, { useState, useRef } from "react"
-import { Navbar, Accordion, Container, Row, Col, Modal, ButtonGroup, Button } from "react-bootstrap"
+import {
+  Navbar,
+  Container, Row, Col,
+  ButtonGroup, Button,
+  Accordion,
+  Modal,
+  Card
+} from "react-bootstrap"
 
 import { QuestsList, MetadataForm, SiteNavbar } from "../components"
 import * as storage from "../utils/storage"
 import { Exam } from "../classes.ts"
+import "./editor.scss"
+
 
 const Editor = () => {
   const defaultStates = {
@@ -56,38 +65,57 @@ const Editor = () => {
     </Accordion.Item>
   )
 
+  const MetaCard = () => (
+    <Card>
+      <Card.Header>Metadata</Card.Header>
+      <Card.Body>
+        <MetadataForm ref={metaFormRef} />
+      </Card.Body>
+    </Card>
+  )
+
+  const QuestsCard = () => (
+    <Card>
+      <Card.Header>Questions</Card.Header>
+      <Card.Body>
+        <QuestsList ref={questListRef} />
+      </Card.Body>
+    </Card>
+  )
+
   return (
     <React.Fragment>
       <SiteNavbar.Top />
-
       <Container>
         <h1>New Exam</h1>
+        <Card>
+          <Row>
+            <Col lg="4">
+              <MetaCard />
+            </Col>
+            <Col>
+              <QuestsCard />
+            </Col>
+          </Row>
 
-        <Accordion defaultActiveKey={["0", "1"]} alwaysOpen>
-          {MetaAccordItem("0")}
-          {QuestsAccordItem("1")}
-        </Accordion>
-
-        <Navbar sticky="bottom" className="justify-content-end">
-          <Button
-            variant="secondary"
-            onClick={handleCancelButton}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSaveButton}>
-            Save
-          </Button>
-        </Navbar>
+          <Card.Footer className="d-flex justify-content-end">
+            <Button
+              variant="secondary"
+              onClick={handleCancelButton}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSaveButton}>
+              Save
+            </Button>
+          </Card.Footer>
+        </Card>
       </Container>
-
-      <SiteNavbar.Bottom />
-
     </React.Fragment>
   )
 }
 
 export default Editor
 
-const scrollable = { maxHeight: "40vh", overflowY: "scroll" }
+// const scrollable = { maxHeight: "40vh", overflowY: "scroll" }

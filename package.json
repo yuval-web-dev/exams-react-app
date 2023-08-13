@@ -18,8 +18,12 @@
     "react-bootstrap-time-picker": "^2.0.1",
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "react-markdown": "^8.0.7",
     "react-router-dom": "^6.10.0",
     "react-scripts": "^5.0.1",
+    "react-syntax-highlighter": "^15.5.0",
+    "sass": "^1.65.1",
     "serialize-javascript": "^6.0.1",
     "typescript": "^5.1.6",
     "uuid": "^9.0.0"

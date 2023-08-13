@@ -1,8 +1,26 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react"
-import { ListGroup, Form, Dropdown, DropdownButton, Modal, Row, Col, Image, Table, Button, ButtonGroup, Nav } from "react-bootstrap"
+import {
+  ListGroup,
+  Form,
+  Dropdown,
+  DropdownButton,
+  Modal,
+  Row,
+  Col,
+  Image,
+  Table,
+  Button, ToggleButton, ButtonGroup,
+  Nav,
+  Badge,
+  OverlayTrigger, Tooltip
+} from "react-bootstrap"
+import { GoTrash, GoPencil } from "react-icons/go"
+import { TfiImport, TfiExport } from "react-icons/tfi"
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
+import { BsCloudDownload } from "react-icons/bs"
 
-import ImageModal from "./ImageModal"
 import QuestForm from "./QuestForm"
+import QuestPreview from "./QuestPreview"
 
 const QuestsList = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
@@ -17,37 +35,23 @@ const QuestsList = forwardRef(({ }, ref) => {
   const defaultStates = {
     quests: [],
     shuffle: false,
-    questModalShow: false,
-    checked: []
-  }
-
-  const defaultRefs = {
-    questFormRef: null,
-    fileInputRef: null
+    formShow: false,
+    previewShow: false,
+    checked: [],
+    selected: { quest: null, idx: null }
   }
 
   const [quests, setQuests] = useState(defaultStates.quests)
-  const [shuffle, setShuffle] = useState(defaultStates.shuffle)
-  const [questModalShow, setQuestModalShow] = useState(defaultStates.questModalShow)
+  const [previewShow, setPreviewShow] = useState(defaultStates.previewShow)
+  const [formShow, setFormShow] = useState(defaultStates.formShow)
   const [checked, setChecked] = useState(defaultStates.checked)
+  const [selected, setSelected] = useState(defaultStates.selected)
+  const [actionsDdShow, setActionsDdShow] = useState(false)
 
-  const questFormRef = useRef(defaultRefs.questFormRef)
-  const fileInputRef = useRef(defaultRefs.fileInputRef)
-
-  // const MapAnswers = (question) => (
-  //   <ol>{
-  //     question.answers.map(answer => {
-  //       return (
-  //         <li
-  //           key={answer}
-  //           style={answer === question.correct ? { color: "green", fontWeight: "bold" } : {}}>
-  //           {answer}
-  //         </li>
-  //       )
-  //     })
-  //   }
-  //   </ol>
-  // )
+  const questFormRef = useRef()
+  const fileInputRef = useRef()
+  const checkAllRef = useRef()
+  const actionsDrpRef = useRef()
 
   const handleExport = () => {
     checked.forEach((item, index) => {
@@ -123,6 +127,7 @@ const QuestsList = forwardRef(({ }, ref) => {
   const handleRemove = () => {
     setQuests(quests.filter(i => !checked.includes(i)))
     setChecked(defaultStates.checked)
+    // checkAllRef.current.checked = false
   }
 
   const handleCheckboxChange = (quest) => {
@@ -141,16 +146,17 @@ const QuestsList = forwardRef(({ }, ref) => {
     }
     const questObj = questFormRef.current.yieldObj()
     setQuests([...quests, questObj])
-    setQuestModalShow(false)
+    setFormShow(false)
   }
 
-  const handleImageLinkClick = (question) => {
-    // setShowImageModal(true)
+  const handleListGroupClick = (quest, idx) => {
+    setSelected({ quest, idx })
+    setPreviewShow(true)
   }
 
-  const QuestModal = () => (
+  const QuestFormModal = () => (
     <Modal
-      show={questModalShow}
+      show={formShow}
       size="lg">
       <Modal.Header>
         <Modal.Title>
@@ -163,7 +169,7 @@ const QuestsList = forwardRef(({ }, ref) => {
       <Modal.Footer>
         <Button
           variant="secondary"
-          onClick={() => setQuestModalShow(false)}>
+          onClick={() => setFormShow(false)}>
           Cancel
         </Button>
         <Button
@@ -175,14 +181,56 @@ const QuestsList = forwardRef(({ }, ref) => {
     </Modal>
   )
 
+  const ActionsDropdown = () => {
+    const single = checked.length === 1
+    const multiple = checked.length > 0
+    return (
+      <DropdownButton
+        ref={actionsDrpRef}
+        variant="outline-primary"
+        drop="end"
+        title="Actions"
+        disabled={quests.length < 1}
+        autoClose={"outside"}>
+        <Dropdown.Item
+          disabled={!multiple}
+          size="sm"
+          variant="danger"
+          onClick={handleRemove}>
+          Remove
+        </Dropdown.Item>
+        <Dropdown.Item
+          disabled={!multiple}
+          size="sm"
+          onClick={handleExport}>
+          Export JSON
+        </Dropdown.Item>
+        <Dropdown.Item
+          disabled={!single}
+          size="sm"
+          onClick={handleMoveUp}>
+          Move up
+        </Dropdown.Item>
+        <Dropdown.Item
+          disabled={!single}
+          size="sm"
+          variant="light"
+          onClick={handleMoveDown}>
+          Move down
+        </Dropdown.Item>
+
+      </DropdownButton >
+    )
+  }
+
   const AddDropdown = () => (
     <DropdownButton
-      size="sm"
-      drop="up"
+      variant="outline-primary"
+      drop="down"
       title="Add">
       <Dropdown.Item
         as="button"
-        onClick={() => { setQuestModalShow(true) }}>
+        onClick={() => { setFormShow(true) }}>
         Create your own
       </Dropdown.Item>
       <Dropdown.Item
@@ -201,76 +249,151 @@ const QuestsList = forwardRef(({ }, ref) => {
   const ActionBar = () => {
     const single = checked.length === 1
     const multiple = checked.length > 0
+
+    const variant = "light"
+
     return (
       <Row>
-        <Col className="d-flex justify-content-end">
-          {AddDropdown()}
-          <Button
-            className="me-auto"
-            size="sm"
-            variant={shuffle ? "warning" : "light"}
-            onClick={() => setShuffle(!shuffle)}>
-            {shuffle ? "Shuffled" : "Ordered"}
-          </Button>
-          <Button
-            disabled={!multiple}
-            size="sm"
-            variant="light"
-            onClick={handleExport}>
-            Export JSON
-          </Button>
-          <Button
-            disabled={!single}
-            size="sm"
-            variant="light"
-            onClick={handleMoveUp}>
-            Move up
-          </Button>
-          <Button
-            disabled={!single}
-            size="sm"
-            variant="light"
-            onClick={handleMoveDown}>
-            Move down
-          </Button>
-          <Button
-            disabled={!multiple}
-            size="sm"
-            variant="outline-danger"
-            onClick={handleRemove}>
-            Remove
-          </Button>
+        <Col className="d-flex">
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>Create your own</Tooltip>}>
+            <Button
+              variant={variant}
+              onClick={() => { setFormShow(true) }}>
+              <GoPencil />
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>Import JSON</Tooltip>}>
+            <Button
+              variant={variant}
+              onClick={() => fileInputRef.current.click()}>
+              <TfiImport />
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>From API</Tooltip>}>
+            <Button
+              className="me-auto"
+              variant={variant}
+              onClick={() => { }}>
+              <BsCloudDownload />
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>Export to JSON</Tooltip>}>
+            <Button
+              disabled={!multiple}
+              variant={variant}
+              onClick={handleExport}>
+              <TfiExport />
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>Move up</Tooltip>}>
+            <Button
+              disabled={!single}
+              variant={variant}
+              onClick={handleMoveUp}>
+              <AiOutlineArrowUp />
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>Move down</Tooltip>}>
+            <Button
+              disabled={!single}
+              variant={variant}
+              onClick={handleMoveDown}>
+              <AiOutlineArrowDown />
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>Remove</Tooltip>}>
+            <Button
+              variant="danger"
+              onClick={handleRemove}>
+              <GoTrash />
+            </Button>
+          </OverlayTrigger>
         </Col>
       </Row>
     )
   }
 
-  const QuestsListGroup = () => (
-    <ListGroup>
-      {quests.map((quest, idx) => (
+  const ListGroupQuests = () => {
+    const onCheck = (e) => {
+      if (!e.target.checked) {
+        setChecked(defaultStates.checked)
+      }
+      else {
+        setChecked(quests)
+      }
+    }
+
+    return (
+      <ListGroup>
         <ListGroup.Item
-          key={idx}
-          action
-          variant="light"
-          style={{ cursor: "default" }}>
+          variant="light">
           <Row>
-            <Col xs="1">
+            <Col className="me-auto">
               <Form.Check
+                style={quests.length === 0 ? { display: "none" } : {}}
+                ref={checkAllRef}
                 type="checkbox"
-                checked={checked.includes(quest)}
-                onChange={() => handleCheckboxChange(quest)} />
-            </Col>
-            <Col xs="1">
-              {idx + 1}
-            </Col>
-            <Col>
-              {quest.body}
+                disabled={quests.length < 1}
+                onChange={e => onCheck(e)} />
             </Col>
           </Row>
         </ListGroup.Item>
-      ))}
-    </ListGroup>
-  )
+
+        {
+          quests.map((quest, idx) => (
+            <ListGroup.Item
+              key={idx}
+              action
+              variant="light">
+              <Row>
+                <Col xs="1">
+                  <Form.Check
+                    type="checkbox"
+                    checked={checked.includes(quest)}
+                    onChange={() => handleCheckboxChange(quest)} />
+                </Col>
+                <Col xs="1">
+                  {idx + 1}
+                </Col>
+                <Col
+                  className="d-flex justify-content-center align-items-center"
+                  xs="1"
+                  onClick={() => { handleListGroupClick(quest, idx) }}>
+                  {quest.type === "text" ?
+                    <Badge bg="secondary">Text</Badge> :
+                    <Badge bg="primary">Image</Badge>
+                  }
+                </Col>
+                <Col>
+                  {typeof quest.body === "string" ? quest.body : quest.body.name}
+                </Col>
+              </Row>
+            </ListGroup.Item>
+          ))
+        }
+      </ListGroup >
+    )
+  }
 
   const JsonInput = () => (
     <input
@@ -284,13 +407,18 @@ const QuestsList = forwardRef(({ }, ref) => {
 
   return (
     <React.Fragment>
-      {QuestModal()}
+      <QuestPreview
+        quest={selected.quest}
+        idx={selected.idx}
+        show={previewShow}
+        setShow={setPreviewShow} />
+      {QuestFormModal()}
       <Row>
         <Col xs="12">
           {ActionBar()}
         </Col>
         <Col xs="12">
-          {QuestsListGroup()}
+          {ListGroupQuests()}
         </Col>
       </Row>
       {JsonInput()}

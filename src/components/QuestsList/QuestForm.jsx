@@ -1,20 +1,15 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from "react"
 import { Accordion, Row, Col, Form, Button, ListGroup, Table, ButtonGroup, } from "react-bootstrap"
-import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 import { ClosedQuest } from "../../classes.ts"
 import consts from "./consts.js"
-
-import { green, red } from "../../assets/svg/index.js"
-
-import QuestForm from './QuestForm'
 
 const testStringPattern = (s, pattern) => {
   const patternRegex = new RegExp(pattern)
   return patternRegex.test(s)
 }
 
-const ClosedQuestionForm = forwardRef(({ }, ref) => {
+const QuestForm = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
     error() {
       return (
@@ -27,6 +22,7 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
     },
     yieldObj() {
       return new ClosedQuest(
+        type,
         type === "text" ? text : image,
         answers,
         correct,
@@ -298,4 +294,4 @@ const ClosedQuestionForm = forwardRef(({ }, ref) => {
   )
 })
 
-export default ClosedQuestionForm
+export default QuestForm
