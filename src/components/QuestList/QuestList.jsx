@@ -1,33 +1,30 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react"
+import React, { useState, useRef, forwardRef, useImperativeHandle } from "react"
 import {
   ListGroup,
   Form,
-  Dropdown,
-  DropdownButton,
   Modal,
   Row,
   Col,
-  Image,
-  Table,
-  Button, ToggleButton, ButtonGroup,
-  Nav,
+  Button,
   Badge,
   OverlayTrigger, Tooltip
 } from "react-bootstrap"
 import { GoTrash, GoPencil } from "react-icons/go"
 import { TfiImport, TfiExport } from "react-icons/tfi"
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
-import { BsCloudDownload } from "react-icons/bs"
+import { BsCloudDownload, BsEye } from "react-icons/bs"
 
-import QuestForm from "./QuestForm"
-import QuestPreview from "./QuestPreview"
+import { QuestForm } from "../QuestForm"
+import QuestPreview from "./QuestPreview.jsx"
 
-const QuestsList = forwardRef(({ }, ref) => {
+const QuestList = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
-    error() {
-      return quests.length === 0
+    validate() {
+      if (quests.length === 0) {
+        throw "err"
+      }
     },
-    yieldArr() {
+    yield() {
       return quests
     }
   }))
@@ -46,12 +43,10 @@ const QuestsList = forwardRef(({ }, ref) => {
   const [formShow, setFormShow] = useState(defaultStates.formShow)
   const [checked, setChecked] = useState(defaultStates.checked)
   const [selected, setSelected] = useState(defaultStates.selected)
-  const [actionsDdShow, setActionsDdShow] = useState(false)
 
   const questFormRef = useRef()
   const fileInputRef = useRef()
   const checkAllRef = useRef()
-  const actionsDrpRef = useRef()
 
   const handleExport = () => {
     checked.forEach((item, index) => {
@@ -140,11 +135,15 @@ const QuestsList = forwardRef(({ }, ref) => {
   }
 
   const handleQuestModalSave = () => {
-    if (questFormRef.current.error()) {
-      alert("Please fill question form as intended.")
+    try {
+      questFormRef.current.validate()
+    }
+    catch {
+      alert("QuestForm validation error.")
       return
     }
-    const questObj = questFormRef.current.yieldObj()
+
+    const questObj = questFormRef.current.yield()
     setQuests([...quests, questObj])
     setFormShow(false)
   }
@@ -184,12 +183,25 @@ const QuestsList = forwardRef(({ }, ref) => {
   const ActionBar = () => {
     const single = checked.length === 1
     const multiple = checked.length > 0
-
     const variant = "light"
+
+    const onCheck = (e) => {
+      if (!e.target.checked) {
+        setChecked(defaultStates.checked)
+      }
+      else {
+        setChecked(quests)
+      }
+    }
 
     return (
       <Row>
-        <Col className="d-flex">
+        <Col className="d-flex align-items-center">
+          <Form.Check
+            className="pe-5"
+            ref={checkAllRef}
+            type="checkbox"
+            onChange={e => onCheck(e)} />
           <OverlayTrigger
             placement="top"
             overlay={<Tooltip>Create your own</Tooltip>}>
@@ -269,63 +281,72 @@ const QuestsList = forwardRef(({ }, ref) => {
   }
 
   const ListGroupQuests = () => {
-    const onCheck = (e) => {
-      if (!e.target.checked) {
-        setChecked(defaultStates.checked)
+
+
+    const Badges = {
+      Text: <Badge bg="secondary">Text</Badge>,
+      Image: <Badge bg="primary">Image</Badge>,
+      Ordered: <Badge bg="secondary">Ordered</Badge>,
+      Shuffled: <Badge bg="warning">Shuffled</Badge>,
+    }
+
+    const BodyDisplay = (quest) => {
+      if (quest?.type === "text") {
+        if (quest?.body?.length > 50) {
+          return quest?.body?.slice(0, 50) + "..."
+        }
+        return quest?.body
       }
       else {
-        setChecked(quests)
+        return quest?.body?.name
       }
     }
 
     return (
       <ListGroup>
-        <ListGroup.Item
-          variant="light">
-          <Row>
-            <Col className="me-auto">
-              <Form.Check
-                style={quests.length === 0 ? { display: "none" } : {}}
-                ref={checkAllRef}
-                type="checkbox"
-                disabled={quests.length < 1}
-                onChange={e => onCheck(e)} />
-            </Col>
-          </Row>
+        <ListGroup.Item variant="light">
+          {ActionBar()}
         </ListGroup.Item>
 
-        {
-          quests.map((quest, idx) => (
-            <ListGroup.Item
-              key={idx}
-              action
-              variant="light">
-              <Row>
-                <Col xs="1">
-                  <Form.Check
-                    type="checkbox"
-                    checked={checked.includes(quest)}
-                    onChange={() => handleCheckboxChange(quest)} />
-                </Col>
-                <Col xs="1">
-                  {idx + 1}
-                </Col>
-                <Col
-                  className="d-flex justify-content-center align-items-center"
-                  xs="1"
-                  onClick={() => { handleListGroupClick(quest, idx) }}>
-                  {quest.type === "text" ?
-                    <Badge bg="secondary">Text</Badge> :
-                    <Badge bg="primary">Image</Badge>
-                  }
-                </Col>
-                <Col>
-                  {typeof quest.body === "string" ? quest.body : quest.body.name}
-                </Col>
-              </Row>
-            </ListGroup.Item>
-          ))
-        }
+        {quests.map((quest, idx) => (
+          <ListGroup.Item
+            key={idx}
+            action
+            variant="light">
+            <Row>
+              <Col xs="1">
+                <Form.Check
+                  type="checkbox"
+                  checked={checked.includes(quest)}
+                  onChange={() => handleCheckboxChange(quest)} />
+              </Col>
+              <Col xs="8" className="px-0">
+                {`${idx + 1}. `}
+                {BodyDisplay(quest)}
+              </Col>
+              <Col xs="3" className="px-0">
+                <Row>
+                  <Col xs="6" className="me-auto">
+                    <Col>
+                      {quest.shuffled === true ? Badges.Shuffled : Badges.Ordered}
+                    </Col>
+                    <Col>
+                      {quest.type === "text" ? Badges.Text : Badges.Image}
+                    </Col>
+                  </Col>
+                  <Col xs="6">
+                    <Button
+                      className="border-0"
+                      variant="light"
+                      onClick={() => handleListGroupClick(quest, idx)}>
+                      <BsEye />
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </ListGroup.Item>
+        ))}
       </ListGroup >
     )
   }
@@ -349,10 +370,7 @@ const QuestsList = forwardRef(({ }, ref) => {
         setShow={setPreviewShow} />
       {QuestFormModal()}
       <Row>
-        <Col xs="12">
-          {ActionBar()}
-        </Col>
-        <Col xs="12">
+        <Col>
           {ListGroupQuests()}
         </Col>
       </Row>
@@ -361,4 +379,4 @@ const QuestsList = forwardRef(({ }, ref) => {
   )
 })
 
-export default QuestsList
+export default QuestList

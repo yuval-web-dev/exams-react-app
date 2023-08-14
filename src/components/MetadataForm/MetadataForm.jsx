@@ -16,10 +16,12 @@ import { Metadata } from "../../classes.ts"
 
 const MetadataForm = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
-    error() {
-      return subject === defaultStates.subject
+    validate() {
+      if (subject === defaultStates.subject) {
+        throw "err"
+      }
     },
-    yieldObj() {
+    yield() {
       const cdate = new Date(date)
       cdate.setHours(0, 0, 0, 0)
       cdate.setSeconds(startHr)
@@ -49,8 +51,6 @@ const MetadataForm = forwardRef(({ }, ref) => {
   const [duration, setDuration] = useState(defaultStates.duration)
   const [shuffle, setShuffle] = useState(defaultStates.shuffle)
 
-  const rowClass = "align-items-center"
-
   const SubjectForm = () => (
     <Row className="mb-3">
       <Col xs="12">
@@ -68,7 +68,7 @@ const MetadataForm = forwardRef(({ }, ref) => {
 
   const DateTimeForm = () => (
     <Row className="my-3">
-      <Col>
+      <Col className="pe-0">
         <Col xs="12">
           Date
         </Col>
@@ -82,7 +82,7 @@ const MetadataForm = forwardRef(({ }, ref) => {
             onChange={newDate => setDate(newDate)} />
         </Col>
       </Col>
-      <Col>
+      <Col className="px-0">
         <Col xs="12">Start</Col>
         <Col xs="12">
           <TimePicker
@@ -94,7 +94,7 @@ const MetadataForm = forwardRef(({ }, ref) => {
             onChange={time => setStart(time)} />
         </Col>
       </Col>
-      <Col>
+      <Col className="ps-0">
         <Row>
           <Col xs="12">End</Col>
           <Col xs="12">

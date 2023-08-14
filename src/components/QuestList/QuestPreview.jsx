@@ -1,5 +1,6 @@
 import React from "react"
 import { Row, Col, ListGroup, Image, Button, Modal } from "react-bootstrap"
+import Code from "../Code"
 
 const QuestPreview = ({ quest, idx, show, setShow }) => {
   const AnswersListGroup = () => (
@@ -30,9 +31,12 @@ const QuestPreview = ({ quest, idx, show, setShow }) => {
       </Modal.Header>
       <Modal.Body>
         <Row>
-          <Col xs="12">
+          <Col className="mb-3" xs="12">
             {quest?.type === "text" ? quest?.body : null}
             {quest?.type === "image" ? <Image src={URL.createObjectURL(quest?.body)} /> : null}
+          </Col>
+          <Col className="mb-3" xs="12">
+            {(quest?.code === undefined || quest?.code === null) ? null : <Code.Snippet lang={quest?.code?.lang} val={quest?.code?.val} />}
           </Col>
           <Col xs="12">
             {AnswersListGroup()}

@@ -5,6 +5,7 @@ class ClosedQuest {
   constructor(
     public type: "text" | "image",
     public body: string | File, // either text question or image question
+    public code: { lang: string, val: string },
     public answers: string[],
     public correct: string,
     public shuffled: boolean
@@ -15,7 +16,8 @@ class OpenQuest {
   id: string = uuidv4()
   constructor(
     public type: "text" | "image",
-    public body: string | File // either text question or image question
+    public body: string | File, // either text question or image question
+    public code: string
   ) { }
 }
 

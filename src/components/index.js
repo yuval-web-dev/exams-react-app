@@ -1,3 +1,3 @@
-export { default as MetadataForm } from "./MetadataForm/MetadataForm"
-export { default as QuestsList } from "./QuestsList/QuestsList"
+export { MetadataForm } from "./MetadataForm"
+export { QuestList } from "./QuestList"
 export { default as SiteNavbar } from "./SiteNavbar"

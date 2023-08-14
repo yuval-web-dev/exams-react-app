@@ -1,40 +1,38 @@
-import React, { useState, useRef } from "react"
+import React, { useRef } from "react"
 import {
-  Navbar,
   Container, Row, Col,
-  ButtonGroup, Button,
-  Accordion,
-  Modal,
+  Button,
   Card
 } from "react-bootstrap"
 
-import { QuestsList, MetadataForm, SiteNavbar } from "../components"
+import { QuestList, MetadataForm, SiteNavbar } from "../components"
 import * as storage from "../utils/storage"
 import { Exam } from "../classes.ts"
 import "./editor.scss"
 
 
 const Editor = () => {
-  const defaultStates = {
-    metadata: null,
-    quests: []
-  }
-
   const questListRef = useRef()
   const metaFormRef = useRef()
 
   const handleSaveButton = () => {
-    if (metaFormRef.current.error()) {
-      alert("Please fill metadata form as intended.")
+    try {
+      metaFormRef.current.validate()
+    }
+    catch {
+      alert("MetadataForm validation error")
       return
     }
-    if (questListRef.current.error()) {
-      alert("Please fill questions form as intended.")
+    try {
+      questListRef.current.validate()
+    }
+    catch {
+      alert("QuestList validation error")
       return
     }
     const examObj = new Exam(
-      metaFormRef.current.yieldObj(),
-      questListRef.current.yieldArr()
+      metaFormRef.current.yield(),
+      questListRef.current.yield()
     )
     storage.save(examObj.id, examObj)
   }
@@ -42,28 +40,6 @@ const Editor = () => {
   const handleCancelButton = () => {
 
   }
-
-  const MetaAccordItem = (eventKey) => (
-    <Accordion.Item eventKey={eventKey}>
-      <Accordion.Header>Metadata</Accordion.Header>
-      <Accordion.Body>
-        <MetadataForm ref={metaFormRef} />
-      </Accordion.Body>
-    </Accordion.Item>
-  )
-
-  const QuestsAccordItem = (eventKey) => (
-    <Accordion.Item eventKey={eventKey}>
-      <Accordion.Header>Questions</Accordion.Header>
-      <Accordion.Body>
-        <Row>
-          <Col>
-            <QuestsList ref={questListRef} />
-          </Col>
-        </Row>
-      </Accordion.Body>
-    </Accordion.Item>
-  )
 
   const MetaCard = () => (
     <Card>
@@ -78,7 +54,7 @@ const Editor = () => {
     <Card>
       <Card.Header>Questions</Card.Header>
       <Card.Body>
-        <QuestsList ref={questListRef} />
+        <QuestList ref={questListRef} />
       </Card.Body>
     </Card>
   )
@@ -86,11 +62,11 @@ const Editor = () => {
   return (
     <React.Fragment>
       <SiteNavbar.Top />
-      <Container>
-        <h1>New Exam</h1>
+      <Container fluid="lg">
+        <h2>New Closed Exam</h2>
         <Card>
           <Row>
-            <Col lg="4">
+            <Col lg="3">
               <MetaCard />
             </Col>
             <Col>
