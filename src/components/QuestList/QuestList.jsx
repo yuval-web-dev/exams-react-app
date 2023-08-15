@@ -5,14 +5,15 @@ import {
   Modal,
   Row,
   Col,
-  Button,
+  Button, ToggleButton, ButtonGroup,
   Badge,
-  OverlayTrigger, Tooltip
+  OverlayTrigger, Tooltip,
 } from "react-bootstrap"
-import { GoTrash, GoPencil } from "react-icons/go"
+import { GoTrash, GoPencil, GoListOrdered } from "react-icons/go"
 import { TfiImport, TfiExport } from "react-icons/tfi"
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
-import { BsCloudDownload, BsEye } from "react-icons/bs"
+import { BsCloudDownload, BsEye, BsCheckSquare, BsSquare } from "react-icons/bs"
+import { BiShuffle } from "react-icons/bi"
 
 import { QuestForm } from "../QuestForm"
 import QuestPreview from "./QuestPreview.jsx"
@@ -35,7 +36,8 @@ const QuestList = forwardRef(({ }, ref) => {
     formShow: false,
     previewShow: false,
     checked: [],
-    selected: { quest: null, idx: null }
+    selected: { quest: null, idx: null },
+    shuffle: false
   }
 
   const [quests, setQuests] = useState(defaultStates.quests)
@@ -43,10 +45,22 @@ const QuestList = forwardRef(({ }, ref) => {
   const [formShow, setFormShow] = useState(defaultStates.formShow)
   const [checked, setChecked] = useState(defaultStates.checked)
   const [selected, setSelected] = useState(defaultStates.selected)
+  const [shuffle, setShuffle] = useState(defaultStates.shuffle)
 
   const questFormRef = useRef()
   const fileInputRef = useRef()
-  const checkAllRef = useRef()
+
+  const empty = quests.length < 1
+  const single = checked.length === 1
+
+  const handleSelector = () => {
+    if (checked === quests) {
+      setChecked(defaultStates.checked)
+    }
+    else {
+      setChecked(quests)
+    }
+  }
 
   const handleExport = () => {
     checked.forEach((item, index) => {
@@ -122,7 +136,6 @@ const QuestList = forwardRef(({ }, ref) => {
   const handleRemove = () => {
     setQuests(quests.filter(i => !checked.includes(i)))
     setChecked(defaultStates.checked)
-    checkAllRef.current.checked = false
   }
 
   const handleCheckboxChange = (quest) => {
@@ -151,6 +164,19 @@ const QuestList = forwardRef(({ }, ref) => {
   const handleListGroupClick = (quest, idx) => {
     setSelected({ quest, idx })
     setPreviewShow(true)
+  }
+
+  const handleOrderBtnToggle = () => {
+    if (shuffle) {
+      setShuffle(false)
+    }
+  }
+
+
+  const handleShuffleBtnToggle = () => {
+    if (!shuffle) {
+      setShuffle(true)
+    }
   }
 
   const QuestFormModal = () => (
@@ -183,98 +209,135 @@ const QuestList = forwardRef(({ }, ref) => {
   const ActionBar = () => {
     const single = checked.length === 1
     const multiple = checked.length > 0
-    const variant = "light"
 
-    const onCheck = (e) => {
-      if (!e.target.checked) {
-        setChecked(defaultStates.checked)
-      }
-      else {
-        setChecked(quests)
-      }
-    }
-
+    const allChecked = (checked.length === quests.length) && (checked.length > 0)
     return (
       <Row>
-        <Col className="d-flex align-items-center">
-          <Form.Check
-            className="pe-5"
-            ref={checkAllRef}
-            type="checkbox"
-            onChange={e => onCheck(e)} />
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Create your own</Tooltip>}>
-            <Button
-              variant={variant}
-              onClick={() => { setFormShow(true) }}>
-              <GoPencil />
-            </Button>
-          </OverlayTrigger>
+        <Col className="d-flex align-items-center px-0">
+          <ButtonGroup className="d-flex align-items-center me-auto">
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>{allChecked ? "Deselect all" : "Select all"}</Tooltip>}>
+              <Button
+                disabled={empty}
+                className="border"
+                variant="light"
+                onClick={handleSelector}>
+                {allChecked ? <BsCheckSquare /> : <BsSquare />}
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>Create your own</Tooltip>}>
+              <Button
+                className="border"
+                variant="light"
+                onClick={() => { setFormShow(true) }}>
+                <GoPencil />
+              </Button>
+            </OverlayTrigger>
 
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Import JSON</Tooltip>}>
-            <Button
-              variant={variant}
-              onClick={() => fileInputRef.current.click()}>
-              <TfiImport />
-            </Button>
-          </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>Import JSON</Tooltip>}>
+              <Button
+                className="border"
+                variant="light"
+                onClick={() => fileInputRef.current.click()}>
+                <TfiImport />
+              </Button>
+            </OverlayTrigger>
 
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>From API</Tooltip>}>
-            <Button
-              className="me-auto"
-              variant={variant}
-              onClick={() => { }}>
-              <BsCloudDownload />
-            </Button>
-          </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>From API</Tooltip>}>
+              <Button
+                className="border"
+                variant="light"
+                onClick={() => { }}>
+                <BsCloudDownload />
+              </Button>
+            </OverlayTrigger>
 
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Export to JSON</Tooltip>}>
-            <Button
-              disabled={!multiple}
-              variant={variant}
-              onClick={handleExport}>
-              <TfiExport />
-            </Button>
-          </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>Ordered</Tooltip>}>
+              <ToggleButton
+                disabled={empty}
+                className="border"
+                type="checkbox"
+                variant="light"
+                checked={!shuffle}
+                onClick={handleOrderBtnToggle}>
+                <GoListOrdered />
+              </ToggleButton>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>Shuffle</Tooltip>}>
+              <ToggleButton
+                disabled={empty}
+                className="border"
+                type="checkbox"
+                variant={shuffle ? "warning" : "light"}
+                checked={shuffle}
+                onClick={handleShuffleBtnToggle}>
+                <BiShuffle />
+              </ToggleButton>
+            </OverlayTrigger>
+          </ButtonGroup>
 
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Move up</Tooltip>}>
-            <Button
-              disabled={!single}
-              variant={variant}
-              onClick={handleMoveUp}>
-              <AiOutlineArrowUp />
-            </Button>
-          </OverlayTrigger>
+          <ButtonGroup>
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>Export to JSON</Tooltip>}>
+              <Button
+                className="border"
+                disabled={!multiple}
+                variant="light"
+                onClick={handleExport}>
+                <TfiExport />
+              </Button>
+            </OverlayTrigger>
 
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Move down</Tooltip>}>
-            <Button
-              disabled={!single}
-              variant={variant}
-              onClick={handleMoveDown}>
-              <AiOutlineArrowDown />
-            </Button>
-          </OverlayTrigger>
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>Move up</Tooltip>}>
+              <Button
+                className="border"
+                disabled={empty || !single}
+                variant="light"
+                onClick={handleMoveUp}>
+                <AiOutlineArrowUp />
+              </Button>
+            </OverlayTrigger>
 
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Remove</Tooltip>}>
-            <Button
-              variant="danger"
-              onClick={handleRemove}>
-              <GoTrash />
-            </Button>
-          </OverlayTrigger>
+            <OverlayTrigger
+              className="border"
+              placement="top"
+              overlay={<Tooltip>Move down</Tooltip>}>
+              <Button
+                className="border"
+                variant="light"
+                disabled={empty || !single}
+                onClick={handleMoveDown}>
+                <AiOutlineArrowDown />
+              </Button>
+            </OverlayTrigger>
+
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip>Remove</Tooltip>}>
+              <Button
+                disabled={empty}
+                className="border"
+                variant="danger"
+                onClick={handleRemove}>
+                <GoTrash />
+              </Button>
+            </OverlayTrigger>
+          </ButtonGroup>
+
         </Col>
       </Row>
     )

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Container, Row, Col, ListGroup } from 'react-bootstrap'
 
-import { SiteNavbar } from '../components'
+import { SiteNav } from '../components'
 
 import * as storage from '../utils/storage'
 
@@ -172,7 +172,7 @@ const Home = () => {
 
   return (
     <React.Fragment>
-      <SiteNavbar.Top />
+      <SiteNav.Top />
       <Container>
         <Row>
           <Col xs="12">
@@ -183,7 +183,7 @@ const Home = () => {
         {ExamList()}
       </Container>
 
-      <SiteNavbar.Bottom />
+      <SiteNav.Bottom />
     </React.Fragment>
   )
 }

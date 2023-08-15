@@ -16,6 +16,8 @@ import consts from "./consts.js"
 
 import { testStringPattern } from "./helpers.js"
 
+import { Text, Img } from "../../classes.ts"
+
 const BodyCard = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
     validate() {
@@ -25,10 +27,16 @@ const BodyCard = forwardRef(({ }, ref) => {
       }
     },
     yield() {
-      return {
-        type: type,
-        body: type === "text" ? text : image,
-        code: codeInput === "" ? null : { lang: codeLang, val: codeInput }
+      if (type === "text") {
+        if (codeInput !== defaultStates.codeInput) {
+          return new Text(text)
+        }
+        else {
+          return new Text(text, { lang: codeLang, val: codeInput })
+        }
+      }
+      else { // type === "image"
+        return new Img(image)
       }
     }
   }))

@@ -3,7 +3,7 @@ import {
   Row, Col,
 } from "react-bootstrap"
 
-import { ClosedQuest } from "../../classes.ts"
+import { CloseEnded } from "../../classes.ts"
 import BodyCard from "./BodyCard.jsx"
 import AnswersCard from "./AnswersCard.jsx"
 
@@ -28,13 +28,11 @@ const QuestForm = forwardRef(({ }, ref) => {
         return
       }
 
-      const { type, body, code } = bodyCardRef.current.yield()
+      const body = bodyCardRef.current.yield()
       const { answers, correct, shuffle } = ansCardRef.current.yield()
 
-      return new ClosedQuest(
-        type,
+      return new CloseEnded(
         body,
-        code,
         answers,
         correct,
         shuffle

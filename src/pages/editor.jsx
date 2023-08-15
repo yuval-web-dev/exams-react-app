@@ -5,7 +5,7 @@ import {
   Card
 } from "react-bootstrap"
 
-import { QuestList, MetadataForm, SiteNavbar } from "../components"
+import { QuestList, MetadataForm, SiteNav } from "../components"
 import * as storage from "../utils/storage"
 import { Exam } from "../classes.ts"
 import "./editor.scss"
@@ -53,7 +53,7 @@ const Editor = () => {
   const QuestsCard = () => (
     <Card>
       <Card.Header>Questions</Card.Header>
-      <Card.Body>
+      <Card.Body className="p-0">
         <QuestList ref={questListRef} />
       </Card.Body>
     </Card>
@@ -61,7 +61,7 @@ const Editor = () => {
 
   return (
     <React.Fragment>
-      <SiteNavbar.Top />
+      <SiteNav.Top />
       <Container fluid="lg">
         <h2>New Closed Exam</h2>
         <Card>

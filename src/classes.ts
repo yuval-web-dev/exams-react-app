@@ -1,23 +1,41 @@
 import { v4 as uuidv4 } from 'uuid'
 
-class ClosedQuest {
-  id: string = uuidv4()
+class Text {
   constructor(
-    public type: "text" | "image",
-    public body: string | File, // either text question or image question
-    public code: { lang: string, val: string },
-    public answers: string[],
-    public correct: string,
-    public shuffled: boolean
+    public body: string,
+    public code?: { lang: string, val: string }
   ) { }
 }
 
-class OpenQuest {
+class Img {
+  constructor(
+    public body: File
+  ) { }
+}
+
+class CloseEnded {
   id: string = uuidv4()
   constructor(
-    public type: "text" | "image",
-    public body: string | File, // either text question or image question
-    public code: string
+    public body: Text | Img,
+    public answers: string[],
+    public correct: string,
+    public shuffle: boolean
+  ) { }
+}
+
+class OpenEnded {
+  id: string = uuidv4()
+  constructor(
+    public body: Text | Img,
+    public score: number
+  ) { }
+}
+
+class QuestList {
+  constructor(
+    public type: "open" | "closed",
+    public items: CloseEnded[] | OpenEnded[],
+    public shuffle: boolean
   ) { }
 }
 
@@ -37,13 +55,14 @@ class Exam {
 
   constructor(
     public metadata: Metadata,
-    public quests: ClosedQuest[] | OpenQuest[]
+    public questList: QuestList
   ) { }
 }
 
 export {
-  ClosedQuest,
-  OpenQuest,
-  Exam,
-  Metadata
+  Text, Img,
+  CloseEnded, OpenEnded,
+  QuestList,
+  Metadata,
+  Exam
 }

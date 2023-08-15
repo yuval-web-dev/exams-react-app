@@ -1,5 +1,5 @@
-export { default as Home } from './home'
-export { default as Editor } from './editor'
-export { default as Tester } from './tester'
-export { default as About } from './about'
-export { default as NotFound } from './notFound'
+export { default as Home } from "./home.jsx"
+export { default as Editor } from "./editor.jsx"
+export { default as About } from "./about.jsx"
+export { default as NotFound } from "./notFound.jsx"
+export { default as Test } from "./test.jsx"
