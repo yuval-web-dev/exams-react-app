@@ -262,7 +262,7 @@ const QuestList = forwardRef(({ }, ref) => {
             <OverlayTrigger
               placement="top"
               overlay={<Tooltip>Ordered</Tooltip>}>
-              <ToggleButton
+              <Button
                 disabled={empty}
                 className="border"
                 type="checkbox"
@@ -270,12 +270,12 @@ const QuestList = forwardRef(({ }, ref) => {
                 checked={!shuffle}
                 onClick={handleOrderBtnToggle}>
                 <GoListOrdered />
-              </ToggleButton>
+              </Button>
             </OverlayTrigger>
             <OverlayTrigger
               placement="top"
               overlay={<Tooltip>Shuffle</Tooltip>}>
-              <ToggleButton
+              <Button
                 disabled={empty}
                 className="border"
                 type="checkbox"
@@ -283,7 +283,7 @@ const QuestList = forwardRef(({ }, ref) => {
                 checked={shuffle}
                 onClick={handleShuffleBtnToggle}>
                 <BiShuffle />
-              </ToggleButton>
+              </Button>
             </OverlayTrigger>
           </ButtonGroup>
 

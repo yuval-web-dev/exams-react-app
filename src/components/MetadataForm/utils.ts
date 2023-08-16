@@ -20,3 +20,7 @@ export const getMinDate = () => {
   d.setDate(d.getDate() + 1)
   return d
 }
+
+export const hhmm = (number) => {
+  return `${number}:00`
+}

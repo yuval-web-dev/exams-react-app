@@ -8,23 +8,26 @@ import TimePicker from "react-bootstrap-time-picker"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import RangeSlider from "react-bootstrap-range-slider"
+import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
 import consts from "./consts.js"
 
 import { Metadata } from "../../classes.ts"
 
+import * as state from "./states.ts"
+import * as util from "./utils.ts"
 
 const MetadataForm = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
     validate() {
-      if (subject === defaultStates.subject) {
+      if (subject === state.subject) {
         throw "err"
       }
     },
     yield() {
       const cdate = new Date(date)
       cdate.setHours(0, 0, 0, 0)
-      cdate.setSeconds(startHr)
+      cdate.setSeconds(start)
       return new Metadata(
         subject,
         {},
@@ -34,22 +37,10 @@ const MetadataForm = forwardRef(({ }, ref) => {
     }
   }))
 
-  const today = new Date()
-  const tomorrow = today.setDate(today.getDate() + 1)
-
-  const defaultStates = {
-    subject: "",
-    date: tomorrow,
-    startHr: 9 * 60 * 60,
-    duration: 30,
-    shuffle: false
-  }
-
-  const [subject, setSubject] = useState(defaultStates.subject)
-  const [date, setDate] = useState(defaultStates.date) // Millis
-  const [startHr, setStart] = useState(defaultStates.startHr) // Secs
-  const [duration, setDuration] = useState(defaultStates.duration)
-  const [shuffle, setShuffle] = useState(defaultStates.shuffle)
+  const [subject, setSubject] = useState(state.subject)
+  const [date, setDate] = useState(state.date) // Millis
+  const [start, setStart] = useState(state.start) // Secs
+  const [duration, setDuration] = useState(state.duration)
 
   const SubjectForm = () => (
     <Row className="mb-3">
@@ -66,47 +57,49 @@ const MetadataForm = forwardRef(({ }, ref) => {
     </Row>
   )
 
-  const DateTimeForm = () => (
-    <Row className="my-3">
-      <Col className="pe-0">
-        <Col xs="12">
-          Date
+  const DateTimeForm = () => {
+    return (
+      <Row className="my-3">
+        <Col className="pe-0">
+          <Col xs="12">
+            Date
+          </Col>
+          <Col xs="12">
+            <DatePicker
+              value={date}
+              selected={date}
+              className="form-control"
+              minDate={state.date}
+              dateFormat="d/M/yy"
+              onChange={date => setDate(date)} />
+          </Col>
         </Col>
-        <Col xs="12">
-          <DatePicker
-            value={date}
-            selected={date}
-            className="form-control"
-            minDate={tomorrow}
-            dateFormat={consts.dateFormat}
-            onChange={newDate => setDate(newDate)} />
-        </Col>
-      </Col>
-      <Col className="px-0">
-        <Col xs="12">Start</Col>
-        <Col xs="12">
-          <TimePicker
-            value={startHr}
-            format={24}
-            step={30}
-            start={consts.minHourRepr}
-            end={consts.maxHourRepr}
-            onChange={time => setStart(time)} />
-        </Col>
-      </Col>
-      <Col className="ps-0">
-        <Row>
-          <Col xs="12">End</Col>
+        <Col className="px-0">
+          <Col xs="12">Start</Col>
           <Col xs="12">
             <TimePicker
-              value={startHr + (duration * 60)}
+              value={start}
               format={24}
-              style={{ color: "grey", pointerEvents: "none" }} />
+              step={30}
+              start={util.hhmm(9)}
+              end={util.hhmm(17)}
+              onChange={time => setStart(time)} />
           </Col>
-        </Row>
-      </Col>
-    </Row>
-  )
+        </Col>
+        <Col className="ps-0">
+          <Row>
+            <Col xs="12">End</Col>
+            <Col xs="12">
+              <TimePicker
+                value={start + (duration * 60)}
+                format={24}
+                style={{ color: "grey", pointerEvents: "none" }} />
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    )
+  }
 
   const DurationForm = () => (
     <Row className="my-3">
@@ -124,27 +117,12 @@ const MetadataForm = forwardRef(({ }, ref) => {
     </Row>
   )
 
-  const ShuffleForm = () => (
-    <Row className="my-3">
-      <Col xs="12">Question Order</Col>
-      <Col xs="12">
-        <Button
-          className="me-auto"
-          variant={shuffle ? "warning" : "light"}
-          onClick={() => setShuffle(!shuffle)}>
-          {shuffle ? "Shuffled" : "Ordered"}
-        </Button>
-      </Col>
-    </Row>
-  )
-
   return (
-    <Container>
+    <React.Fragment>
       {SubjectForm()}
       {DateTimeForm()}
       {DurationForm()}
-      {ShuffleForm()}
-    </Container >
+    </React.Fragment >
   )
 })
 
