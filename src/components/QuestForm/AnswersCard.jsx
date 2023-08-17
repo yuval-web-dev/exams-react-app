@@ -5,7 +5,7 @@ import {
   Button, ButtonGroup,
   ListGroup,
   Card,
-  ToggleButton,
+  InputGroup,
   OverlayTrigger, Tooltip
 } from "react-bootstrap"
 import { BiShuffle } from "react-icons/bi"
@@ -14,7 +14,7 @@ import { GoTrash } from "react-icons/go"
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
 import { BsArrowReturnLeft } from "react-icons/bs"
 import { testStringPattern } from "./helpers"
-
+import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 const AnswersCard = forwardRef(({ }, ref) => {
   useImperativeHandle(ref, () => ({
@@ -104,18 +104,6 @@ const AnswersCard = forwardRef(({ }, ref) => {
     }
   }
 
-  const handleOrderBtnToggle = () => {
-    if (shuffle) {
-      setShuffle(false)
-    }
-  }
-
-  const handleShuffleBtnToggle = () => {
-    if (!shuffle) {
-      setShuffle(true)
-    }
-  }
-
   const handleCheckAll = (e) => {
     if (!e.target.checked) {
       setChecked(defaultStates.checked)
@@ -134,9 +122,10 @@ const AnswersCard = forwardRef(({ }, ref) => {
     }
   }
 
-  const AnswerForm = () => (
-    <Row>
-      <ButtonGroup as="Col" xs="12">
+  const AnswerForm = () => {
+
+    return (
+      <InputGroup>
         <Form.Control
           ref={answerFormRef}
           spellCheck
@@ -147,9 +136,9 @@ const AnswersCard = forwardRef(({ }, ref) => {
           variant="outline-primary">
           <BsArrowReturnLeft />
         </Button>
-      </ButtonGroup>
-    </Row>
-  )
+      </InputGroup>
+    )
+  }
 
   const ActionBar = () => {
     const single = answers.length === 1
@@ -234,49 +223,45 @@ const AnswersCard = forwardRef(({ }, ref) => {
     </ListGroup>
   )
 
+  const OrderForm = () => {
+    const handleSwitchOrder = () => {
+      setShuffle(!shuffle)
+    }
+
+    return (
+      <Row>
+        <Col className="d-flex align-items-center justify-content-start">
+          <div className="me-5">Order of Appearance</div>
+          <BootstrapSwitchButton
+            checked={shuffle}
+            width="125"
+            offlabel="Ordered"
+            onlabel="Shuffle"
+            onstyle="warning"
+            onChange={handleSwitchOrder} />
+        </Col>
+      </Row>
+    )
+  }
+
   return (
     <Card>
-      <Card.Header className="d-flex align-items-center">
-        <h5 className="me-auto">
-          Answers
-        </h5>
-        <ButtonGroup>
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Ordered</Tooltip>}>
-            <ToggleButton
-              className="border"
-              type="checkbox"
-              variant="light"
-              checked={!shuffle}
-              onClick={handleOrderBtnToggle}>
-              <GoListOrdered />
-            </ToggleButton>
-          </OverlayTrigger>
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Shuffle</Tooltip>}>
-            <ToggleButton
-              className="border"
-              type="checkbox"
-              variant={shuffle ? "warning" : "light"}
-              checked={shuffle}
-              onClick={handleShuffleBtnToggle}>
-              <BiShuffle />
-            </ToggleButton>
-          </OverlayTrigger>
-        </ButtonGroup>
+      <Card.Header className="d-flex align-items-center justify-content-center">
+        <h5>Answers</h5>
       </Card.Header>
 
-      <Card.Body>
-        <Row>
-          <Col xs="12" className="mb-4">
+      <Card.Body className="p-0">
+        <ListGroup>
+          <ListGroup.Item>
+            {OrderForm()}
+          </ListGroup.Item>
+          <ListGroup.Item>
             {AnswerForm()}
-          </Col>
-          <Col xs="12">
+          </ListGroup.Item>
+          <ListGroup.Item>
             {ListGroupAnswers()}
-          </Col>
-        </Row>
+          </ListGroup.Item>
+        </ListGroup>
       </Card.Body>
     </Card>
   )

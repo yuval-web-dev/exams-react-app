@@ -43,8 +43,8 @@ const Editor = () => {
 
   const MetaCard = () => (
     <Card>
-      <Card.Header>Metadata</Card.Header>
-      <Card.Body>
+      <Card.Header className="d-flex justify-content-center"><h5 className="mb-0">Metadata</h5></Card.Header>
+      <Card.Body className="p-0">
         <MetadataForm ref={metaFormRef} />
       </Card.Body>
     </Card>
@@ -52,7 +52,7 @@ const Editor = () => {
 
   const QuestsCard = () => (
     <Card>
-      <Card.Header>Questions</Card.Header>
+      <Card.Header className="d-flex justify-content-center"><h5 className="mb-0">Questions</h5></Card.Header>
       <Card.Body className="p-0">
         <QuestList ref={questListRef} />
       </Card.Body>
@@ -66,7 +66,7 @@ const Editor = () => {
         <h2>New Closed Exam</h2>
         <Card>
           <Row>
-            <Col lg="3">
+            <Col md="4">
               <MetaCard />
             </Col>
             <Col>

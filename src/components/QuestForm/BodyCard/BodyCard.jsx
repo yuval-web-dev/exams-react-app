@@ -5,34 +5,35 @@ import {
   ButtonGroup,
   Card,
   ToggleButton,
-  OverlayTrigger, Tooltip
+  OverlayTrigger, Tooltip,
+  ListGroup,
+  InputGroup
 } from "react-bootstrap"
 import CodeEditor from "@uiw/react-textarea-code-editor"
+import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
 import { BsImage, BsCodeSlash } from "react-icons/bs"
 import { LuTextCursorInput } from "react-icons/lu"
 
-import consts from "./consts.js"
+import consts from "../consts.js"
+import * as state from "./states.ts"
+import { Text, Img } from "../../../classes.ts"
 
-import { testStringPattern } from "./helpers.js"
-
-import { Text, Img } from "../../classes.ts"
-
-const BodyCard = forwardRef(({ }, ref) => {
+const BodyCard = forwardRef(({ type }, ref) => {
   useImperativeHandle(ref, () => ({
     validate() {
-      if ((type === "text" && text === defaultStates.text) ||
-        (type === "image" && image === defaultStates.image)) {
+      if ((type === "text" && text === state.text) ||
+        (type === "image" && image === state.image)) {
         throw "err"
       }
     },
     yield() {
       if (type === "text") {
-        if (codeInput !== defaultStates.codeInput) {
+        if (code !== state.code) {
           return new Text(text)
         }
         else {
-          return new Text(text, { lang: codeLang, val: codeInput })
+          return new Text(text, { lang: lang, val: code })
         }
       }
       else { // type === "image"
@@ -41,38 +42,17 @@ const BodyCard = forwardRef(({ }, ref) => {
     }
   }))
 
-  const defaultStates = {
-    type: "text",
-    text: "",
-    image: null,
-    showCodeEditor: false,
-    codeLang: "plaintext",
-    codeInput: ""
-  }
+  const [format, setFormat] = useState(state.format)
+  const [text, setText] = useState(state.text)
+  const [image, setImage] = useState(state.image)
+  const [code, setCode] = useState(state.code)
+  const [lang, setLang] = useState(state.lang)
+  const [pts, setPts] = useState(state.pts)
 
-  const [type, setType] = useState(defaultStates.type)
-  const [text, setText] = useState(defaultStates.text)
-  const [image, setImage] = useState(defaultStates.image)
-  const [showCodeEditor, setShowCodeEditor] = useState(defaultStates.showCodeEditor)
-  const [codeLang, setCodeLang] = useState(defaultStates.codeLang)
-  const [codeInput, setCodeInput] = useState(defaultStates.codeInput)
+  const [showCodeEditor, setShowCodeEditor] = useState(false)
 
   const imageInputRef = useRef()
   const codeEditorRef = useRef()
-
-  const handleTextBtnToggle = () => {
-    if (type === "image") {
-      setType("text")
-      setImage(defaultStates.image)
-    }
-  }
-
-  const handleImageBtnToggle = () => {
-    if (type === "text") {
-      setType("image")
-      setText(defaultStates.text)
-    }
-  }
 
   const handleImageUpload = async (e) => {
     const newImage = e.target.files[0]
@@ -91,13 +71,13 @@ const BodyCard = forwardRef(({ }, ref) => {
   const TextInput = () => {
     const handleCodeToggle = () => {
       if (showCodeEditor) {
-        if (codeInput !== defaultStates.codeInput) {
+        if (code !== state.code) {
           if (!window.confirm("Discard changes?")) {
             return
           }
         }
         setShowCodeEditor(false)
-        setCodeInput("")
+        setCode("")
       } else {
         setShowCodeEditor(true)
       }
@@ -105,7 +85,7 @@ const BodyCard = forwardRef(({ }, ref) => {
 
 
     const handleChangeLang = (lang) => {
-      setCodeLang(lang)
+      setLang(lang)
     }
 
     const SimpleCodeEditor = () => (
@@ -113,10 +93,10 @@ const BodyCard = forwardRef(({ }, ref) => {
         ref={codeEditorRef}
         style={showCodeEditor ? { fontSize: 12, backgroundColor: "whitesmoke", fontFamily: "Hack" } : { display: "none" }}
         data-color-mode="light"
-        language={codeLang}
+        language={lang}
         placeholder="happy hacking!"
-        value={codeInput}
-        onChange={e => setCodeInput(e.target.value)} />
+        value={code}
+        onChange={e => setCode(e.target.value)} />
     )
 
     return (
@@ -158,47 +138,70 @@ const BodyCard = forwardRef(({ }, ref) => {
     )
   }
 
+  const FormatPtsForm = () => {
+    const PtsForm = () => {
+      const handleChangePts = (newPts) => {
+        setPts(newPts)
+      }
+
+      return (
+        <Col xs="6" className="d-flex align-items-center justify-content-start">
+          <div>Points</div>
+          <input
+            style={{ width: "75px" }}
+            value={pts}
+            class="form-control"
+            type="number"
+            min="1"
+            max="100"
+            onChange={e => handleChangePts(e.target.value)}></input>
+        </Col>
+      )
+    }
+
+    const handleChangeFormat = () => {
+      if (format === "image") {
+        setFormat("text")
+        setImage(state.image)
+      }
+      if (format === "text") {
+        setFormat("image")
+        setText(state.text)
+      }
+    }
+
+    return (
+      <Row>
+        <Col xs="6" className="d-flex align-items-center justify-content-start">
+          <div className="me-2">Format</div>
+          <BootstrapSwitchButton
+            checked={format === "image"}
+            width="125"
+            offlabel="Text"
+            onlabel="Image"
+            onChange={handleChangeFormat} />
+        </Col>
+        {type === "open" ? PtsForm() : null}
+      </Row>
+    )
+  }
+
 
   return (
     <Card>
-      <Card.Header className="d-flex align-items-center">
-        <h5 className="me-auto">
-          Body
-        </h5>
-        <ButtonGroup toggle>
-
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Text</Tooltip>}>
-            <ToggleButton
-              className="border"
-              type="checkbox"
-              variant="light"
-              checked={type === "text"}
-              onClick={handleTextBtnToggle}>
-              <LuTextCursorInput />
-            </ToggleButton>
-          </OverlayTrigger>
-
-          <OverlayTrigger
-            placement="top"
-            overlay={<Tooltip>Image</Tooltip>}>
-            <ToggleButton
-              className="border"
-              type="checkbox"
-              variant={type === "image" ? "primary" : "light"}
-              checked={type === "image"}
-              onClick={handleImageBtnToggle}>
-              <BsImage />
-            </ToggleButton>
-          </OverlayTrigger>
-
-        </ButtonGroup>
+      <Card.Header className="d-flex align-items-center justify-content-center">
+        <h5>Body</h5>
 
       </Card.Header>
-
-      <Card.Body>
-        {type === "text" ? TextInput() : ImageInput()}
+      <Card.Body className="p-0">
+        <ListGroup>
+          <ListGroup.Item>
+            {FormatPtsForm()}
+          </ListGroup.Item>
+          <ListGroup.Item>
+            {format === "text" ? TextInput() : ImageInput()}
+          </ListGroup.Item>
+        </ListGroup>
       </Card.Body>
     </Card>
   )

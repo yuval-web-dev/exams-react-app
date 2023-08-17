@@ -3,11 +3,11 @@ import {
   Row, Col,
 } from "react-bootstrap"
 
-import { CloseEnded } from "../../classes.ts"
-import BodyCard from "./BodyCard.jsx"
+import { CloseEnded, OpenEnded } from "../../classes.ts"
+import BodyCard from "./BodyCard/BodyCard.jsx"
 import AnswersCard from "./AnswersCard.jsx"
 
-const QuestForm = forwardRef(({ }, ref) => {
+const QuestForm = forwardRef(({ type }, ref) => {
   useImperativeHandle(ref, () => ({
     validate() {
       return null
@@ -20,23 +20,33 @@ const QuestForm = forwardRef(({ }, ref) => {
         alert("bodyCard form validation failed")
         return
       }
-      try {
-        ansCardRef.current.validate()
-      }
-      catch {
-        alert("answerCard form validation failed")
-        return
+      if (type === "closed") {
+        try {
+          ansCardRef.current.validate()
+        }
+        catch {
+          alert("answerCard form validation failed")
+          return
+        }
       }
 
-      const body = bodyCardRef.current.yield()
-      const { answers, correct, shuffle } = ansCardRef.current.yield()
+      const { body, score } = bodyCardRef.current.yield()
 
-      return new CloseEnded(
-        body,
-        answers,
-        correct,
-        shuffle
-      )
+      if (type === "closed") {
+        const { answers, correct, shuffle } = ansCardRef.current.yield()
+        return new CloseEnded(
+          body,
+          answers,
+          correct,
+          shuffle
+        )
+      }
+      else {
+        return new OpenEnded(
+          body,
+          score
+        )
+      }
     }
   }))
 
@@ -46,10 +56,10 @@ const QuestForm = forwardRef(({ }, ref) => {
   return (
     <Row>
       <Col xs="12">
-        <BodyCard ref={bodyCardRef} />
+        <BodyCard type={type} ref={bodyCardRef} />
       </Col>
       <Col xs="12">
-        <AnswersCard ref={ansCardRef} />
+        {type === "closed" ? <AnswersCard ref={ansCardRef} /> : null}
       </Col>
     </Row>
   )

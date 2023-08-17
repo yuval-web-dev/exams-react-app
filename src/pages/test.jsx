@@ -1,6 +1,10 @@
 import React, { useState } from "react"
 import axios from "axios"
-import { Form } from "react-bootstrap"
+import {
+  Form,
+  Button,
+  ButtonGroup
+} from "react-bootstrap"
 
 import { Text, CloseEnded } from "../classes.ts"
 
@@ -66,10 +70,18 @@ const demo = async () => {
 
 const Test = () => {
 
-  demo()
+  // demo()
 
   return (
-    null
+    <Form>
+      <Form.Label>asdf</Form.Label>
+      <Form.Control as="Row">
+        <ButtonGroup>
+          <Button>Open</Button>
+          <Button>Closed</Button>
+        </ButtonGroup>
+      </Form.Control>
+    </Form>
   )
 }
 
