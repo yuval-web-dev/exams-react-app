@@ -1,8 +1,7 @@
 import React, { useState, useImperativeHandle, forwardRef } from "react"
 import {
-  Container, Row, Col,
+  Row, Col,
   Form,
-  Button,
   ListGroup
 } from "react-bootstrap"
 import TimePicker from "react-bootstrap-time-picker"
@@ -16,32 +15,34 @@ import consts from "./consts.js"
 import { Metadata } from "../../classes.ts"
 
 import * as state from "./states.ts"
-import * as util from "./utils.ts"
+import * as util from "./utils.js"
 
-const MetadataForm = forwardRef(({ }, ref) => {
-  useImperativeHandle(ref, () => ({
-    validate() {
-      if (subject === state.subject) {
-        throw "err"
-      }
-    },
-    yield() {
-      const cdate = new Date(date)
-      cdate.setHours(0, 0, 0, 0)
-      cdate.setSeconds(start)
-      return new Metadata(
-        subject,
-        {},
-        cdate,
-        Number(duration)
-      )
-    }
-  }))
+const MetadataComponent = ({ setObj }) => {
+  // useImperativeHandle(ref, () => ({
+  //   validate() {
+  //     if (subject === state.subject) {
+  //       throw "err"
+  //     }
+  //   },
+  //   yield() {
+  //     const cdate = new Date(date)
+  //     cdate.setHours(0, 0, 0, 0)
+  //     cdate.setSeconds(start)
+  //     return new Metadata(
+  //       subject,
+  //       {},
+  //       cdate,
+  //       Number(duration)
+  //     )
+  //   }
+  // }))
 
   const [subject, setSubject] = useState(state.subject)
   const [date, setDate] = useState(state.date) // Millis
   const [start, setStart] = useState(state.start) // Secs
   const [duration, setDuration] = useState(state.duration)
+
+  const labelClassname = "my-0"
 
   const SubjectForm = () => {
     const handleSubjectChange = (newSubject) => {
@@ -49,8 +50,8 @@ const MetadataForm = forwardRef(({ }, ref) => {
     }
     return (
       <Form>
-        <Form.Label>
-          Subject
+        <Form.Label className={labelClassname}>
+          <small>Subject</small>
         </Form.Label>
         <Form.Control
           value={subject}
@@ -61,13 +62,14 @@ const MetadataForm = forwardRef(({ }, ref) => {
     )
   }
 
-  const DateTimeForm = () => {
+  const DateStartEndForms = () => {
+
     return (
       <Row>
-        <Col>
-          <Form>
-            <Form.Label>
-              Date
+        <Col className="pe-1">
+          <Form className="d-flex flex-column">
+            <Form.Label className={labelClassname}>
+              <small>Date</small>
             </Form.Label>
             <DatePicker
               value={date}
@@ -78,10 +80,10 @@ const MetadataForm = forwardRef(({ }, ref) => {
               onChange={date => setDate(date)} />
           </Form>
         </Col>
-        <Col>
+        <Col className="px-1">
           <Form>
-            <Form.Label>
-              Start
+            <Form.Label className={labelClassname}>
+              <small>Start</small>
             </Form.Label>
             <TimePicker
               value={start}
@@ -92,9 +94,11 @@ const MetadataForm = forwardRef(({ }, ref) => {
               onChange={time => setStart(time)} />
           </Form>
         </Col>
-        <Col>
+        <Col className="ps-1">
           <Form>
-            <Form.Label>End</Form.Label>
+            <Form.Label className={labelClassname}>
+              <small>End</small>
+            </Form.Label>
             <TimePicker
               value={start + (duration * 60)}
               format={24}
@@ -105,10 +109,10 @@ const MetadataForm = forwardRef(({ }, ref) => {
     )
   }
 
-  const DurationForm = () => (
+  const DurationSlider = () => (
     <Form>
-      <Form.Label>
-        Duration (Mins)
+      <Form.Label className={labelClassname}>
+        <small>Duration (Mins)</small>
       </Form.Label>
       <RangeSlider
         value={duration}
@@ -127,13 +131,13 @@ const MetadataForm = forwardRef(({ }, ref) => {
         {SubjectForm()}
       </ListGroup.Item>
       <ListGroup.Item>
-        {DateTimeForm()}
+        {DateStartEndForms()}
       </ListGroup.Item>
       <ListGroup.Item>
-        {DurationForm()}
+        {DurationSlider()}
       </ListGroup.Item>
     </ListGroup>
   )
-})
+}
 
-export default MetadataForm
+export default MetadataComponent

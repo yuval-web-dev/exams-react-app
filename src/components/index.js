@@ -1,3 +1,2 @@
-export { MetadataForm } from "./MetadataForm"
-export { QuestList } from "./QuestList"
+export { ExamEditor } from "./ExamEditor"
 export { default as SiteNav } from "./SiteNav"

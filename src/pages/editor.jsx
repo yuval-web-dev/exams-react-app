@@ -9,80 +9,36 @@ import { QuestList, MetadataForm, SiteNav } from "../components"
 import * as storage from "../utils/storage"
 import { Exam } from "../classes.ts"
 import "./editor.scss"
+import ExamEditor from "../components/ExamEditor/ExamEditor"
 
 
-const Editor = () => {
-  const questListRef = useRef()
-  const metaFormRef = useRef()
+const editor = () => {
 
-  const handleSaveButton = () => {
-    try {
-      metaFormRef.current.validate()
-    }
-    catch {
-      alert("MetadataForm validation error")
-      return
-    }
-    try {
-      questListRef.current.validate()
-    }
-    catch {
-      alert("QuestList validation error")
-      return
-    }
-    const examObj = new Exam(
-      metaFormRef.current.yield(),
-      questListRef.current.yield()
-    )
-    storage.save(examObj.id, examObj)
+  const handleClickCancel = () => {
+    alert("Cancel button clicked!")
   }
 
-  const handleCancelButton = () => {
-
+  const handleClickSave = () => {
+    alert("Save button clicked!")
   }
-
-  const MetaCard = () => (
-    <Card>
-      <Card.Header className="d-flex justify-content-center"><h5 className="mb-0">Metadata</h5></Card.Header>
-      <Card.Body className="p-0">
-        <MetadataForm ref={metaFormRef} />
-      </Card.Body>
-    </Card>
-  )
-
-  const QuestsCard = () => (
-    <Card>
-      <Card.Header className="d-flex justify-content-center"><h5 className="mb-0">Questions</h5></Card.Header>
-      <Card.Body className="p-0">
-        <QuestList ref={questListRef} />
-      </Card.Body>
-    </Card>
-  )
 
   return (
     <React.Fragment>
       <SiteNav.Top />
-      <Container fluid="lg">
-        <h2>New Closed Exam</h2>
+      <Container fluid="sm">
+        <h2>New Exam</h2>
         <Card>
-          <Row>
-            <Col md="4">
-              <MetaCard />
-            </Col>
-            <Col>
-              <QuestsCard />
-            </Col>
-          </Row>
+          <ExamEditor />
 
           <Card.Footer className="d-flex justify-content-end">
             <Button
               variant="secondary"
-              onClick={handleCancelButton}>
+              onClick={handleClickCancel}>
               Cancel
             </Button>
             <Button
               variant="primary"
-              onClick={handleSaveButton}>
+              onClick={handleClickSave}>
               Save
             </Button>
           </Card.Footer>
@@ -92,6 +48,6 @@ const Editor = () => {
   )
 }
 
-export default Editor
+export default editor
 
 // const scrollable = { maxHeight: "40vh", overflowY: "scroll" }

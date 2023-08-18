@@ -13,37 +13,68 @@ import CodeEditor from "@uiw/react-textarea-code-editor"
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 import RangeSlider from "react-bootstrap-range-slider"
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css'
-
-
 import { BsArrowReturnLeft } from "react-icons/bs"
 import { GoTrash } from "react-icons/go"
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
 
-
-
 import consts from "./consts.js"
 import * as state from "./states.ts"
-import { Text, Img } from "../../classes.ts"
+import { Text, Img, OpenEnded, CloseEnded } from "../../classes.ts"
+
 
 const QuestEditor = forwardRef(({ type }, ref) => {
   useImperativeHandle(ref, () => ({
     validate() {
-      if ((type === "text" && text === state.text) ||
-        (type === "image" && image === state.image)) {
-        throw "err"
+      if (format === "text") {
+        if (text === state.text) {
+          throw "no text entered"
+        }
+        if (attachCode && code === state.code) {
+          throw "no code entered"
+        }
+      }
+      else { // format === "image"
+        if ((image === state.image)) {
+          throw "no image selected"
+        }
+      }
+      if (type === "closed") {
+        if (answers === state.answers) {
+          throw "no answers entered"
+        }
+        if (answers.length < 2) {
+          throw "less than 2 answers"
+        }
+        if (correct === state.correct) {
+          throw "no correct answer selected"
+        }
       }
     },
     yield() {
-      if (type === "text") {
-        if (code !== state.code) {
-          return new Text(text)
-        }
-        else {
-          return new Text(text, { lang: lang, val: code })
-        }
+      var body
+      if (format === "text") {
+        body = new Text(
+          text,
+          code === state.code ? null : { lang: lang, val: code }
+        )
       }
-      else { // type === "image"
-        return new Img(image)
+      else { // format === "image"
+        body = new Img(image)
+      }
+
+      if (type === "closed") {
+        return new CloseEnded(
+          body,
+          answers,
+          correct,
+          shuffle
+        )
+      }
+      else { // type === "open"
+        return new OpenEnded(
+          body,
+          points
+        )
       }
     }
   }))
@@ -71,15 +102,14 @@ const QuestEditor = forwardRef(({ type }, ref) => {
 
   const Control = () => {
     const divClass = "d-flex flex-column me-2"
+
     const FormatSwitch = () => {
       const handleChangeFormat = () => {
         if (format === "image") {
           setFormat("text")
-          setImage(state.image)
         }
         if (format === "text") {
           setFormat("image")
-          setText(state.text)
         }
       }
 
@@ -99,17 +129,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
 
     const AttachCodeSwitch = () => {
       const handleCodeToggle = () => {
-        if (attachCode) {
-          if (code !== state.code) {
-            if (!window.confirm("Discard changes?")) {
-              return
-            }
-          }
-          setAttachCode(false)
-          setCode("")
-        } else {
-          setAttachCode(true)
-        }
+        setAttachCode(!attachCode)
       }
 
       return (
@@ -150,8 +170,8 @@ const QuestEditor = forwardRef(({ type }, ref) => {
       <Row>
         <Col className="d-flex justify-content-start">
           {FormatSwitch()}
-          {AttachCodeSwitch()}
           {type === "closed" ? AppearanceSwitch() : null}
+          {format === "text" ? AttachCodeSwitch() : null}
         </Col>
       </Row>
     )
@@ -172,6 +192,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
         <Form>
           <Form.Label><small>Text</small></Form.Label>
           <Form.Control
+            value={text}
             spellCheck
             pattern={consts.answerPattern}
             onChange={e => handleChangeText(e.target.value)} />
@@ -189,6 +210,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
             multiple={false}
             onChange={e => handleImageUpload(e)} />
         </Form>
+
       )
     }
   }
@@ -301,11 +323,8 @@ const QuestEditor = forwardRef(({ type }, ref) => {
     )
   }
 
-  const AnswerList = () => {
-    const Actions = () => {
-      const single = answers.length === 1
-      const variant = "light"
-
+  const AnswerListGroup = () => {
+    const Control = () => {
       const handleMoveUp = () => {
         const idx = answers.indexOf(checked[0])
         if (idx > 0) {
@@ -334,6 +353,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
           setCorrect(state.correct)
         }
         setChecked([])
+        checkAllRef.current.checked = false
       }
 
       const handleCheckAll = (e) => {
@@ -363,7 +383,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
               className="me-1">
               <Button
                 style={{ width: "60px", height: "25px" }}
-                className="border p-0"
+                className="p-0"
                 disabled={noneChecked || multipleChecked}
                 variant="outline-secondary"
                 onClick={handleMoveUp}>
@@ -371,7 +391,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
               </Button>
               <Button
                 style={{ width: "60px", height: "25px" }}
-                className="border p-0"
+                className="p-0"
                 disabled={noneChecked || multipleChecked}
                 variant="outline-secondary"
                 onClick={handleMoveDown}>
@@ -382,7 +402,6 @@ const QuestEditor = forwardRef(({ type }, ref) => {
             <Button
               disabled={noneChecked}
               style={{ width: "60px", height: "50px" }}
-              className="border"
               variant="outline-danger"
               onClick={handleRemove}>
               <GoTrash />
@@ -421,7 +440,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
           <Col>
             <ListGroup>
               <ListGroup.Item>
-                {Actions()}
+                {Control()}
               </ListGroup.Item>
               {answers.map((answer, idx) => (
                 <ListGroup.Item
@@ -460,7 +479,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
       </ListGroup.Item>
       <ListGroup.Item
         className=""
-        style={attachCode ? {} : { display: "none" }}>
+        style={attachCode && format === "text" ? {} : { display: "none" }}>
         {CodeForm()}
       </ListGroup.Item>
       {type === "closed" ?
@@ -469,7 +488,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
             {AnswerForm()}
           </ListGroup.Item>
           <ListGroup.Item>
-            {AnswerList()}
+            {AnswerListGroup()}
           </ListGroup.Item>
         </React.Fragment>
         :
@@ -482,59 +501,3 @@ const QuestEditor = forwardRef(({ type }, ref) => {
 })
 
 export default QuestEditor
-
-
-
-// QUESTFORM
-// validate() {
-//   return null
-// },
-// yield() {
-//   try {
-//     bodyCardRef.current.validate()
-//   }
-//   catch {
-//     alert("bodyCard form validation failed")
-//     return
-//   }
-//   if (type === "closed") {
-//     try {
-//       ansCardRef.current.validate()
-//     }
-//     catch {
-//       alert("answerCard form validation failed")
-//       return
-//     }
-//   }
-
-//   const { body, score } = bodyCardRef.current.yield()
-
-//   if (type === "closed") {
-//     const { answers, correct, shuffle } = ansCardRef.current.yield()
-//     return new CloseEnded(
-//       body,
-//       answers,
-//       correct,
-//       shuffle
-//     )
-//   }
-//   else {
-//     return new OpenEnded(
-//       body,
-//       score
-//     )
-//   }
-
-// ANSWERS CARD
-// validate() {
-//   if (
-//     (answers === defaultStates.answers) ||
-//     (answers.length < 2) ||
-//     (correct === defaultStates.correct)
-//   ) {
-//     throw "err"
-//   }
-// },
-// yield() {
-//   return { answers: answers, correct: correct, shuffle: shuffle }
-// }

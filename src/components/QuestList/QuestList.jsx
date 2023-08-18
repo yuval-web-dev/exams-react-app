@@ -20,18 +20,7 @@ import { QuestEditor } from "../QuestEditor"
 import QuestPreview from "./QuestPreview.jsx"
 import * as state from "./states.ts"
 
-const QuestList = forwardRef(({ }, ref) => {
-  useImperativeHandle(ref, () => ({
-    validate() {
-      if (quests.length === 0) {
-        throw "err"
-      }
-    },
-    yield() {
-      return quests
-    }
-  }))
-
+const QuestList = ({ setObj }) => {
 
   const [type, setType] = useState(state.type)
   const [quests, setQuests] = useState(state.quests)
@@ -44,6 +33,7 @@ const QuestList = forwardRef(({ }, ref) => {
 
   const questFormRef = useRef()
   const fileInputRef = useRef()
+  const checkAllRef = useRef()
 
   const empty = quests.length < 1
   const single = checked.length === 1
@@ -124,9 +114,9 @@ const QuestList = forwardRef(({ }, ref) => {
     )
   }
 
-  const ListGroupQuests = () => {
+  const QuestListGroup = () => {
 
-    const ActionBar = () => {
+    const Control = () => {
       const handleCheckAll = () => {
         if (checked === quests) {
           setChecked([])
@@ -174,66 +164,57 @@ const QuestList = forwardRef(({ }, ref) => {
       const handleRemove = () => {
         setQuests(quests.filter(i => !checked.includes(i)))
         setChecked([])
+        checkAllRef.current.checked = false
       }
 
-      const single = checked.length === 1
-      const multiple = checked.length > 0
+      const noneChecked = checked.length === 0
+      const multipleChecked = checked.length > 1
 
-      const allChecked = (checked.length === quests.length) && (checked.length > 0)
       return (
         <Row>
           <Col className="d-flex align-items-center">
             <Form.Check
+              ref={checkAllRef}
               className="me-auto"
               type="checkbox"
               disabled={empty}
               onClick={handleCheckAll} />
 
-            <ButtonGroup vertical className="mx-3">
+            <ButtonGroup vertical>
               <Button
-                className="border py-0"
-                disabled={empty || !single}
-                variant="light"
+                style={{ width: "60px", height: "25px" }}
+                className="p-0"
+                disabled={noneChecked || multipleChecked}
+                variant="outline-secondary"
                 onClick={handleMoveUp}>
                 <AiOutlineArrowUp />
               </Button>
-
               <Button
-                className="border py-0"
-                variant="light"
-                disabled={empty || !single}
+                style={{ width: "60px", height: "25px" }}
+                className="p-0"
+                disabled={noneChecked || multipleChecked}
+                variant="outline-secondary"
                 onClick={handleMoveDown}>
                 <AiOutlineArrowDown />
               </Button>
             </ButtonGroup>
 
-            <ButtonGroup>
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip>Export to JSON</Tooltip>}>
-                <Button
-                  style={{ width: "100px" }}
-                  className="border"
-                  disabled={!multiple}
-                  variant="light"
-                  onClick={handleExport}>
-                  <TfiExport />
-                </Button>
-              </OverlayTrigger>
+            <Button
+              className="mx-2"
+              style={{ width: "60px", height: "50px" }}
+              disabled={noneChecked}
+              variant="outline-secondary"
+              onClick={handleExport}>
+              <TfiExport />
+            </Button>
 
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip>Remove</Tooltip>}>
-                <Button
-                  style={{ width: "100px" }}
-                  disabled={empty}
-                  className="border"
-                  variant="danger"
-                  onClick={handleRemove}>
-                  <GoTrash />
-                </Button>
-              </OverlayTrigger>
-            </ButtonGroup>
+            <Button
+              disabled={noneChecked}
+              style={{ width: "60px", height: "50px" }}
+              variant="outline-danger"
+              onClick={handleRemove}>
+              <GoTrash />
+            </Button>
 
           </Col>
         </Row>
@@ -275,15 +256,12 @@ const QuestList = forwardRef(({ }, ref) => {
 
     return (
       <ListGroup>
-        <ListGroup.Item variant="secondary">
-          {ActionBar()}
+        <ListGroup.Item>
+          {Control()}
         </ListGroup.Item>
 
         {quests.map((quest, idx) => (
-          <ListGroup.Item
-            key={idx}
-            action
-            variant="light">
+          <ListGroup.Item key={idx} action>
             <Row>
               <Col xs="1">
                 <Form.Check
@@ -307,8 +285,7 @@ const QuestList = forwardRef(({ }, ref) => {
                   </Col>
                   <Col xs="6">
                     <Button
-                      className="border-0"
-                      variant="light"
+                      variant="outline-secondary"
                       onClick={() => handleListGroupClick(quest, idx)}>
                       <BsEye />
                     </Button>
@@ -332,99 +309,109 @@ const QuestList = forwardRef(({ }, ref) => {
       ref={fileInputRef} />
   )
 
-  const TypeAndOrder = () => {
-    const handleTypeSwitch = () => {
-      if (type === "closed") {
-        setType("open")
+  const Control = () => {
+
+    const divClass = "d-flex flex-column me-2"
+
+    const AddButtons = () => {
+      const handleClickPencil = () => {
+        setFormShow(true)
       }
-      else { // type === "open"
-        setType("closed")
+
+      const handleClickJson = () => {
+        fileInputRef.current.click()
       }
+
+      const handleClickQuizApi = () => {
+        alert("quizapi clicked")
+      }
+
+      return (
+        <div className={divClass}>
+          <small>Add</small>
+
+          <ButtonGroup>
+            <Button
+              size="sm"
+              style={{ width: "80px" }}
+              className="border"
+              variant="light"
+              onClick={handleClickPencil}>
+              <GoPencil />
+            </Button>
+            <Button
+              size="sm"
+              style={{ width: "80px" }}
+              className="border"
+              variant="light"
+              onClick={handleClickJson}>
+              <TfiImport />
+            </Button>
+
+            <Button
+              size="sm"
+              disabled={type === "open"}
+              style={{ width: "80px" }}
+              className="border"
+              variant="light"
+              onClick={handleClickQuizApi}>
+              QuizAPI
+            </Button>
+          </ButtonGroup>
+        </div>
+      )
     }
 
-    const handleOrderSwitch = () => {
-      setShuffle(!shuffle)
-    }
+    const TypeSwitch = () => {
+      const handleTypeSwitch = () => {
+        if (type === "closed") {
+          setType("open")
+        }
+        else { // type === "open"
+          setType("closed")
+        }
+      }
 
-    return (
-      <Row>
-        <Col xs="6" className="d-flex justify-content-start align-items-center">
-          <div className="me-5">Type</div>
+      return (
+        <div className={divClass}>
+          <small>Type</small>
           <BootstrapSwitchButton
+            size="sm"
             checked={type === "open"}
-            width="150"
+            width="100"
             offlabel="Closed"
             onlabel="Open"
-            onstyle="light"
             onChange={handleTypeSwitch} />
-        </Col>
-        <Col xs="6" className="d-flex justify-content-start align-items-center">
-          <div className="me-5">Order of Appearance</div>
+        </div>
+      )
+    }
+
+    const AppearanceSwitch = () => {
+      const handleOrderSwitch = () => {
+        setShuffle(!shuffle)
+      }
+
+      return (
+        <div className={divClass}>
+          <small>Appearance</small>
           <BootstrapSwitchButton
+            size="sm"
             checked={shuffle === true}
-            width="150"
+            width="100"
             offlabel="Ordered"
             onlabel="Shuffled"
             onstyle="warning"
             onChange={handleOrderSwitch} />
-        </Col>
-      </Row >
-    )
-  }
-
-  const AddButtons = () => {
-    const handleClickYourOwn = () => {
-      setFormShow(true)
-    }
-
-    const handleClickJson = () => {
-      fileInputRef.current.click()
-    }
-
-    const handleClickQuizApi = () => {
-      alert("quizapi clicked")
+        </div>
+      )
     }
 
     return (
       <Row>
-        <Col className="d-flex justify-content-start align-items-center">
-          <div className="me-5">Add</div>
-          <ButtonGroup>
-            <OverlayTrigger
-              placement="top"
-              overlay={<Tooltip>your own</Tooltip>}>
-              <Button
-                style={{ width: "75px" }}
-                className="border"
-                variant="light"
-                onClick={handleClickYourOwn}>
-                <GoPencil />
-              </Button>
-            </OverlayTrigger>
-
-            <OverlayTrigger
-              placement="top"
-              overlay={<Tooltip>from JSON</Tooltip>}>
-              <Button
-                style={{ width: "75px" }}
-                className="border"
-                variant="light"
-                onClick={handleClickJson}>
-                <TfiImport />
-              </Button>
-            </OverlayTrigger>
-
-            <Button
-              disabled={type === "open"}
-              style={{ width: "100px" }}
-              className="border"
-              variant="light"
-              onClick={handleClickQuizApi}>
-              <Image
-                style={{ width: "75px" }}
-                src="https://quizapi.io/storage/settings/March2020/H8dOZWtQD0IND4pqOJTT.png" />
-            </Button>
-          </ButtonGroup>
+        <Col className="d-flex justify-content-start">
+          {AddButtons()}
+          {TypeSwitch()}
+          {AppearanceSwitch()}
         </Col>
       </Row>
     )
@@ -442,17 +429,14 @@ const QuestList = forwardRef(({ }, ref) => {
 
       <ListGroup>
         <ListGroup.Item>
-          {TypeAndOrder()}
-        </ListGroup.Item>
-        <ListGroup.Item>
-          {AddButtons()}
+          {Control()}
         </ListGroup.Item>
         <ListGroup.Item className="p-0 border-0">
-          {ListGroupQuests()}
+          {QuestListGroup()}
         </ListGroup.Item>
       </ListGroup>
     </React.Fragment>
   )
-})
+}
 
 export default QuestList

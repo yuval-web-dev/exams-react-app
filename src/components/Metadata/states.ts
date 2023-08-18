@@ -1,4 +1,4 @@
-import * as util from "./utils.ts"
+import * as util from "./utils.js"
 
 export const subject: string = ""
 export const date: string = util.getMinDate()

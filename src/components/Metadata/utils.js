@@ -1,4 +1,4 @@
-export const addMinutesToTime = (time: string, minutesToAdd: number) => {
+export const addMinutesToTime = (time, minutesToAdd) => {
   const [hours, minutes] = time.split(':').map(Number);
 
   // Convert time to minutes and add the minutes to it

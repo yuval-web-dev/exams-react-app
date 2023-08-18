@@ -1,4 +1,4 @@
-export const format: string = "text"
+export const format: "text" | "image" = "text"
 export const text: string = ""
 export const image: File | null = null
 export const code: string = ""

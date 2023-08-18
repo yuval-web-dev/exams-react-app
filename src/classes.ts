@@ -2,14 +2,14 @@ import { v4 as uuidv4 } from 'uuid'
 
 class Text {
   constructor(
-    public body: string,
+    public val: string,
     public code?: { lang: string, val: string }
   ) { }
 }
 
 class Img {
   constructor(
-    public body: File
+    public val: File
   ) { }
 }
 
@@ -27,7 +27,7 @@ class OpenEnded {
   id: string = uuidv4()
   constructor(
     public body: Text | Img,
-    public score: number
+    public points: number
   ) { }
 }
 
