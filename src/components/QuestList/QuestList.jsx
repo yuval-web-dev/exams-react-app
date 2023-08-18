@@ -11,13 +11,12 @@ import {
 } from "react-bootstrap"
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
-import { GoTrash, GoPencil, GoListOrdered, GoNumber } from "react-icons/go"
+import { GoTrash, GoPencil } from "react-icons/go"
 import { TfiImport, TfiExport } from "react-icons/tfi"
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
-import { BsCloudDownload, BsEye, BsCheckSquare, BsSquare, BsChatText } from "react-icons/bs"
-import { BiShuffle } from "react-icons/bi"
+import { BsEye } from "react-icons/bs"
 
-import { QuestForm } from "../QuestForm"
+import { QuestEditor } from "../QuestEditor"
 import QuestPreview from "./QuestPreview.jsx"
 import * as state from "./states.ts"
 
@@ -107,7 +106,7 @@ const QuestList = forwardRef(({ }, ref) => {
           <Modal.Title>{`New ${type} Question`}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-0">
-          <QuestForm type={type} ref={questFormRef} />
+          <QuestEditor type={type} ref={questFormRef} />
         </Modal.Body>
         <Modal.Footer>
           <Button
