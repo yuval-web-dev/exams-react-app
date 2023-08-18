@@ -3,6 +3,10 @@ import { Routes, Route } from "react-router-dom"
 
 import * as pages from "./pages"
 
+// Redux toolkit
+import { Provider } from "react-redux"
+import store from "./app/store"
+
 
 const App = () => {
 
@@ -27,13 +31,15 @@ const App = () => {
 
 
   return (
-    <Routes>
-      <Route path="/" element={<pages.Home />} />
-      <Route path="/edit" element={<pages.Editor />} />
-      <Route path="/test" element={<pages.Test />} />
-      <Route path="/about" element={<pages.About />} />
-      <Route path="/*" element={< pages.NotFound />} />
-    </Routes>
+    <Provider store={store}>
+      <Routes>
+        <Route path="/" element={<pages.Home />} />
+        <Route path="/edit" element={<pages.Editor />} />
+        <Route path="/test" element={<pages.Test />} />
+        <Route path="/about" element={<pages.About />} />
+        <Route path="/*" element={< pages.NotFound />} />
+      </Routes>
+    </Provider>
   )
 }
 

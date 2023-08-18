@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef, useImperativeHandle } from "react"
+import React from "react"
 import {
   ListGroup,
   Form,
@@ -19,24 +19,42 @@ import { BsEye } from "react-icons/bs"
 import { QuestEditor } from "../QuestEditor"
 import QuestPreview from "./QuestPreview.jsx"
 import * as state from "./states.ts"
+import quizApiLogo from "../../assets/quizapi_full.svg"
 
-const QuestList = ({ setObj }) => {
+import { QuestList } from "../../classes.ts"
 
-  const [type, setType] = useState(state.type)
-  const [quests, setQuests] = useState(state.quests)
-  const [selected, setSelected] = useState(state.selected)
-  const [shuffle, setShuffle] = useState(state.shuffle)
 
-  const [previewShow, setPreviewShow] = useState(false)
-  const [formShow, setFormShow] = useState(false)
-  const [checked, setChecked] = useState([])
+const QuestListComponent = ({ }, ref) => {
+  React.useImperativeHandle(ref, () => ({
+    validate() {
+      if (quests.length === 0) {
+        throw "no questions added"
+      }
+    },
+    createObj() {
+      return new QuestList(
+        type,
+        quests,
+        shuffle
+      )
+    }
+  }))
 
-  const questFormRef = useRef()
-  const fileInputRef = useRef()
-  const checkAllRef = useRef()
+  const [type, setType] = React.useState(state.type)
+  const [quests, setQuests] = React.useState(state.quests)
+  const [selected, setSelected] = React.useState(state.selected)
+  const [shuffle, setShuffle] = React.useState(state.shuffle)
+
+  const [previewShow, setPreviewShow] = React.useState(false)
+  const [formShow, setFormShow] = React.useState(false)
+  const [checked, setChecked] = React.useState([])
+
+  const editorRef = React.useRef()
+  const fileInputRef = React.useRef()
+  const checkAllRef = React.useRef()
 
   const empty = quests.length < 1
-  const single = checked.length === 1
+
 
   const handleImport = async (event) => {
     const files = event.target.files;
@@ -74,17 +92,21 @@ const QuestList = ({ setObj }) => {
     }
   }
 
-  const QuestFormModal = () => {
-    const handleQuestModalSave = () => {
+  const QuestEditorModal = () => {
+    const handleClickCancel = () => {
+      setFormShow(false)
+    }
+
+    const handleClickSave = () => {
       try {
-        questFormRef.current.validate()
+        editorRef.current.validate()
       }
       catch {
         alert("QuestForm validation error.")
         return
       }
 
-      const questObj = questFormRef.current.yield()
+      const questObj = editorRef.current.yield()
       setQuests([...quests, questObj])
       setFormShow(false)
     }
@@ -96,17 +118,17 @@ const QuestList = ({ setObj }) => {
           <Modal.Title>{`New ${type} Question`}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-0">
-          <QuestEditor type={type} ref={questFormRef} />
+          <QuestEditor type={type} ref={editorRef} />
         </Modal.Body>
         <Modal.Footer>
           <Button
-            variant="secondary"
-            onClick={() => setFormShow(false)}>
+            variant="outline-secondary"
+            onClick={handleClickCancel}>
             Cancel
           </Button>
           <Button
             variant="primary"
-            onClick={handleQuestModalSave}>
+            onClick={handleClickSave}>
             Save
           </Button>
         </Modal.Footer>
@@ -310,7 +332,6 @@ const QuestList = ({ setObj }) => {
   )
 
   const Control = () => {
-
     const divClass = "d-flex flex-column me-2"
 
     const AddButtons = () => {
@@ -327,13 +348,12 @@ const QuestList = ({ setObj }) => {
       }
 
       return (
-        <div className={divClass}>
+        <div className={divClass + " me-3"}>
           <small>Add</small>
-
           <ButtonGroup>
             <Button
               size="sm"
-              style={{ width: "80px" }}
+              style={{ width: "70px" }}
               className="border"
               variant="light"
               onClick={handleClickPencil}>
@@ -341,7 +361,7 @@ const QuestList = ({ setObj }) => {
             </Button>
             <Button
               size="sm"
-              style={{ width: "80px" }}
+              style={{ width: "70px" }}
               className="border"
               variant="light"
               onClick={handleClickJson}>
@@ -351,11 +371,11 @@ const QuestList = ({ setObj }) => {
             <Button
               size="sm"
               disabled={type === "open"}
-              style={{ width: "80px" }}
+              style={{ width: "70px" }}
               className="border"
               variant="light"
               onClick={handleClickQuizApi}>
-              QuizAPI
+              <Image width="50" src={quizApiLogo} />
             </Button>
           </ButtonGroup>
         </div>
@@ -419,7 +439,7 @@ const QuestList = ({ setObj }) => {
 
   return (
     <React.Fragment>
-      {QuestFormModal()}
+      {QuestEditorModal()}
       {JsonInput()}
       <QuestPreview
         quest={selected.quest}
@@ -439,4 +459,4 @@ const QuestList = ({ setObj }) => {
   )
 }
 
-export default QuestList
+export default React.forwardRef(QuestListComponent)

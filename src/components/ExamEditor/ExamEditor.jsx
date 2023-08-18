@@ -1,27 +1,52 @@
-import React, { useState } from "react"
+import React from "react"
 import {
-  Row, Col
+  Row, Col,
+  Card,
+  Button
 } from "react-bootstrap"
 
 import { MetadataComponent } from "../Metadata"
-import { QuestList } from "../QuestList"
-
+import { QuestListComponent } from "../QuestList"
 import * as storage from "../../utils/storage"
 
-const ExamEditor = ({ setObj }) => {
-  const [metadataObj, setMetadataObj] = useState(null)
-  const [questlistObj, setQuestlistObj] = useState(null)
 
+const ExamEditor = () => {
+  const metadataRef = React.useRef()
+  const questlistRef = React.useRef()
+
+  const handleClickCancel = () => {
+    alert("Cancel button clicked!")
+  }
+
+  const handleClickSave = () => {
+    alert("Save button clicked!")
+  }
 
   return (
-    <Row>
-      <Col lg="4">
-        <MetadataComponent setObj={setMetadataObj} />
-      </Col>
-      <Col>
-        <QuestList setObj={setQuestlistObj} />
-      </Col>
-    </Row>
+    <Card>
+      <Row>
+        <Col lg="4">
+          <MetadataComponent ref={metadataRef} />
+        </Col>
+        <Col>
+          <QuestListComponent ref={questlistRef} />
+        </Col>
+      </Row>
+
+      <Card.Footer className="d-flex justify-content-end">
+        <Button
+          className="me-2"
+          variant="outline-secondary"
+          onClick={handleClickCancel}>
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handleClickSave}>
+          Save
+        </Button>
+      </Card.Footer>
+    </Card>
   )
 }
 

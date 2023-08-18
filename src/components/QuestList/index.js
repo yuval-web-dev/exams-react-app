@@ -1,1 +1,1 @@
-export { default as QuestList } from "./QuestList.jsx"
+export { default as QuestListComponent } from "./QuestList.jsx"

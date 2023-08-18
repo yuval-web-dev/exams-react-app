@@ -35,7 +35,7 @@ const QuestPreview = ({ quest, idx, show, setShow }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button
-          variant="secondary"
+          variant="outline-secondary"
           onClick={() => setShow(false)}>
           Close
         </Button>

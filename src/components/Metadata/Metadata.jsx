@@ -1,4 +1,4 @@
-import React, { useState, useImperativeHandle, forwardRef } from "react"
+import React from "react"
 import {
   Row, Col,
   Form,
@@ -17,30 +17,31 @@ import { Metadata } from "../../classes.ts"
 import * as state from "./states.ts"
 import * as util from "./utils.js"
 
-const MetadataComponent = ({ setObj }) => {
-  // useImperativeHandle(ref, () => ({
-  //   validate() {
-  //     if (subject === state.subject) {
-  //       throw "err"
-  //     }
-  //   },
-  //   yield() {
-  //     const cdate = new Date(date)
-  //     cdate.setHours(0, 0, 0, 0)
-  //     cdate.setSeconds(start)
-  //     return new Metadata(
-  //       subject,
-  //       {},
-  //       cdate,
-  //       Number(duration)
-  //     )
-  //   }
-  // }))
+const MetadataComponent = ({ }, ref) => {
+  React.useImperativeHandle(ref, () => ({
+    validate() {
+      if (subject === state.subject) {
+        throw "err"
+      }
+    },
+    yield() {
+      const cdate = new Date(date)
+      cdate.setHours(0, 0, 0, 0)
+      cdate.setSeconds(start)
+      return new Metadata(
+        subject,
+        {},
+        cdate,
+        Number(duration)
+      )
+    }
+  }))
 
-  const [subject, setSubject] = useState(state.subject)
-  const [date, setDate] = useState(state.date) // Millis
-  const [start, setStart] = useState(state.start) // Secs
-  const [duration, setDuration] = useState(state.duration)
+
+  const [subject, setSubject] = React.useState(state.subject)
+  const [date, setDate] = React.useState(state.date) // Millis
+  const [start, setStart] = React.useState(state.start) // Secs
+  const [duration, setDuration] = React.useState(state.duration)
 
   const labelClassname = "my-0"
 
@@ -140,4 +141,4 @@ const MetadataComponent = ({ setObj }) => {
   )
 }
 
-export default MetadataComponent
+export default React.forwardRef(MetadataComponent)
