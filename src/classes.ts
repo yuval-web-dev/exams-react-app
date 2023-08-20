@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 
-class Text {
+class Txt {
   constructor(
     public val: string,
     public code?: { lang: string, val: string }
@@ -60,7 +60,7 @@ class Exam {
 }
 
 export {
-  Text, Img,
+  Txt, Img,
   CloseEnded, OpenEnded,
   QuestList,
   Metadata,

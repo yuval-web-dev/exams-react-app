@@ -19,7 +19,7 @@ import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
 
 import consts from "./consts.js"
 import * as state from "./states.ts"
-import { Text, Img, OpenEnded, CloseEnded } from "../../classes.ts"
+import { Txt, Img, OpenEnded, CloseEnded } from "../../classes.ts"
 
 
 const QuestEditor = forwardRef(({ type }, ref) => {
@@ -53,7 +53,7 @@ const QuestEditor = forwardRef(({ type }, ref) => {
     yield() {
       var body
       if (format === "text") {
-        body = new Text(
+        body = new Txt(
           text,
           code === state.code ? null : { lang: lang, val: code }
         )

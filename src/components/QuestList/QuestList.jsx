@@ -6,8 +6,7 @@ import {
   Row, Col,
   Image,
   Button, ButtonGroup,
-  Badge,
-  OverlayTrigger, Tooltip,
+  Badge
 } from "react-bootstrap"
 import BootstrapSwitchButton from "bootstrap-switch-button-react"
 
@@ -17,7 +16,7 @@ import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
 import { BsEye } from "react-icons/bs"
 
 import { QuestEditor } from "../QuestEditor"
-import QuestPreview from "./QuestPreview.jsx"
+import { QuestPreview } from "../QuestPreview"
 import * as state from "./states.ts"
 import quizApiLogo from "../../assets/quizapi_full.svg"
 

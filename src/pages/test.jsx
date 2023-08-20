@@ -6,7 +6,10 @@ import {
   ButtonGroup
 } from "react-bootstrap"
 
-import { Text, CloseEnded } from "../classes.ts"
+import { Txt, CloseEnded } from "../classes.ts"
+
+import { QuizApiForm } from "../components"
+
 
 const quizApi = async (apiKey, category, tags, difficulty) => {
   try {
@@ -44,7 +47,7 @@ const demo = async () => {
 
   console.log(resdata)
 
-  const body = new Text(resdata?.question)
+  const body = new Txt(resdata?.question)
   const answers = []
   var correct
 
@@ -68,20 +71,14 @@ const demo = async () => {
 
 }
 
+
+
 const Test = () => {
 
   // demo()
 
   return (
-    <Form>
-      <Form.Label>asdf</Form.Label>
-      <Form.Control as="Row">
-        <ButtonGroup>
-          <Button>Open</Button>
-          <Button>Closed</Button>
-        </ButtonGroup>
-      </Form.Control>
-    </Form>
+    <QuizApiForm></QuizApiForm>
   )
 }
 
