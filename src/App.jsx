@@ -1,45 +1,38 @@
-import React, { useState, useEffect } from "react"
-import { Routes, Route } from "react-router-dom"
-
-import * as pages from "./pages"
+import React from "react"
+import { Routes, Route, Navigate } from "react-router-dom"
+import { AuthProvider, RequireAuth, withIsAuthenticated } from 'react-auth-kit'
+import * as Pages from "./pages"
 
 // Redux toolkit
 import { Provider } from "react-redux"
 import store from "./app/store"
 
 
+const DashboardRoutes = () => (
+  <RequireAuth loginPath={"/login"}>
+    <Routes>
+      <Route path="/" element={<Pages.Dashboard />} />
+      <Route path="/edit" element={<Pages.Editor />} />
+      <Route path="/test" element={<Pages.Test />} />
+    </Routes>
+  </RequireAuth>
+)
+
+
 const App = () => {
-
-  // const [user, setUser] = useState(new User())
-
-  // A function that describes what side effects to perform,
-  //  such as fetching data from an API or adding an event listener.
-  const useEffectFunc = () => {
-    // const loggeddUser = new User() // Author
-    // loggeddUser.firstname = "Jim"
-    // loggeddUser.surname = "Kurose"
-    // setUser(loggeddUser)
-  }
-
-  // controls when the side effect should run.
-  // This array contains values that the effect depends on,
-  //  and React will re-run the effect whenever any of these values change.
-  // If you don"t specify the dependency array, the effect will run on every render.
-  let useEffectDependancyArr = []
-
-  useEffect(useEffectFunc, useEffectDependancyArr)
-
-
   return (
-    <Provider store={store}>
+    <AuthProvider
+      authName="_auth"
+      authType="cookie"
+      cookieSecure={false}>
       <Routes>
-        <Route path="/" element={<pages.Home />} />
-        <Route path="/edit" element={<pages.Editor />} />
-        <Route path="/test" element={<pages.Test />} />
-        <Route path="/about" element={<pages.About />} />
-        <Route path="/*" element={< pages.NotFound />} />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/register" element={<Pages.Register />} />
+        <Route path="/login" element={<Pages.Login />} />
+        <Route path="/dashboard/*" element={<DashboardRoutes />} />
+        <Route path="/*" element={<Navigate to="/" />} />
       </Routes>
-    </Provider>
+    </AuthProvider>
   )
 }
 

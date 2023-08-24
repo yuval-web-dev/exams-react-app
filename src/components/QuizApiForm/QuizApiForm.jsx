@@ -56,7 +56,18 @@ const resDataToObj = (resData) => {
 }
 
 
-const QuizApiForm = () => {
+const QuizApiForm = ({ }, ref) => {
+  React.useImperativeHandle(ref, () => ({
+    validate() {
+      if (quests.length < 1) {
+        throw "no questions added"
+      }
+    },
+    yield() {
+      return checked
+    }
+  }))
+
   const [key, setKey] = React.useState("VOZNHbvQRb0rmx9OYxp0gykxs0wP7bsdB5GabvfC")
   const [cat, setCat] = React.useState("")
   const [tag, setTag] = React.useState("")
@@ -292,43 +303,33 @@ const QuizApiForm = () => {
 
 
   return (
-    <Modal size="lg" show={true}>
-      <Modal.Header>From QuizAPI</Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Row>
-            <Col>
-              {KeySubform()}
-            </Col>
-          </Row>
-          <Row className="my-3 py-3 border-top border-bottom">
-            <Col>
-              {CategorySubform()}
-            </Col>
-            <Col>
-              {TagSubform()}
-            </Col>
-            <Col>
-              {LimitSubform()}
-            </Col>
-            <Col className="d-flex align-items-end justify-content-end">
-              {SearchButton()}
-            </Col>
-          </Row>
-          <Row className="mt-3">
-            <Col>
-              {ListQuests()}
-            </Col>
-          </Row>
-        </Form>
-        <Button onClick={() => console.log(checked)} variant="warning">test</Button>
-      </Modal.Body>
-      <Modal.Footer className="d-flex justify-content-end">
-        <Button variant="outline-secondary">Cancel</Button>
-        <Button disabled={checked.length < 1} variant="primary">Add Selected</Button>
-      </Modal.Footer>
-    </Modal>
+    <Form>
+      <Row>
+        <Col>
+          {KeySubform()}
+        </Col>
+      </Row>
+      <Row className="my-3 py-3 border-top border-bottom">
+        <Col>
+          {CategorySubform()}
+        </Col>
+        <Col>
+          {TagSubform()}
+        </Col>
+        <Col>
+          {LimitSubform()}
+        </Col>
+        <Col className="d-flex align-items-end justify-content-end">
+          {SearchButton()}
+        </Col>
+      </Row>
+      <Row className="mt-3">
+        <Col>
+          {ListQuests()}
+        </Col>
+      </Row>
+    </Form>
   )
 }
 
-export default QuizApiForm
+export default React.forwardRef(QuizApiForm)

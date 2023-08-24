@@ -21,6 +21,7 @@ import * as state from "./states.ts"
 import quizApiLogo from "../../assets/quizapi_full.svg"
 
 import { QuestList } from "../../classes.ts"
+import { QuizApiForm } from "../QuizApiForm"
 
 
 const QuestListComponent = ({ }, ref) => {
@@ -46,9 +47,11 @@ const QuestListComponent = ({ }, ref) => {
 
   const [previewShow, setPreviewShow] = React.useState(false)
   const [formShow, setFormShow] = React.useState(false)
+  const [quizApiShow, setQuizApiShow] = React.useState(false)
   const [checked, setChecked] = React.useState([])
 
   const editorRef = React.useRef()
+  const quizApiFormRef = React.useRef()
   const fileInputRef = React.useRef()
   const checkAllRef = React.useRef()
 
@@ -130,6 +133,38 @@ const QuestListComponent = ({ }, ref) => {
             onClick={handleClickSave}>
             Save
           </Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+
+  const QuizApiModal = () => {
+    const handleCancel = () => {
+      setQuizApiShow(false)
+    }
+
+    const handleAdd = () => {
+      try {
+        quizApiFormRef.current.validate()
+        const newQuests = quizApiFormRef.current.yield()
+        setQuests(...quests, newQuests)
+        setQuizApiShow(false)
+      }
+      catch (err) {
+        alert(err)
+      }
+    }
+
+
+    return (
+      <Modal size="lg" show={quizApiShow}>
+        <Modal.Header>From QuizAPI</Modal.Header>
+        <Modal.Body>
+          <QuizApiForm ref={quizApiFormRef} />
+        </Modal.Body>
+        <Modal.Footer className="d-flex justify-content-end">
+          <Button variant="outline-secondary" onClick={handleCancel}>Cancel</Button>
+          <Button variant="primary" onClick={handleAdd}>Add Selected</Button>
         </Modal.Footer>
       </Modal>
     )
@@ -343,7 +378,7 @@ const QuestListComponent = ({ }, ref) => {
       }
 
       const handleClickQuizApi = () => {
-        alert("quizapi clicked")
+        setQuizApiShow(true)
       }
 
       return (
@@ -438,6 +473,7 @@ const QuestListComponent = ({ }, ref) => {
 
   return (
     <React.Fragment>
+      {QuizApiModal()}
       {QuestEditorModal()}
       {JsonInput()}
       <QuestPreview

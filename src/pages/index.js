@@ -1,5 +1,6 @@
-export { default as Home } from "./home.jsx"
+export { default as Dashboard } from "./dashboard.jsx"
 export { default as Editor } from "./editor.jsx"
-export { default as About } from "./about.jsx"
 export { default as NotFound } from "./notFound.jsx"
 export { default as Test } from "./test.jsx"
+export { default as Login } from "./login.jsx"
+export { default as Register } from "./register.jsx"

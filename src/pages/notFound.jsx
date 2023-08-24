@@ -5,11 +5,9 @@ const NotFound = () => {
   return (
     <React.Fragment>
       <p>Are you lost?</p>
-      <p>
-        <Link to="/">
-          Back to safe haven
-        </Link>
-      </p>
+      <Link to="/">
+        Back to safe haven
+      </Link>
     </React.Fragment>
   )
 }

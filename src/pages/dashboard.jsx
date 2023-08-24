@@ -4,14 +4,19 @@ import { Form, Button, Container, Row, Col, ListGroup } from 'react-bootstrap'
 import { SiteNav } from '../components'
 
 import * as storage from '../utils/storage'
+import { useIsAuthenticated } from 'react-auth-kit'
+import { useNavigate } from 'react-router-dom'
 
-const Home = () => {
+
+
+const Dashboard = () => {
   const defaultStates = {
     exams: [],
     checked: []
   }
-  const [exams, setExams] = useState(defaultStates.exams) // Exam[]
-  const [checked, setChecked] = useState(defaultStates.checked) // Exam
+  const [exams, setExams] = useState(defaultStates.exams)
+  const [checked, setChecked] = useState(defaultStates.checked)
+
 
   useEffect(() => {
     const fetchLocalExams = async () => {
@@ -19,7 +24,8 @@ const Home = () => {
       setExams(exams)
     }
     fetchLocalExams()
-  }, []); // The empty array ensures this effect runs only once, similar to componentDidMount
+  }, [])
+
 
   const handleCheckbox = (exam) => {
     if (checked.includes(exam)) {
@@ -30,6 +36,7 @@ const Home = () => {
     }
   }
 
+
   const handleRemove = () => {
     const removeLocalExams = async () => {
       await storage.remove(checked.map(exam => exam.id))
@@ -38,6 +45,7 @@ const Home = () => {
     removeLocalExams()
     setChecked(defaultStates.checked)
   }
+
 
   // const handleJsonChange = (newFile) => {
   //   const allowedTypes = ["application/json"]
@@ -53,6 +61,7 @@ const Home = () => {
   //   }
   //   jsonInputRef.current.value = ""
   // }
+
 
   // const handleJsonImport = () => {
   //   // const reader = new FileReader()
@@ -125,6 +134,7 @@ const Home = () => {
   //   // document.body.removeChild(element)
   // }
 
+
   const ActionBar = () => (
     <Row>
       <Col className="d-flex justify-content-end">
@@ -142,6 +152,7 @@ const Home = () => {
       </Col>
     </Row>
   )
+
 
   const ExamList = () => (
     <ListGroup>
@@ -170,6 +181,7 @@ const Home = () => {
     </ListGroup>
   )
 
+
   return (
     <React.Fragment>
       <SiteNav.Top />
@@ -182,10 +194,11 @@ const Home = () => {
         {ActionBar()}
         {ExamList()}
       </Container>
-
       <SiteNav.Bottom />
     </React.Fragment>
   )
 }
 
-export default Home
+
+
+export default Dashboard
