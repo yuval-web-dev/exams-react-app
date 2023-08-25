@@ -184,7 +184,6 @@ const Dashboard = () => {
 
   return (
     <React.Fragment>
-      <SiteNav.Top />
       <Container>
         <Row>
           <Col xs="12">
@@ -194,7 +193,6 @@ const Dashboard = () => {
         {ActionBar()}
         {ExamList()}
       </Container>
-      <SiteNav.Bottom />
     </React.Fragment>
   )
 }

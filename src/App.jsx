@@ -6,15 +6,18 @@ import * as Pages from "./pages"
 // Redux toolkit
 import { Provider } from "react-redux"
 import store from "./app/store"
+import { SiteNav } from "./components"
 
 
 const DashboardRoutes = () => (
   <RequireAuth loginPath={"/login"}>
+    <SiteNav.Top />
     <Routes>
       <Route path="/" element={<Pages.Dashboard />} />
       <Route path="/edit" element={<Pages.Editor />} />
       <Route path="/test" element={<Pages.Test />} />
     </Routes>
+    <SiteNav.Bottom />
   </RequireAuth>
 )
 

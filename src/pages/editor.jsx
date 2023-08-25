@@ -10,7 +10,6 @@ import ExamEditor from "../components/ExamEditor/ExamEditor"
 const editor = () => {
   return (
     <React.Fragment>
-      <SiteNav.Top />
       <Container fluid="sm">
         <h2>New Exam</h2>
         <ExamEditor />
