@@ -2,7 +2,8 @@ import React from "react"
 import {
   Row, Col,
   Form,
-  ListGroup
+  ListGroup,
+  Button
 } from "react-bootstrap"
 import TimePicker from "react-bootstrap-time-picker"
 import DatePicker from "react-datepicker"
@@ -10,38 +11,36 @@ import "react-datepicker/dist/react-datepicker.css"
 import RangeSlider from "react-bootstrap-range-slider"
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
-import consts from "./consts.js"
-
+import * as dateUtils from "./date.js"
 import { Metadata } from "../../classes.ts"
 
-import * as state from "./states.ts"
-import * as util from "./utils.js"
+
 
 const MetadataComponent = ({ }, ref) => {
   React.useImperativeHandle(ref, () => ({
     validate() {
-      if (subject === state.subject) {
+      if (subject === "") {
         throw "err"
       }
     },
     yield() {
-      const cdate = new Date(date)
-      cdate.setHours(0, 0, 0, 0)
-      cdate.setSeconds(start)
-      return new Metadata(
-        subject,
-        {},
-        cdate,
-        Number(duration)
-      )
+      // const cdate = new Date(date)
+      // cdate.setHours(0, 0, 0, 0)
+      // cdate.setSeconds(hour)
+      // return new Metadata(
+      //   subject,
+      //   {},
+      //   cdate,
+      //   Number(duration)
+      // )
     }
   }))
 
-
-  const [subject, setSubject] = React.useState(state.subject)
-  const [date, setDate] = React.useState(state.date) // Millis
-  const [start, setStart] = React.useState(state.start) // Secs
-  const [duration, setDuration] = React.useState(state.duration)
+  const [startsAt, setStartsAt] = React.useState(dateUtils.genStart())
+  const [subject, setSubject] = React.useState("")
+  const [date, setDate] = React.useState(dateUtils.genStart()) // Millis
+  const [hour, setHour] = React.useState(9 * 60 * 60) // Secs
+  const [duration, setDuration] = React.useState(30)
 
   const labelClassname = "my-0"
 
@@ -64,6 +63,16 @@ const MetadataComponent = ({ }, ref) => {
   }
 
   const DateStartEndForms = () => {
+    const handleHourChange = (secs) => {
+      setHour(secs)
+      const newStart = dateUtils.calcStart(date, secs)
+      setStartsAt(newStart)
+    }
+
+    const handleDateChange = (date) => {
+      setDate(date)
+    }
+
 
     return (
       <Row>
@@ -76,9 +85,9 @@ const MetadataComponent = ({ }, ref) => {
               value={date}
               selected={date}
               className="form-control"
-              minDate={state.date}
+              minDate={dateUtils.genStart()}
               dateFormat="d/M/yy"
-              onChange={date => setDate(date)} />
+              onChange={handleDateChange} />
           </Form>
         </Col>
         <Col className="px-1">
@@ -87,12 +96,12 @@ const MetadataComponent = ({ }, ref) => {
               <small>Start</small>
             </Form.Label>
             <TimePicker
-              value={start}
+              value={hour}
               format={24}
               step={30}
-              start={util.hhmm(9)}
-              end={util.hhmm(17)}
-              onChange={time => setStart(time)} />
+              start={dateUtils.numberToHHmm(9)}
+              end={dateUtils.numberToHHmm(17)}
+              onChange={handleHourChange} />
           </Form>
         </Col>
         <Col className="ps-1">
@@ -101,7 +110,7 @@ const MetadataComponent = ({ }, ref) => {
               <small>End</small>
             </Form.Label>
             <TimePicker
-              value={start + (duration * 60)}
+              value={hour + (duration * 60)}
               format={24}
               style={{ color: "grey", pointerEvents: "none" }} />
           </Form>
@@ -127,17 +136,23 @@ const MetadataComponent = ({ }, ref) => {
   )
 
   return (
-    <ListGroup>
-      <ListGroup.Item>
-        {SubjectForm()}
-      </ListGroup.Item>
-      <ListGroup.Item>
-        {DateStartEndForms()}
-      </ListGroup.Item>
-      <ListGroup.Item>
-        {DurationSlider()}
-      </ListGroup.Item>
-    </ListGroup>
+    <React.Fragment>
+      <Button
+        variant="warning"
+        onClick={() => console.log(startsAt)}>Test</Button>
+      <ListGroup>
+        <ListGroup.Item>
+          {SubjectForm()}
+        </ListGroup.Item>
+        <ListGroup.Item>
+          {DateStartEndForms()}
+        </ListGroup.Item>
+        <ListGroup.Item>
+          {DurationSlider()}
+        </ListGroup.Item>
+      </ListGroup>
+    </React.Fragment>
+
   )
 }
 

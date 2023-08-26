@@ -30,7 +30,6 @@ const App = () => {
       cookieSecure={false}>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/register" element={<Pages.Register />} />
         <Route path="/login" element={<Pages.Login />} />
         <Route path="/dashboard/*" element={<DashboardRoutes />} />
         <Route path="/*" element={<Navigate to="/" />} />
@@ -38,5 +37,7 @@ const App = () => {
     </AuthProvider>
   )
 }
+
+
 
 export default App

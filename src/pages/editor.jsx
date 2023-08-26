@@ -3,7 +3,6 @@ import {
   Container
 } from "react-bootstrap"
 
-import { SiteNav } from "../components"
 import ExamEditor from "../components/ExamEditor/ExamEditor"
 
 

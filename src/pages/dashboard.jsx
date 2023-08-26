@@ -4,25 +4,44 @@ import { Form, Button, Container, Row, Col, ListGroup } from 'react-bootstrap'
 import { SiteNav } from '../components'
 
 import * as storage from '../utils/storage'
-import { useIsAuthenticated } from 'react-auth-kit'
+import { useAuthHeader, useIsAuthenticated } from 'react-auth-kit'
 import { useNavigate } from 'react-router-dom'
+
+import axios from "axios"
 
 
 
 const Dashboard = () => {
-  const defaultStates = {
-    exams: [],
-    checked: []
-  }
-  const [exams, setExams] = useState(defaultStates.exams)
-  const [checked, setChecked] = useState(defaultStates.checked)
+  const [exams, setExams] = useState([])
+  const [checked, setChecked] = useState([])
 
+  const authHeader = useAuthHeader()
+
+  const fetchLocalExams = async () => {
+    try {
+      const localExams = await storage.fetch()
+      setExams(...exams, localExams)
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+  const fetchDbExams = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:8080/api/data/fetch-all",
+        { headers: { "Authorization": authHeader() } }
+      )
+      await storage.save_many(res.data.exams, "eid")
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
-    const fetchLocalExams = async () => {
-      const exams = await storage.fetch()
-      setExams(exams)
-    }
+    fetchDbExams()
     fetchLocalExams()
   }, [])
 
@@ -38,101 +57,13 @@ const Dashboard = () => {
 
 
   const handleRemove = () => {
-    const removeLocalExams = async () => {
-      await storage.remove(checked.map(exam => exam.id))
-    }
-    setExams(exams.filter(exam => !checked.includes(exam)))
-    removeLocalExams()
-    setChecked(defaultStates.checked)
+    // const removeLocalExams = async () => {
+    //   await storage.remove(checked.map(exam => exam.id))
+    // }
+    // setExams(exams.filter(exam => !checked.includes(exam)))
+    // removeLocalExams()
+    // setChecked([])
   }
-
-
-  // const handleJsonChange = (newFile) => {
-  //   const allowedTypes = ["application/json"]
-  //   if (newFile === undefined) {
-  //     return
-  //   }
-  //   else if (!allowedTypes.includes(newFile?.type)) {
-  //     alert(`Allowed file types: ${[...allowedTypes]}`)
-  //     setJsonImport(null)
-  //   }
-  //   else {
-  //     setJsonImport(newFile)
-  //   }
-  //   jsonInputRef.current.value = ""
-  // }
-
-
-  // const handleJsonImport = () => {
-  //   // const reader = new FileReader()
-
-  //   // reader.onload = async (e) => {
-  //   //   const jsonParsed = JSON.parse(e.target.result)
-  //   //   const keys = Object.keys(jsonParsed)
-  //   //   const possibleKeys = ["body", "image", "answers", "corrects", "isRandomized"]
-  //   //   if (!keys.every(key => (possibleKeys.includes(key)))) {
-  //   //     alert("bad JSON!")
-  //   //     return
-  //   //   }
-  //   //   if (jsonParsed.hasOwnProperty("body")) {
-  //   //     setBody(jsonParsed.body)
-  //   //   }
-  //   //   if (jsonParsed.hasOwnProperty("image")) {
-  //   //     const imageName = jsonParsed.image
-  //   //     const storedImageBlob = await getImageFromCache(imageName) // Returns Blob
-
-  //   //     if (storedImageBlob === null) {
-  //   //       alert(`Could not find "${imageName}" in cache`)
-  //   //     }
-  //   //     else {
-  //   //       // const storedImageData = URL.createObjectURL(storedImageBlob)
-  //   //       // const storedImage = new Image()
-  //   //       // storedImage.onload = () => {
-  //   //       //   setImageUrl(storedImage)
-  //   //       // }
-  //   //       // storedImage.src = storedImageData
-  //   //       // setImageUrl(storedImageData)
-  //   //       const storedImageData = URL.createObjectURL(storedImageBlob)
-  //   //       const storedImage = new Image()
-  //   //       storedImage.src = storedImageData
-  //   //       setImageUrl(storedImage)
-  //   //     }
-  //   //   }
-  //   //   if (jsonParsed.hasOwnProperty("answers")) {
-  //   //     setAnswers(jsonParsed.answers)
-  //   //   }
-
-  //   //   if (jsonParsed.hasOwnProperty("corrects")) {
-  //   //     setCorrect(jsonParsed.corrects)
-  //   //   }
-
-  //   //   if (jsonParsed.hasOwnProperty("isRandomized")) {
-  //   //     setShuffle(jsonParsed.isRandomized)
-  //   //   }
-  //   // }
-  //   // reader.readAsText(jsonImport)
-
-  //   // setJsonImport(null)
-  // }
-
-  // const handleJsonExport = () => {
-  //   // const data = {
-  //   //   body,
-  //   //   image: img.name,
-  //   //   answers,
-  //   //   corrects: correct,
-  //   //   isRandomized: shuffle
-  //   // }
-  //   // const json = JSON.stringify(data)
-  //   // const element = document.createElement("a")
-  //   // element.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(json))
-  //   // // element.setAttribute("download", `${jsonName === "" ? "question" : jsonName}.json`)
-  //   // element.setAttribute("download", `${jsonExport === "" ? "untitled_question" : jsonExport}.json`)
-  //   // element.style.display = "none"
-  //   // document.body.appendChild(element)
-  //   // element.click()
-  //   // document.body.removeChild(element)
-  // }
 
 
   const ActionBar = () => (
@@ -157,25 +88,8 @@ const Dashboard = () => {
   const ExamList = () => (
     <ListGroup>
       {exams.map((exam, idx) => (
-        <ListGroup.Item
-          key={idx}
-          action
-          variant="light"
-          style={{ cursor: "default" }}>
-          <Row>
-            <Col xs="1">
-              <Form.Check
-                type="checkbox"
-                checked={checked.includes(exam)}
-                onChange={() => handleCheckbox(exam)} />
-            </Col>
-            <Col xs="3">
-              {exam.metadata.subject}
-            </Col>
-            <Col xs="2">
-              by {exam.metadata.author.surname}
-            </Col>
-          </Row>
+        <ListGroup.Item key={idx} action style={{ cursor: "default" }}>
+          {exam.eid}
         </ListGroup.Item>
       ))}
     </ListGroup>
@@ -183,17 +97,10 @@ const Dashboard = () => {
 
 
   return (
-    <React.Fragment>
-      <Container>
-        <Row>
-          <Col xs="12">
-            <h1>My Exams</h1>
-          </Col>
-        </Row>
-        {ActionBar()}
-        {ExamList()}
-      </Container>
-    </React.Fragment>
+    <Container>
+      {/* {ExamList()} */}
+      <Button variant="warning" onClick={() => console.log(exams)}>Test</Button>
+    </Container>
   )
 }
 

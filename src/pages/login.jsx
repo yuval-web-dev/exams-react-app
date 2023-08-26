@@ -1,6 +1,6 @@
 import React from "react"
 import axios from "axios"
-import { useSignIn, useAuthUser } from "react-auth-kit"
+import { useSignIn } from "react-auth-kit"
 import { Card, Container, Row, Col, Nav, Form, Button } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { useIsAuthenticated } from "react-auth-kit"
@@ -20,7 +20,7 @@ const Login = () => {
   }, [isAuth, navigate])
 
   const [mode, setMode] = React.useState("login")
-  const [inputs, setInputs] = React.useState({ username: "", password: "", key: "" })
+  const [inputs, setInputs] = React.useState({ username: "", password: "", inviteCode: "" })
 
 
   const handleSubmit = async (event) => {
@@ -43,8 +43,8 @@ const Login = () => {
       }
 
       else { // mode === "register"
-        if (inputs.key !== "") {
-          formData.append("key", inputs.key)
+        if (inputs.inviteCode !== "") {
+          formData.append("code", inputs.inviteCode)
         }
         const res = await axios.post(
           `${ENDPOINT}/register`,
@@ -98,10 +98,10 @@ const Login = () => {
     <React.Fragment>
       <Form.Label className="text-muted">Lecturer?</Form.Label>
       <Form.Control
-        value={inputs.key || ""}
+        value={inputs.inviteCode || ""}
         type="password"
-        placeholder="Secret key"
-        onChange={e => setInputs({ ...inputs, key: e.target.value })} />
+        placeholder="Enter invite code"
+        onChange={e => setInputs({ ...inputs, inviteCode: e.target.value })} />
     </React.Fragment>
   )
 
