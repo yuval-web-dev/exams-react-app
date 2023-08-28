@@ -22,21 +22,21 @@ const Dashboard = () => {
       const localExams = await storage.fetch()
       setExams(...exams, localExams)
     }
-    catch (error) {
-      console.log(error)
+    catch (err) {
+      console.error(err)
     }
   }
 
   const fetchDbExams = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:8080/api/data/fetch-all",
+        "http://localhost:8080/api/data/exams/fetch-all",
         { headers: { "Authorization": authHeader() } }
       )
-      await storage.save_many(res.data.exams, "eid")
+      await storage.save_many(res.data.exams, "name")
     }
-    catch (error) {
-      console.error(error)
+    catch (err) {
+      console.error(err)
     }
   }
 

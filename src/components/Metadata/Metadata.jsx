@@ -137,9 +137,6 @@ const MetadataComponent = ({ }, ref) => {
 
   return (
     <React.Fragment>
-      <Button
-        variant="warning"
-        onClick={() => console.log(startsAt)}>Test</Button>
       <ListGroup>
         <ListGroup.Item>
           {SubjectForm()}

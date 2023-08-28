@@ -25,7 +25,7 @@ const Top = () => {
           <Nav.Link href="/dashboard/test">Tester</Nav.Link>
         </Nav>
         <Nav>
-          <span className="navbar-text me-3">Signed as: {auth().user}</span>
+          <span className="navbar-text me-3">{auth().username}</span>
           <Nav.Link onClick={handleSignout}>Sign out</Nav.Link>
         </Nav>
       </Container>
