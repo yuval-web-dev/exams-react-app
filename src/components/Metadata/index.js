@@ -1,1 +1,0 @@
-export { default as MetadataComponent } from "./Metadata.jsx"
