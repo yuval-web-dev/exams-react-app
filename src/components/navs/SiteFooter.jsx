@@ -8,10 +8,10 @@ const SiteFooter = () => (
     bg="light"
     variant="light"
     className="justify-content-center">
-    <Navbar.Text className="text-center text-muted">
+    <Navbar.Text className="text-center text-muted small">
       Powered by <FaReact size={18} /> React
       <br />
-      &copy; {new Date().getFullYear()} Yuval Rotem. All Rights Reserved.
+      &copy; 2023 Yuval Rotem. All Rights Reserved.
     </Navbar.Text>
   </Navbar>
 );

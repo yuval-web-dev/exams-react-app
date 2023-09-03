@@ -2,7 +2,7 @@ import React from "react"
 import { Container, Row, Col } from "react-bootstrap"
 
 
-const PreLogin = ({ children }) => {
+const PreLoginPageContainer = ({ children }) => {
 
   return (
     <Container>
@@ -15,4 +15,4 @@ const PreLogin = ({ children }) => {
   )
 }
 
-export default PreLogin
+export default PreLoginPageContainer

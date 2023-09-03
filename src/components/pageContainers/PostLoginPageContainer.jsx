@@ -4,7 +4,7 @@ import { Container } from "react-bootstrap";
 import { Navs } from "../navs"
 
 
-const PostLogin = ({ children }) => {
+const PostLoginPageContainer = ({ children }) => {
   return (
     <React.Fragment>
       <Navs.Navbar />
@@ -17,4 +17,4 @@ const PostLogin = ({ children }) => {
 };
 
 
-export default PostLogin
+export default PostLoginPageContainer

@@ -17,11 +17,9 @@ const HomePage = () => {
 
   React.useEffect(() => {
     const refreshExams = async () => {
-      const authHeaderString = authHeader();
-
       try {
         // Fetch exams from the API
-        const apiResponse = await api.fetchExams(authHeaderString);
+        const apiResponse = await api.fetchExams(authHeader());
         if (apiResponse) {
           // Filter out duplicates and update the state
           setExams((prevExams) => {
@@ -33,7 +31,7 @@ const HomePage = () => {
         }
 
         // Fetch exams from storage
-        const storageExams = await storage.fetchExams();
+        const storageExams = await storage.getExams();
         if (storageExams) {
           // Filter out duplicates and update the state
           setExams((prevExams) => {
@@ -53,20 +51,28 @@ const HomePage = () => {
   }, []);
 
 
+  const handleSelectExam = async (exam) => {
+    if (exam === selectedExam) {
+      setSelectedExam(null)
+      await storage.clearSelectedExam()
+    }
+    else {
+      setSelectedExam(exam)
+      await storage.setSelectedExam(exam)
+    }
 
-
+  }
 
   const handleClickStart = () => {
     if (selectedExam) {
-      storage.setSelectedExam(selectedExam)
+      navigate("/take-exam")
     }
-    // navigate("/take-exam")
   }
 
 
   return (
     <PageContainers.PostLogin>
-      <SelectionLists.Exams exams={exams} selectedExam={selectedExam} setSelectedExam={setSelectedExam} />
+      <SelectionLists.Exams exams={exams} selectedExam={selectedExam} handler={handleSelectExam} />
       <Button
         variant="outline-primary"
         disabled={selectedExam === null}

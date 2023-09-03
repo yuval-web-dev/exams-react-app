@@ -2,11 +2,7 @@ import React from "react"
 import { ListGroup } from "react-bootstrap"
 
 
-const ExamsSelectionList = ({ exams, selectedExam, setSelectedExam }) => {
-
-  const handleSelectExam = (exam) => {
-    setSelectedExam(curr => curr === exam ? null : exam);
-  }
+const ExamsSelectionList = ({ exams, selectedExam, handler }) => {
 
   return (
     <ListGroup>
@@ -15,7 +11,7 @@ const ExamsSelectionList = ({ exams, selectedExam, setSelectedExam }) => {
           key={idx}
           action
           active={exam === selectedExam}
-          onClick={() => handleSelectExam(exam)}>
+          onClick={() => handler(exam)}>
           {exam.name}
         </ListGroup.Item>
       ))}

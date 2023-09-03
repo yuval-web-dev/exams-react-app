@@ -1,9 +1,9 @@
-import { crud } from "./crud.js"
+import { localForage } from "./localForage.js"
 
 
-const fetchExams = async () => {
+const getExams = async () => {
   try {
-    const localExams = await crud.readMany("exams")
+    const localExams = await localForage.getMany("exams")
     console.info("Fetching local exams successful.")
     return localExams
   }
@@ -15,7 +15,7 @@ const fetchExams = async () => {
 
 const setSelectedExam = async (selectedExam) => {
   try {
-    await crud.createOne("selectedExam", selectedExam, "selectedExam")
+    await localForage.setOne("selectedExam", selectedExam, "selectedExam")
   }
   catch (err) {
     console.error("Setting selected exam failed:", err)
@@ -23,8 +23,31 @@ const setSelectedExam = async (selectedExam) => {
   }
 }
 
+const getSelectedExam = async () => {
+  try {
+    const exam = await localForage.getOne("selectedExam", "selectedExam")
+    return exam
+  }
+  catch (err) {
+    console.error("Getting selected exam failed:", err)
+    return false
+  }
+}
+
+const clearSelectedExam = async () => {
+  try {
+    await localForage.removeOne("selectedExam", "selectedExam")
+    return true
+  }
+  catch (err) {
+    console.error("Getting selected exam failed:", err)
+    return false
+  }
+}
+
 
 export const storage = {
-  fetchExams,
-  setSelectedExam
+  getExams,
+  getSelectedExam, setSelectedExam,
+  clearSelectedExam
 }
