@@ -20,13 +20,16 @@ const fetchFromQuizApi = async (apiKey, category, tags, limit) => {
     return res?.data
   }
   catch (err) {
-    console.error("Fetching questions from QuizAPI failed:\n", err)
+    console.error("Fetching questions from QuizAPI failed:", err)
   }
 }
 
 
-const login = async (formData) => {
+const login = async (username, password) => {
   try {
+    const formData = new FormData()
+    formData.append("username", username)
+    formData.append("password", password)
     const res = await axios.post(
       `${ENDPOINT}/login`,
       formData,
@@ -36,14 +39,20 @@ const login = async (formData) => {
     return res?.data // the signed jwt
   }
   catch (err) {
-    console.error("User login failed:\n", err)
+    console.error("User login failed:", err)
     return undefined
   }
 }
 
 
-const register = async (formData) => {
+const register = async (username, password, firstName, lastName, inviteCode) => {
   try {
+    const formData = new FormData()
+    formData.append("username", username)
+    formData.append("password", password)
+    formData.append("firstName", firstName)
+    formData.append("lastName", lastName)
+    formData.append("inviteCode", inviteCode)
     await axios.post(
       `${ENDPOINT}/register`,
       formData,
@@ -53,7 +62,7 @@ const register = async (formData) => {
     return true
   }
   catch (err) {
-    console.error("User registration failed:\n", err)
+    console.error("User registration failed:", err)
     return false
   }
 }
@@ -69,7 +78,7 @@ const fetchExams = async (authHeaderString) => {
     return res?.data
   }
   catch (err) {
-    console.error("Fetching exams from server failed:\n", err)
+    console.error("Fetching exams from server failed:", err)
   }
 }
 

@@ -2,39 +2,42 @@ import React from "react"
 import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
 
+import { PageContainers } from "../components"
 import { Forms } from "../components"
-import * as api from "../api"
+import { api } from "../api"
 
 
 const LoginPage = () => {
-  const ref = React.useRef()
+  const formRef = React.useRef()
   const signIn = AuthKit.useSignIn()
   const isAuth = AuthKit.useIsAuthenticated()
   const navigate = RouterDom.useNavigate()
 
-  React.useEffect(() => {
-    if (isAuth()) {
-      navigate("/")
-    }
-  }, [isAuth, navigate])
 
-  const handleLoginFormSubmit = async (event) => {
+  React.useEffect(
+    () => { if (isAuth()) { navigate("/") } },
+    [isAuth, navigate]
+  )
+
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    // try {
-    //   const formData = new FormData()
-    //   formData.append("username", inputs.username)
-    //   formData.append("password", inputs.password)
-    //   const jwt = await api.login(formData)
-    //   signIn(jwt)
-    //   navigate("/")
-    // }
-    // catch (err) {
-    //   console.error("User login failed:\n" + err)
-    // }
+    const { username, password } = formRef.current.getInputs()
+
+    // get the sign-in config: 
+    const signInConfig = await api.login(username, password)
+    if (signInConfig) {
+      signIn(signInConfig)
+    }
+    else {
+      // TODO add a Bootstrap Alert or Toast
+      alert("error login")
+    }
   }
 
   return (
-    <Forms.Login ref={ref} />
+    <PageContainers.PreLogin>
+      <Forms.Login submitHandler={handleSubmit} ref={formRef} />
+    </PageContainers.PreLogin>
   )
 }
 

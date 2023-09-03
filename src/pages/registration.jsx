@@ -2,24 +2,31 @@ import React from "react"
 import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
 
-import { Forms } from "../components"
-import * as api from "../api"
+import { Forms, PageContainers } from "../components"
+import { api } from "../api"
 
 
 const RegistrationPage = () => {
-  const ref = React.useRef()
-  const signIn = AuthKit.useSignIn()
+  const formRef = React.useRef()
   const isAuth = AuthKit.useIsAuthenticated()
   const navigate = RouterDom.useNavigate()
 
-  React.useEffect(() => {
-    if (isAuth()) {
-      navigate("/")
-    }
-  }, [isAuth, navigate])
+  React.useEffect(
+    () => { if (isAuth()) { navigate("/") } },
+    [isAuth, navigate]
+  )
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    const { username, password, firstName, lastName, inviteCode } = formRef.current.getInputs()
+    const result = await api.register(username, password, firstName, lastName, inviteCode)
+    // TODO add a Bootstrap Alert or Toast
+  }
 
   return (
-    <Forms.Registration ref={ref} />
+    <PageContainers.PreLogin>
+      <Forms.Registration ref={formRef} submitHandler={handleSubmit} />
+    </PageContainers.PreLogin>
   )
 }
 

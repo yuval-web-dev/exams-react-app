@@ -1,57 +1,34 @@
 import React from "react"
-import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
 import { AuthProvider, RequireAuth } from 'react-auth-kit'
-import { Container, Row, Col } from "react-bootstrap"
 
 import { Pages } from "../pages"
-import { Navs } from "../components"
 
 
-const PreLoginContainer = ({ children }) => {
-
-  return (
-    <Container>
-      <Row>
-        <Col style={{ height: "100vh" }} className="d-flex align-items-center justify-content-center">
-          {children}
-        </Col>
-      </Row>
-    </Container>
-  )
-}
-
-
-const PostLoginContainer = ({ children }) => {
-
+const ProtectedRoutesElement = () => {
   return (
     <RequireAuth loginPath="/login">
-      <Navs.Navbar />
-      {children}
-      <Navs.Footer />
+      <Routes>
+        <Route path="/" element={<Pages.Home />} />
+        <Route path="/edit-exam" element={<Pages.EditExam />} />
+        <Route path="/take-exam" element={<Pages.TakeExam />} />
+      </Routes>
     </RequireAuth>
   )
-};
+}
 
 
 const AppRoutes = () => {
-
   return (
     <AuthProvider authName="_auth" authType="cookie" cookieSecure={false}>
       <Routes>
-        <Route path="/" element=
-          {
-            <RequireAuth loginPath="/login">
-              <Routes>
-                <Route path="/" element={<Pages.Home />} />
-              </Routes>
-            </RequireAuth>
-          } />
+        <Route path="/*" element={<ProtectedRoutesElement />} />
         <Route path="/login" element={<Pages.Login />} />
-        <Route path="/register" element={<Pages.Register />} />
+        <Route path="/register" element={<Pages.Registration />} />
       </Routes>
     </AuthProvider>
-  )
-}
+  );
+};
 
 
 export default AppRoutes

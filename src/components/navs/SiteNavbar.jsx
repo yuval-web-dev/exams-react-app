@@ -11,7 +11,7 @@ const SiteNavbar = () => {
   const signOut = useSignOut()
   const navigate = useNavigate()
 
-  const handleSignout = async () => {
+  const handleClickSignOut = async () => {
     // await storage.delete_store("exams")
     // await storage.delete_store("wizard")
     signOut()
@@ -39,11 +39,10 @@ const SiteNavbar = () => {
           <RestrictedLinks auth={auth} />
         </Nav>
         <Nav>
-          <span className="navbar-text me-3">{auth().user}</span>
-          <Nav.Link onClick={handleSignout}>Sign out</Nav.Link>
+          <Nav.Link disabled>{`${auth().firstName} ${auth().lastName}`}</Nav.Link >
+          <Nav.Link className="link-danger" onClick={handleClickSignOut}>Sign out</Nav.Link>
         </Nav>
       </Container>
-      <Button onClick={console.log(auth())} >Test</Button>
     </Navbar>
   )
 }

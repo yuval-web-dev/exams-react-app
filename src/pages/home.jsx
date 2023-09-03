@@ -1,10 +1,9 @@
 import React from "react"
-import axios from "axios"
-import { Form, Button, Container, Row, Col, ListGroup } from "react-bootstrap"
-import { useAuthHeader, useIsAuthenticated } from "react-auth-kit"
-import { useNavigate } from "react-router-dom"
+import { Button } from "react-bootstrap"
+import * as AuthKit from "react-auth-kit"
+import * as RouterDom from "react-router-dom"
 
-import { SiteNav } from "../components"
+import { SelectionLists, PageContainers } from "../components"
 import { api } from "../api"
 import { storage } from "../storage"
 
@@ -13,56 +12,68 @@ const HomePage = () => {
   const [exams, setExams] = React.useState([])
   const [selectedExam, setSelectedExam] = React.useState(null)
 
-  const authHeader = useAuthHeader()
-  const navigate = useNavigate()
+  const navigate = RouterDom.useNavigate()
+  const authHeader = AuthKit.useAuthHeader()
 
   React.useEffect(() => {
-    const fetchAllExams = async () => {
-      const authHeaderString = authHeader()
-      const serverExams = await api.fetchExams(authHeaderString)
-      const localExams = await storage.fetchExams()
-      setExams([...serverExams, ...localExams])
+    const refreshExams = async () => {
+      const authHeaderString = authHeader();
+
+      try {
+        // Fetch exams from the API
+        const apiResponse = await api.fetchExams(authHeaderString);
+        if (apiResponse) {
+          // Filter out duplicates and update the state
+          setExams((prevExams) => {
+            const newExams = apiResponse.exams.filter(
+              (apiExam) => !prevExams.some((exam) => exam.id === apiExam.id)
+            );
+            return [...prevExams, ...newExams];
+          });
+        }
+
+        // Fetch exams from storage
+        const storageExams = await storage.fetchExams();
+        if (storageExams) {
+          // Filter out duplicates and update the state
+          setExams((prevExams) => {
+            const newExams = storageExams.filter(
+              (storageExam) => !prevExams.some((exam) => exam.id === storageExam.id)
+            );
+            return [...prevExams, ...newExams];
+          });
+        }
+      } catch (error) {
+        // Handle errors if needed
+        console.error("Error fetching exams:", error);
+      }
+    };
+
+    refreshExams();
+  }, []);
+
+
+
+
+
+  const handleClickStart = () => {
+    if (selectedExam) {
+      storage.setSelectedExam(selectedExam)
     }
-    fetchAllExams()
-  }, [])
-
-
-  const ExamList = () => {
-    const handleSelectItem = (exam) => {
-      setSelectedExam(curr => curr === exam ? null : exam);
-    }
-
-    return (
-      <ListGroup>
-        {exams?.map((exam, idx) => (
-          <ListGroup.Item
-            key={idx}
-            action
-            active={exam === selectedExam}
-            onClick={() => handleSelectItem(exam)}>
-            {exam.name}
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
-    )
-  }
-
-  const handleStartTest = () => {
-    // storage.create("wizard", [{ "selectedExam": selectedExam }], "name")
-    navigate("/wizard")
+    // navigate("/take-exam")
   }
 
 
   return (
-    <Container>
-      {ExamList()}
+    <PageContainers.PostLogin>
+      <SelectionLists.Exams exams={exams} selectedExam={selectedExam} setSelectedExam={setSelectedExam} />
       <Button
         variant="outline-primary"
         disabled={selectedExam === null}
-        onClick={handleStartTest}>
-        Start Test
+        onClick={handleClickStart}>
+        Start Exam
       </Button>
-    </Container>
+    </PageContainers.PostLogin>
   )
 }
 
