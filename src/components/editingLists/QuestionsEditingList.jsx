@@ -45,77 +45,6 @@ const QuestionsEditingList = ({ }, ref) => {
 
   const empty = quests.length < 1
 
-
-  // const handleImport = async (event) => {
-  //   const files = event.target.files;
-  //   if (!files || files.length === 0) {
-  //     return
-  //   }
-  //   const importedQuests = []
-  //   const readAndParseFile = (file) => {
-  //     return new Promise((resolve, reject) => {
-  //       const reader = new FileReader()
-  //       reader.onload = (e) => {
-  //         const content = e.target.result
-  //         try {
-  //           const parsedObject = JSON.parse(content)
-  //           resolve(parsedObject)
-  //         } catch (error) {
-  //           reject(`Error parsing JSON from ${file.name}: ${error}`)
-  //         }
-  //       }
-  //       reader.onerror = () => {
-  //         reject(`Error reading ${file.name}`)
-  //       }
-  //       reader.readAsText(file)
-  //     })
-  //   }
-  //   try {
-  //     for (const file of files) {
-  //       const parsedObject = await readAndParseFile(file);
-  //       importedQuests.push(parsedObject);
-  //     }
-  //     setQuests([...quests, ...importedQuests]);
-  //     event.target.value = null;
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-
-
-  const QuizApiModal = () => {
-    const handleCancel = () => {
-      setQuizApiShow(false)
-    }
-
-    const handleAdd = () => {
-      try {
-        quizApiFormRef.current.validate()
-        const newQuests = quizApiFormRef.current.yield()
-        setQuests(...quests, newQuests)
-        setQuizApiShow(false)
-      }
-      catch (err) {
-        alert(err)
-      }
-    }
-
-
-    return (
-      <Modal size="lg" show={quizApiShow}>
-        <Modal.Header>From QuizAPI</Modal.Header>
-        <Modal.Body>
-          {/* <QuizApiForm ref={quizApiFormRef} /> */}
-        </Modal.Body>
-        <Modal.Footer className="d-flex justify-content-end">
-          <Button variant="outline-secondary" onClick={handleCancel}>Cancel</Button>
-          <Button variant="primary" onClick={handleAdd}>Add Selected</Button>
-        </Modal.Footer>
-      </Modal>
-    )
-  }
-
   const QuestListGroup = () => {
 
     const Control = () => {
@@ -300,16 +229,6 @@ const QuestionsEditingList = ({ }, ref) => {
       </ListGroup >
     )
   }
-
-  const JsonInput = () => (
-    <input
-      type="file"
-      multiple
-      // onChange={handleImport}
-      accept=".json"
-      style={{ display: 'none' }}
-      ref={fileInputRef} />
-  )
 
   const Control = () => {
     const divClass = "d-flex flex-column me-2"

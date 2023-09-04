@@ -29,13 +29,11 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
 
 const login = async (username, password) => {
   try {
-    const formData = new FormData()
-    formData.append("username", username)
-    formData.append("password", password)
+    const data = { username, password }
     const res = await axios.post(
       `${ENDPOINT}/login`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
+      data,
+      { headers: { "Content-Type": "application/json" } }
     )
     console.info("User login successful.")
     return res?.data // the signed jwt
@@ -48,16 +46,17 @@ const login = async (username, password) => {
 
 const register = async (username, password, firstName, lastName, inviteCode) => {
   try {
-    const formData = new FormData()
-    formData.append("username", username)
-    formData.append("password", password)
-    formData.append("firstName", firstName)
-    formData.append("lastName", lastName)
-    formData.append("inviteCode", inviteCode)
+    const data = {
+      username,
+      password,
+      firstName,
+      lastName,
+      inviteCode
+    }
     await axios.post(
       `${ENDPOINT}/register`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
+      data,
+      { headers: { "Content-Type": "application/json" } }
     )
     console.info("User registration successful.")
     return true

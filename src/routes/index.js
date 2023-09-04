@@ -10,7 +10,9 @@ const ProtectedRoutesElement = () => {
     <RequireAuth loginPath="/login">
       <Routes>
         <Route path="/" element={<Pages.Home />} />
-        <Route path="/edit-exam" element={<Pages.EditExam />} />
+        <Route path="/my-exams" element={<Pages.Exams />} />
+        <Route path="/my-submissions" element={<Pages.Submissions />} />
+        <Route path="/create-exam" element={<Pages.CreateExam />} />
         <Route path="/take-exam" element={<Pages.TakeExam />} />
       </Routes>
     </RequireAuth>

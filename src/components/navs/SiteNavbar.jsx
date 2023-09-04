@@ -3,8 +3,6 @@ import { useAuthUser, useSignOut } from "react-auth-kit"
 import { Container, Navbar, Nav, Button } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 
-import * as storage from "../../storage"
-
 
 const SiteNavbar = () => {
   const auth = useAuthUser()
@@ -18,25 +16,14 @@ const SiteNavbar = () => {
     navigate("/")
   }
 
-  const RestrictedLinks = ({ auth }) => {
-    if (auth().privilege === "lecturer")
-      return (
-        <React.Fragment>
-          <Nav.Link href="/edit-exam">Editor</Nav.Link>
-        </React.Fragment>
-      )
-    else {
-      return null
-    }
-  }
-
   return (
     <Navbar sticky="top" bg="light">
       <Container fluid="lg">
         <Navbar.Brand>Brand</Navbar.Brand>
         <Nav className="me-auto">
-          <Nav.Link href="/">Home</Nav.Link>
-          <RestrictedLinks auth={auth} />
+          <Nav.Link className="" href="/">Home</Nav.Link>
+          <Nav.Link className="" href="/my-exams">Exams</Nav.Link>
+          <Nav.Link className="" href="/my-submissions">Submissions</Nav.Link>
         </Nav>
         <Nav>
           <Nav.Link disabled>{`${auth().firstName} ${auth().lastName}`}</Nav.Link >

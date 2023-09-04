@@ -8,7 +8,7 @@ import { api } from "../api"
 import { storage } from "../storage"
 
 
-const HomePage = () => {
+const ExamsPage = () => {
   const [exams, setExams] = React.useState([])
   const [selectedExam, setSelectedExam] = React.useState(null)
 
@@ -19,7 +19,7 @@ const HomePage = () => {
     const refreshExams = async () => {
       try {
         // Fetch exams from the API
-        const apiResponse = await api.fetchExams(authHeader());
+        const apiResponse = await api.getExams(authHeader());
         if (apiResponse) {
           // Filter out duplicates and update the state
           setExams((prevExams) => {
@@ -85,4 +85,4 @@ const HomePage = () => {
 
 
 
-export default HomePage
+export default ExamsPage
