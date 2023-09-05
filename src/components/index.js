@@ -1,6 +1,6 @@
-export { Editors } from "./editors"
 export { Forms } from "./forms"
 export { Lists } from "./editingLists"
+export { ModalForms } from "./modalForms"
 export { Navs } from "./navs"
 export { Previews } from "./previews"
 export { SelectionLists } from "./selectionLists"

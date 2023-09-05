@@ -8554,6 +8554,13 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
+react-virtual-drag-list@^2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/react-virtual-drag-list/-/react-virtual-drag-list-2.5.2.tgz#ea23039bd20f57a903698804c98d31023123fd83"
+  integrity sha512-QDnL4GM0H8UFSEwgHEG7+Wz5maqsQ9AUIJn1JhO//6tXCZJgP0FZJuyk2zGUvr08bjrjfcn8381NuwYxoGan+g==
+  dependencies:
+    sortable-dnd "0.5.4"
+
 "react@>=16.8.0 || ^17.x || ^18.x", react@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
@@ -9156,6 +9163,11 @@ sockjs@^0.3.24:
     faye-websocket "^0.11.3"
     uuid "^8.3.2"
     websocket-driver "^0.7.4"
+
+sortable-dnd@0.5.4:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/sortable-dnd/-/sortable-dnd-0.5.4.tgz#c483d6a75a626d9192ff8769c4456d3f97ec309e"
+  integrity sha512-eKs7IfKvWsXBDwN3HjpbLmn9DQrWAJcOdavCwVNrIhAx0vm+26/Byeq1Jp11lDtolkfkFjFn1ieWpyljQ0ipRA==
 
 source-list-map@^2.0.0, source-list-map@^2.0.1:
   version "2.0.1"

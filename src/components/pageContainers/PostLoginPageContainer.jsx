@@ -8,7 +8,7 @@ const PostLoginPageContainer = ({ children }) => {
   return (
     <React.Fragment>
       <Navs.Navbar />
-      <Container>
+      <Container fluid="lg">
         {children}
       </Container>
       <Navs.Footer />

@@ -1,6 +1,6 @@
 import React from "react"
 import { useAuthUser, useSignOut } from "react-auth-kit"
-import { Container, Navbar, Nav, Button } from "react-bootstrap"
+import { Container, Navbar, Nav, Button, NavDropdown } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 
 
@@ -19,21 +19,21 @@ const SiteNavbar = () => {
   return (
     <Navbar sticky="top" bg="light">
       <Container fluid="lg">
-        <Navbar.Brand>Brand</Navbar.Brand>
+        <Navbar.Brand>Exams App</Navbar.Brand>
         <Nav className="me-auto">
           <Nav.Link className="" href="/">Home</Nav.Link>
           <Nav.Link className="" href="/my-exams">Exams</Nav.Link>
           <Nav.Link className="" href="/my-submissions">Submissions</Nav.Link>
         </Nav>
         <Nav>
-          <Nav.Link disabled>{`${auth().firstName} ${auth().lastName}`}</Nav.Link >
-          <Nav.Link className="link-danger" onClick={handleClickSignOut}>Sign out</Nav.Link>
+          <NavDropdown className="me-auto" title={`${auth().firstName} ${auth().lastName}`}>
+            <NavDropdown.Item href="#" onClick={handleClickSignOut}>Sign out</NavDropdown.Item>
+          </NavDropdown>
         </Nav>
       </Container>
     </Navbar>
   )
 }
-
 
 
 export default SiteNavbar
