@@ -1,9 +1,9 @@
 import React from "react"
-import { Card, Row, Col, Form, Button } from "react-bootstrap"
+import { Card, Form, Button, Spinner, Alert } from "react-bootstrap"
 import * as RouterDom from "react-router-dom"
 
 
-const RegistrationForm = ({ submitHandler }, ref) => {
+const RegistrationForm = ({ submitHandler }) => {
   const [inputs, setInputs] = React.useState(
     {
       username: "",
@@ -13,13 +13,28 @@ const RegistrationForm = ({ submitHandler }, ref) => {
       inviteCode: ""
     }
   )
-
-  React.useImperativeHandle(ref, () => ({ getInputs: () => inputs }), [inputs])
+  const [loading, setLoading] = React.useState(false)
+  const [success, setSuccess] = React.useState(false)
+  const [fail, setFail] = React.useState(false)
 
   const navigate = RouterDom.useNavigate()
 
   const handleChangeInput = (event) => {
     setInputs({ ...inputs, [event.target.name]: event.target.value })
+  }
+
+  const handleSubmitForm = async (event) => {
+    event.preventDefault()
+    setLoading(true)
+    const register = await submitHandler(inputs)
+    if (register) {
+      setFail(false)
+      setSuccess(true)
+    }
+    else {
+      setFail(true)
+      setLoading(false)
+    }
   }
 
   const handleClickLink = () => {
@@ -33,7 +48,7 @@ const RegistrationForm = ({ submitHandler }, ref) => {
         Register
       </Card.Header>
       <Card.Body>
-        <Form onSubmit={submitHandler} className="d-flex flex-column h-100">
+        <Form onSubmit={handleSubmitForm} className="d-flex flex-column h-100">
           <Form.Control
             name="username"
             value={inputs.username}
@@ -74,6 +89,20 @@ const RegistrationForm = ({ submitHandler }, ref) => {
             className="my-1"
             onChange={handleChangeInput} />
 
+          <Alert
+            dismissible
+            onClose={() => setFail(false)}
+            show={fail}
+            variant="danger">
+            Registration failed.
+          </Alert>
+
+          <Alert
+            show={success}
+            variant="success">
+            Registration successful! Redirecting...
+          </Alert>
+
           <div className="mt-auto d-flex flex-column align-items-center">
             <div className="d-flex flex-row">
               <p className="me-2">
@@ -86,7 +115,13 @@ const RegistrationForm = ({ submitHandler }, ref) => {
                 Login
               </p>
             </div>
-            <Button className="w-100" variant="primary" type="submit">Register</Button>
+            {
+              loading ?
+                <Button className="w-100" variant="secondary" disabled><Spinner size="sm" /></Button>
+                :
+                <Button className="w-100" variant="primary" type="submit">Register</Button>
+            }
+
           </div>
         </Form>
       </Card.Body>
@@ -94,4 +129,4 @@ const RegistrationForm = ({ submitHandler }, ref) => {
   )
 }
 
-export default React.forwardRef(RegistrationForm)
+export default RegistrationForm

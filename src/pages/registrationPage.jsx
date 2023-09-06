@@ -7,7 +7,6 @@ import { api } from "../api"
 
 
 const RegistrationPage = () => {
-  const formRef = React.useRef()
   const isAuth = AuthKit.useIsAuthenticated()
   const navigate = RouterDom.useNavigate()
 
@@ -16,16 +15,24 @@ const RegistrationPage = () => {
     [isAuth, navigate]
   )
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    const { username, password, firstName, lastName, inviteCode } = formRef.current.getInputs()
-    const result = await api.register(username, password, firstName, lastName, inviteCode)
-    // TODO add a Bootstrap Alert or Toast
+  const handleSubmit = async (inputs) => {
+    const { username, password, firstName, lastName, inviteCode } = inputs
+    const apiResponse = await api.register(username, password, firstName, lastName, inviteCode)
+    if (apiResponse) {
+      setTimeout(
+        () => navigate("/login"),
+        2000
+      )
+      return true
+    }
+    else {
+      return false
+    }
   }
 
   return (
     <PageContainers.PreLogin>
-      <Forms.Registration ref={formRef} submitHandler={handleSubmit} />
+      <Forms.Registration submitHandler={handleSubmit} />
     </PageContainers.PreLogin>
   )
 }

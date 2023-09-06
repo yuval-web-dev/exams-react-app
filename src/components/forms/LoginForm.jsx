@@ -1,17 +1,18 @@
 import React from "react"
-import { Row, Col, Card, Form, Button } from "react-bootstrap"
+import { Card, Form, Button, Spinner, Alert } from "react-bootstrap"
 import * as RouterDom from "react-router-dom"
 
 
 const LoginForm = ({ submitHandler }, ref) => {
-  const navigate = RouterDom.useNavigate()
+  const [inputs, setInputs] = React.useState({
+    username: "",
+    password: ""
+  })
+  const [loading, setLoading] = React.useState(false)
+  const [success, setSuccess] = React.useState(false)
+  const [fail, setFail] = React.useState(false)
 
-  const [inputs, setInputs] = React.useState(
-    {
-      username: "",
-      password: ""
-    }
-  )
+  const navigate = RouterDom.useNavigate()
 
   React.useImperativeHandle(ref, () => ({ getInputs: () => inputs }), [inputs])
 
@@ -23,13 +24,27 @@ const LoginForm = ({ submitHandler }, ref) => {
     navigate("/register")
   }
 
+  const handleSubmitForm = async (event) => {
+    event.preventDefault()
+    setLoading(true)
+    const loginResult = await submitHandler(inputs)
+    if (loginResult) {
+      setFail(false)
+      setSuccess(true)
+    }
+    else {
+      setFail(true)
+      setLoading(false)
+    }
+  }
+
   return (
     <Card className="w-100 h-50">
       <Card.Header className="d-flex justify-content-center display-4">
         Login
       </Card.Header>
       <Card.Body>
-        <Form onSubmit={submitHandler} className="d-flex flex-column h-100">
+        <Form onSubmit={handleSubmitForm} className="d-flex flex-column h-100">
           <Form.Control
             name="username"
             value={inputs.username}
@@ -46,6 +61,21 @@ const LoginForm = ({ submitHandler }, ref) => {
             required
             className="my-1"
             onChange={handleChangeInput} />
+
+          <Alert
+            dismissible
+            onClose={() => setFail(false)}
+            show={fail}
+            variant="danger">
+            Login failed.
+          </Alert>
+
+          <Alert
+            show={success}
+            variant="success">
+            Login successful! Redirecting...
+          </Alert>
+
           <div className="mt-auto d-flex flex-column align-items-center">
             <div className="d-flex flex-row">
               <p className="me-2">
@@ -55,7 +85,12 @@ const LoginForm = ({ submitHandler }, ref) => {
                 Register
               </p>
             </div>
-            <Button className="w-100" variant="primary" type="submit">Login</Button>
+            {
+              loading ?
+                <Button className="w-100" variant="secondary" disabled><Spinner size="sm" /></Button>
+                :
+                <Button className="w-100" variant="primary" type="submit">Login</Button>
+            }
           </div>
         </Form>
       </Card.Body>

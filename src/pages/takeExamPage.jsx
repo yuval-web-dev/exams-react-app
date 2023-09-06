@@ -54,8 +54,8 @@ const TakeExamPage = () => {
   }
 
   const handleClickNavigateLink = (event) => {
-    event.preventDefault()
-    setShowNavigate(true)
+    event?.preventDefault()
+    setShowNavigate(!showNavigate)
   }
 
   const handleHideNavigate = (event) => {
@@ -75,7 +75,7 @@ const TakeExamPage = () => {
           <Container fluid={fluid}>
             <Nav className="d-flex flex-row justify-content-start w-100">
               <Navbar.Brand>{brand}</Navbar.Brand>
-              <Nav.Link onClick={handleClickNavigateLink}>Navigate <ImCompass2 /></Nav.Link>
+              <Nav.Link active={showNavigate} onClick={handleClickNavigateLink}>Navigate <ImCompass2 /></Nav.Link>
               <Nav.Link className="ms-auto">Timer</Nav.Link>
               <NavDropdown
                 disabled
