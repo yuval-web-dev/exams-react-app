@@ -186,7 +186,7 @@ const QuizApiForm = ({ }, ref) => {
       //   return
       // }
 
-      // const newQuests = []
+      const newQuests = []
 
 
       // resData.map((item, idx) => {

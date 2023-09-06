@@ -1,5 +1,7 @@
 import axios from "axios"
 import moment from "moment"
+import { v4 as uuidv4 } from "uuid"
+import _ from "lodash"
 
 const URL = "http://localhost:8080"
 const SERVICE = "exams-app-backend"
@@ -12,18 +14,47 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
     const res = await axios.get(
       "https://quizapi.io/api/v1/questions",
       {
-        params: {
+        params:
+        {
           apiKey,
           category,
           tags,
           limit
         }
-      })
+      }
+    )
+    const questions = []
+    res.data.forEach((question) => {
+      if (question.multiple_correct_answers === "false") {
+        var correctAnswer
+        var answerObjects = []
+        _.zip(Object.values(question.answers), Object.values(question.correct_answers)).forEach(
+          ([answer, isCorrect]) => {
+            if (answer) {
+              const id = uuidv4()
+              if (isCorrect === "true") {
+                correctAnswer = id
+              }
+              answerObjects.push({ id, answer })
+            }
+          }
+        )
+        questions.push({
+          id: uuidv4(),
+          question: question.question,
+          answers: answerObjects,
+          correctAnswer,
+          shuffle: false,
+        })
+      }
+    })
+
     console.info("Getting questions from QuizAPI successful.")
-    return res?.data
+    return questions
   }
   catch (err) {
     console.error("Getting questions from QuizAPI failed:", err)
+    return null
   }
 }
 
@@ -35,11 +66,11 @@ const login = async (username, password) => {
       data,
       { headers: { "Content-Type": "application/json" } }
     )
-    console.info("User login successful.")
+    console.info(`User login "${username}" successful.`)
     return res?.data // the signed jwt
   }
   catch (err) {
-    console.error("User login failed:", err)
+    console.error(`User login "${username}" failed:`, err)
     return undefined
   }
 }

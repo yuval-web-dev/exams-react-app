@@ -27,66 +27,70 @@ const RegistrationForm = ({ submitHandler }, ref) => {
   }
 
   return (
-    <Form onSubmit={submitHandler}>
-      <Card>
-        <Card.Header className="d-flex align-items-center justify-content-center">
-          <h1>Register</h1>
-        </Card.Header>
-        <Card.Body>
-          <Row>
-            <Col>
-              <Form.Control
-                name="username"
-                value={inputs.username}
-                required
-                type="text"
-                placeholder="Username"
-                onChange={handleChangeInput} />
-              <Form.Control
-                name="password"
-                required
-                value={inputs.password}
-                type="password"
-                placeholder="Password"
-                onChange={handleChangeInput} />
-              <Form.Control
-                name="firstName"
-                value={inputs.firstName}
-                required
-                type="text"
-                placeholder="First Name"
-                onChange={handleChangeInput} />
-              <Form.Control
-                name="lastName"
-                required
-                value={inputs.lastName}
-                type="text"
-                placeholder="Last Name"
-                onChange={handleChangeInput} />
-              <Form.Control
-                name="inviteCode"
-                value={inputs.inviteCode}
-                type="password"
-                placeholder="Invite code"
-                onChange={handleChangeInput} />
-            </Col>
-          </Row>
-          <Row>
-            <Col className="d-flex flex-column align-items-center justify-content-center">
-              <div className="d-flex flex-row">
-                <p className="me-2">
-                  Already have an account?
-                </p>
-                <p className="link-primary" onClick={handleClickLink} style={{ cursor: "pointer" }}>
-                  Login
-                </p>
-              </div>
-              <Button className="w-100" variant="primary" type="submit">Register</Button>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-    </Form>
+
+    <Card className="w-100 h-50">
+      <Card.Header className="d-flex justify-content-center display-4">
+        Register
+      </Card.Header>
+      <Card.Body>
+        <Form onSubmit={submitHandler} className="d-flex flex-column h-100">
+          <Form.Control
+            name="username"
+            value={inputs.username}
+            required
+            type="text"
+            placeholder="Username"
+            className="my-1"
+            onChange={handleChangeInput} />
+          <Form.Control
+            name="password"
+            required
+            value={inputs.password}
+            type="password"
+            placeholder="Password"
+            className="my-1"
+            onChange={handleChangeInput} />
+          <Form.Control
+            name="firstName"
+            value={inputs.firstName}
+            required
+            type="text"
+            placeholder="First Name"
+            className="my-1"
+            onChange={handleChangeInput} />
+          <Form.Control
+            name="lastName"
+            required
+            value={inputs.lastName}
+            type="text"
+            placeholder="Last Name"
+            className="my-1"
+            onChange={handleChangeInput} />
+          <Form.Control
+            name="inviteCode"
+            value={inputs.inviteCode}
+            type="password"
+            placeholder="Invite code"
+            className="my-1"
+            onChange={handleChangeInput} />
+
+          <div className="mt-auto d-flex flex-column align-items-center">
+            <div className="d-flex flex-row">
+              <p className="me-2">
+                Already have an account?
+              </p>
+              <p
+                className="link-primary"
+                onClick={handleClickLink}
+                style={{ cursor: "pointer" }}>
+                Login
+              </p>
+            </div>
+            <Button className="w-100" variant="primary" type="submit">Register</Button>
+          </div>
+        </Form>
+      </Card.Body>
+    </Card >
   )
 }
 

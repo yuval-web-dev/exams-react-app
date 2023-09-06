@@ -1,34 +1,44 @@
 import React from "react"
-import { Routes, Route } from "react-router-dom"
-import { AuthProvider, RequireAuth } from 'react-auth-kit'
+import { Navigate, Routes, Route } from "react-router-dom"
+import * as AuthKit from "react-auth-kit" // https://authkit.arkadip.dev/
 
 import { Pages } from "../pages"
 
 
+const LOGIN = "/login"
+
+const PrivateRoute = ({ children }) => {
+  const isAuthenticated = AuthKit.useIsAuthenticated();
+  const auth = isAuthenticated();
+  return auth ? children : <Navigate to={LOGIN} />;
+}
+
 const ProtectedRoutesElement = () => {
   return (
-    <RequireAuth loginPath="/login">
-      <Routes>
-        <Route path="/" element={<Pages.Home />} />
-        <Route path="/my-exams" element={<Pages.Exams />} />
-        <Route path="/my-submissions" element={<Pages.Submissions />} />
-        <Route path="/create-exam" element={<Pages.CreateExam />} />
-        <Route path="/take-exam" element={<Pages.TakeExam />} />
-      </Routes>
-    </RequireAuth>
+    <Routes>
+      <Route path="/" element={<Pages.Home />} />
+      <Route path="/my-exams" element={<Pages.Exams />} />
+      <Route path="/my-submissions" element={<Pages.Submissions />} />
+      <Route path="/create-exam" element={<Pages.CreateExam />} />
+      <Route path="/take-exam" element={<Pages.TakeExam />} />
+    </Routes>
   )
 }
 
 
 const AppRoutes = () => {
   return (
-    <AuthProvider authName="_auth" authType="cookie" cookieSecure={false}>
+    <AuthKit.AuthProvider
+      authName="_auth"
+      authType="cookie"
+      cookieDomain={window.location.hostname}
+      cookieSecure={false}>
       <Routes>
-        <Route path="/*" element={<ProtectedRoutesElement />} />
+        <Route path="/*" element={<PrivateRoute><ProtectedRoutesElement /></PrivateRoute>} />
         <Route path="/login" element={<Pages.Login />} />
         <Route path="/register" element={<Pages.Registration />} />
       </Routes>
-    </AuthProvider>
+    </AuthKit.AuthProvider>
   );
 };
 

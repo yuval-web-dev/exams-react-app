@@ -1,11 +1,9 @@
 import React from "react"
 import * as AuthKit from "react-auth-kit"
-import { Row, Col, Form, ListGroup, ListGroupItem } from "react-bootstrap"
+import { Row, Col, Form, ListGroup, ListGroupItem, Badge } from "react-bootstrap"
 import TimePicker from "react-bootstrap-time-picker"
-import DatePicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
-import RangeSlider from "react-bootstrap-range-slider"
-import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
+import DatePicker from "react-datepicker"; import "react-datepicker/dist/react-datepicker.css"
+import RangeSlider from "react-bootstrap-range-slider"; import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
 import * as dateUtils from "./date.js"
 
@@ -22,9 +20,20 @@ const ExamMetadataForm = ({ }, ref) => {
   })
   const [date, setDate] = React.useState(dateUtils.genStart()) // Millis
   const [hour, setHour] = React.useState(9 * 60 * 60) // Secs
-  const [duration, setDuration] = React.useState(30)
 
-
+  React.useImperativeHandle(
+    ref,
+    () => {
+      return {
+        get() {
+          const inputsModified = inputs
+          inputsModified.duration = Number(inputs.duration)
+          return inputsModified
+        }
+      }
+    },
+    [inputs]
+  )
 
 
   const inputsSetter = (key, value) => {
@@ -104,7 +113,7 @@ const ExamMetadataForm = ({ }, ref) => {
         <Col>
           <Form.Label>End</Form.Label>
           <TimePicker
-            value={hour + (duration * 60)}
+            value={hour + (inputs.duration * 60)}
             format={24}
             style={{ color: "grey", pointerEvents: "none" }} />
         </Col>
@@ -112,14 +121,21 @@ const ExamMetadataForm = ({ }, ref) => {
 
       <ListGroupItem>
         <Form.Label>Duration (Mins)</Form.Label>
-        <RangeSlider
-          value={duration}
-          step={30}
-          min={30}
-          max={180}
-          tooltipPlacement="bottom"
-          tooltip="auto"
-          onChange={e => setDuration(e.target.value)} />
+        <Row>
+          <Col xs="2" lg="1">
+            <Badge className="fs-5">{inputs.duration}</Badge>
+          </Col>
+          <Col>
+            <RangeSlider
+              name="duration"
+              value={inputs.duration}
+              step={30}
+              min={30}
+              max={180}
+              tooltip="off"
+              onChange={handleChangeInput} />
+          </Col>
+        </Row>
       </ListGroupItem>
     </ListGroup>
   )

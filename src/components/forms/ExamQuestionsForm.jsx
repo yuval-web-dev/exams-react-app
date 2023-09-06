@@ -1,15 +1,23 @@
 import React from "react"
-import { Row, Col, Button, ListGroup, ListGroupItem } from "react-bootstrap"
+import { Row, Col, Button, ListGroup, Image } from "react-bootstrap"
 import VirtualList from "react-virtual-drag-list" // https://www.npmjs.com/package/react-virtual-drag-list
 import { v4 as uuidv4 } from "uuid"
 
 import { ModalForms } from "../modalForms"
+import QuizApiLogo from "../../assets/quizapi_full.svg"
 
 
 const ExamQuestionsForm = ({ }, ref) => {
   const [questions, setQuestions] = React.useState([])
   const [shuffle, setShuffle] = React.useState(false)
   const [modalFormShow, setModalFormShow] = React.useState(false)
+  React.useImperativeHandle(
+    ref,
+    () => {
+      return { get() { return { questions, shuffle } } }
+    },
+    [questions, shuffle]
+  )
 
   const handleClickButton = (event) => {
     event.preventDefault()
@@ -64,14 +72,22 @@ const ExamQuestionsForm = ({ }, ref) => {
           <Button
             name="New Question"
             variant="light"
-            className="me-auto"
+            className=""
             onClick={handleClickButton}>
             Create a Question
+          </Button>
+          <Button
+            name="quiz-api"
+            variant="light"
+            className="mx-1 p-1"
+            onClick={handleClickButton}>
+            <Image src={QuizApiLogo} height="18px"></Image>
           </Button>
           <Button
             name={shuffle ? "Shuffled" : "Ordered"}
             disabled={noQuestions}
             variant={shuffle ? "warning" : "light"}
+            className="ms-auto"
             onClick={handleClickButton}>
             {shuffle ? "Shuffled" : "Ordered"}
           </Button>
@@ -104,6 +120,9 @@ const ExamQuestionsForm = ({ }, ref) => {
         show={modalFormShow}
         saveHandler={handleSaveModalForm}
         cancelHandler={handleCancelModalForm} />
+      <ModalForms.QuizApi
+        show={true} />
+
     </React.Fragment>
   )
 }

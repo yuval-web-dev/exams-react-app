@@ -7,7 +7,7 @@ const PreLoginPageContainer = ({ children }) => {
   return (
     <Container>
       <Row>
-        <Col className="w-75 d-flex align-items-center justify-content-center">
+        <Col className="d-flex align-items-start justify-content-center mt-5" style={{ height: "100vh" }}>
           {children}
         </Col>
       </Row>

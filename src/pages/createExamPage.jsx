@@ -1,51 +1,33 @@
 import React from "react"
 import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
+import { v4 as uuidv4 } from "uuid"
+import { Row, Col, Button, Tabs, Tab } from "react-bootstrap"
 
 import { Forms, PageContainers, ModalForms } from "../components"
-import { Row, Col, Button, Tabs, Tab } from "react-bootstrap"
+import { storage } from "../storage"
 
 
 const CreateExamPage = () => {
   const authUser = AuthKit.useAuthUser()
 
-  const [exam, setExam] = React.useState({
-    name: "",
-    lecturerFirstName: "",
-    lecturerLastName: "",
-    start: "",
-    duration: 0,
-    shuffle: false,
-    questions: []
-  })
-
-  const [activekey, setActiveKey] = React.useState("Metadata")
-
   const metadataFormRef = React.useRef()
   const questionsFormRef = React.useRef()
 
-  // const handleChangeMetadata = (metadata) => {
-  //   const { name, lecturerFirstName, lecturerLastName, start, duration } = metadata
-  //   setExam({
-  //     ...exam,
-  //     name,
-  //     lecturerFirstName,
-  //     lecturerLastName,
-  //     start,
-  //     duration
-  //   })
-  // }
-
-  // const handleChangeQuestions = (questions) => {
-  //   setExam({
-  //     ...exam,
-  //     questions
-  //   })
-  // }
+  const handleClickSave = async () => {
+    const metadata = metadataFormRef.current.get()
+    const questions = questionsFormRef.current.get()
+    // TODO validate the above
+    const exam = {
+      id: uuidv4(),
+      ...metadata,
+      ...questions
+    }
+    await storage.insertExam(exam)
+  }
 
   const handleClick = (event) => {
     event.preventDefault()
-    alert(`Clicked "${event.target.name}" button.`)
   }
 
 
@@ -69,7 +51,7 @@ const CreateExamPage = () => {
         <Row>
           <Col className="d-flex justify-content-end">
             <Button name="Cancel" variant="outline-secondary" onClick={handleClick} style={{ width: "75px" }}>Cancel</Button>
-            <Button name="Save" variant="primary" onClick={handleClick} className="ms-1" style={{ width: "75px" }}>Save</Button>
+            <Button name="Save" variant="primary" onClick={handleClickSave} className="ms-1" style={{ width: "75px" }}>Save</Button>
           </Col>
         </Row>
       </PageContainers.PostLogin>

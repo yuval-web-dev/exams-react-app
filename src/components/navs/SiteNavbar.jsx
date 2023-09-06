@@ -5,15 +5,20 @@ import { useNavigate } from "react-router-dom"
 
 
 const SiteNavbar = () => {
-  const auth = useAuthUser()
+  const authUser = useAuthUser()
   const signOut = useSignOut()
   const navigate = useNavigate()
 
   const handleClickSignOut = async () => {
-    // await storage.delete_store("exams")
-    // await storage.delete_store("wizard")
-    signOut()
-    navigate("/")
+    // TODO clear local storage! and move to an outer function
+    if (signOut()) {
+      console.info(`User sign out "${authUser().username}" successful.`)
+      navigate("/")
+    }
+    else {
+      console.info(`User sign out "${authUser().username}" failed.`)
+    }
+
   }
 
   return (
@@ -26,8 +31,21 @@ const SiteNavbar = () => {
           <Nav.Link className="" href="/my-submissions">Submissions</Nav.Link>
         </Nav>
         <Nav>
-          <NavDropdown className="me-auto" title={`${auth().firstName} ${auth().lastName}`}>
-            <NavDropdown.Item href="#" onClick={handleClickSignOut}>Sign out</NavDropdown.Item>
+          <NavDropdown
+            className="me-auto"
+            align="end"
+            title={`${authUser().firstName} ${authUser().lastName}`}>
+            <NavDropdown.Item
+              href="#"
+              onClick={() => { }}>
+              Settings
+            </NavDropdown.Item>
+            <NavDropdown.Item
+              href="#"
+              className="bg-danger-subtle"
+              onClick={handleClickSignOut}>
+              Sign out
+            </NavDropdown.Item>
           </NavDropdown>
         </Nav>
       </Container>

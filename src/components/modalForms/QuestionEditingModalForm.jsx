@@ -17,7 +17,7 @@ const LANGS = [
 ]
 
 
-const QuestionEditingModal = ({ show, saveHandler, cancelHandler }, ref) => {
+const QuestionEditingModal = ({ show, saveHandler, cancelHandler }) => {
   const [inputs, setInputs] = React.useState(
     {
       id: uuidv4(),
@@ -252,4 +252,4 @@ const QuestionEditingModal = ({ show, saveHandler, cancelHandler }, ref) => {
   )
 }
 
-export default React.forwardRef(QuestionEditingModal)
+export default QuestionEditingModal

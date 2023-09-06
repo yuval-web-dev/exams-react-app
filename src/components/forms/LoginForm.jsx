@@ -24,47 +24,42 @@ const LoginForm = ({ submitHandler }, ref) => {
   }
 
   return (
-    <Form onSubmit={submitHandler}>
-      <Card>
-        <Card.Header className="d-flex align-items-center justify-content-center">
-          <h1 className="my-0">Login</h1>
-        </Card.Header>
-        <Card.Body>
-          <Row>
-            <Col>
-              <Form.Control
-                name="username"
-                value={inputs.username}
-                className="mb-2"
-                required
-                type="text"
-                placeholder="Username"
-                onChange={handleChangeInput} />
-              <Form.Control
-                name="password"
-                value={inputs.password}
-                type="password"
-                placeholder="Password"
-                required
-                onChange={handleChangeInput} />
-            </Col>
-          </Row>
-          <Row>
-            <Col className="d-flex flex-column align-items-center justify-content-center">
-              <div className="d-flex flex-row">
-                <p className="me-2">
-                  Don't have an account?
-                </p>
-                <p className="link-primary" onClick={handleClickLink} style={{ cursor: "pointer" }}>
-                  Register
-                </p>
-              </div>
-              <Button className="w-100" variant="primary" type="submit">Login</Button>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-    </Form>
+    <Card className="w-100 h-50">
+      <Card.Header className="d-flex justify-content-center display-4">
+        Login
+      </Card.Header>
+      <Card.Body>
+        <Form onSubmit={submitHandler} className="d-flex flex-column h-100">
+          <Form.Control
+            name="username"
+            value={inputs.username}
+            required
+            type="text"
+            placeholder="Username"
+            className="my-1"
+            onChange={handleChangeInput} />
+          <Form.Control
+            name="password"
+            value={inputs.password}
+            type="password"
+            placeholder="Password"
+            required
+            className="my-1"
+            onChange={handleChangeInput} />
+          <div className="mt-auto d-flex flex-column align-items-center">
+            <div className="d-flex flex-row">
+              <p className="me-2">
+                Don't have an account?
+              </p>
+              <p className="link-primary" onClick={handleClickLink} style={{ cursor: "pointer" }}>
+                Register
+              </p>
+            </div>
+            <Button className="w-100" variant="primary" type="submit">Login</Button>
+          </div>
+        </Form>
+      </Card.Body>
+    </Card>
   )
 }
 
