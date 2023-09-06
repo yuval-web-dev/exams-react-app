@@ -2,9 +2,11 @@ import React from "react"
 import { useAuthUser, useSignOut } from "react-auth-kit"
 import { Container, Navbar, Nav, Button, NavDropdown } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
+import { BsGear } from "react-icons/bs"
+import { MdLogout } from "react-icons/md"
 
 
-const SiteNavbar = () => {
+const SiteNavbar = ({ fluid }) => {
   const authUser = useAuthUser()
   const signOut = useSignOut()
   const navigate = useNavigate()
@@ -22,8 +24,8 @@ const SiteNavbar = () => {
   }
 
   return (
-    <Navbar sticky="top" bg="light">
-      <Container fluid="lg">
+    <Navbar>
+      <Container fluid={fluid}>
         <Navbar.Brand>Exams App</Navbar.Brand>
         <Nav className="me-auto">
           <Nav.Link className="" href="/">Home</Nav.Link>
@@ -37,14 +39,18 @@ const SiteNavbar = () => {
             title={`${authUser().firstName} ${authUser().lastName}`}>
             <NavDropdown.Item
               href="#"
+              className="d-flex justify-content-between align-items-center"
               onClick={() => { }}>
               Settings
+              <BsGear />
             </NavDropdown.Item>
+            <NavDropdown.Divider />
             <NavDropdown.Item
               href="#"
-              className="bg-danger-subtle"
+              className="d-flex justify-content-between align-items-center"
               onClick={handleClickSignOut}>
               Sign out
+              <MdLogout />
             </NavDropdown.Item>
           </NavDropdown>
         </Nav>

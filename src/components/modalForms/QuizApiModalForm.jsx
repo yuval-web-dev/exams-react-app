@@ -1,15 +1,15 @@
 import React from "react"
-import { Row, Col, Modal, Button, ListGroup, ListGroupItem, Dropdown, Alert, Form, InputGroup, Spinner } from "react-bootstrap"
-import VirtualList from "react-virtual-drag-list" // https://www.npmjs.com/package/react-virtual-drag-list
+import { Row, Col, Modal, Button, ListGroup, ListGroupItem, Alert, Form, InputGroup, Spinner, Accordion, Badge } from "react-bootstrap"
 import { PiEye, PiEyeClosed } from "react-icons/pi"
+import RangeSlider from "react-bootstrap-range-slider"; import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
 import { api } from "../../api"
-import DropdownToggle from "react-bootstrap/esm/DropdownToggle"
+import "./index.css"
 
 
 const range = n => [...Array(n).keys()].slice(1)
 
-const QuizApiModalForm = ({ show }) => {
+const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
   const [inputs, setInputs] = React.useState({
     apiKey: "VOZNHbvQRb0rmx9OYxp0gykxs0wP7bsdB5GabvfC",
     category: "",
@@ -31,6 +31,16 @@ const QuizApiModalForm = ({ show }) => {
   const handleChangeInput = (event) => {
     event.preventDefault()
     inputsSetter(event.target.name, event.target.value)
+  }
+
+  const handleChangePoints = (event) => {
+    const newQuestions = questions.map(question => {
+      if (event.target.id === question.id) {
+        question.points = event.target.value
+      }
+      return question
+    })
+    setQuestions(newQuestions)
   }
 
   const handleSearchQuestions = async () => {
@@ -59,11 +69,12 @@ const QuizApiModalForm = ({ show }) => {
         return
 
       case "Save":
-        // handleModalFormSubmit()
+        // TODO validation...
+        saveHandler(questions)
         return
 
       case "Cancel":
-        // cancelHandler()
+        cancelHandler()
         return
 
       default:
@@ -72,29 +83,11 @@ const QuizApiModalForm = ({ show }) => {
     }
   }
 
-  const handleRightClickQuestion = (event) => {
-    event.preventDefault()
-    const newQuestions = questions.filter(answer => answer.id !== event.target.id)
+  const handleRightClick = (questionId) => {
+    const newQuestions = questions.filter(question => question.id !== questionId)
     setQuestions(newQuestions)
   }
 
-  const CustomDropdownToggle = React.forwardRef(({ children, id, onClick }, ref) => {
-    const handleClick = (event) => {
-      event.preventDefault()
-      onClick(event)
-    }
-    return (
-      <ListGroupItem
-        id={id}
-        action
-        ref={ref}
-        onClick={handleClick}
-        onContextMenu={handleRightClickQuestion}>
-        {children}
-      </ListGroupItem>
-    )
-  }
-  )
 
   return (
     <Modal size="lg" show={show}>
@@ -180,40 +173,56 @@ const QuizApiModalForm = ({ show }) => {
           </ListGroupItem>
 
           <ListGroupItem className="p-0">
-            {
-              showAlert ? <Alert dismissible className="d-flex justify-content-center" variant="danger">{`Nothing was found... ¯\\_(ツ)_/¯`}</Alert> :
-                questions.map((question, idx) => {
-                  return (
-                    <Dropdown>
-                      <Dropdown.Toggle id={question.id} as={CustomDropdownToggle}>
+            <Accordion>
+              {
+                showAlert ? <Alert dismissible className="d-flex justify-content-center" variant="danger">{`Nothing was found... ¯\\_(ツ)_/¯`}</Alert> :
+                  questions.map((question, idx) => (
+                    <Accordion.Item
+                      key={`question_${idx}`}
+                      eventKey={idx}
+                      onContextMenu={event => { event.preventDefault(); handleRightClick(question.id) }}>
+                      <Accordion.Header>
                         {question.question}
-                      </Dropdown.Toggle>
+                      </Accordion.Header>
+                      <Accordion.Body className="p-0">
+                        <ListGroup.Item >
+                          <Form.Label>Points</Form.Label>
+                          <Row>
+                            <Col xs="2" className="pe-0 d-flex justify-content-start align-items-center">
+                              <Badge className="w-75 fs-6 me-0">{questions[idx].points}</Badge>
+                            </Col>
+                            <Col className="ps-0">
+                              <RangeSlider
+                                id={question.id}
+                                value={questions[idx].points}
+                                min={5}
+                                max={100}
+                                step={5}
+                                tooltip="off"
+                                onChange={handleChangePoints} />
+                            </Col>
+                          </Row>
+                        </ListGroup.Item>
+                        {question.answers.map((answer, idx) => (
+                          <ListGroupItem
+                            key={`answer_${idx}`}
+                            variant={answer.id === question.correctAnswer ? "success" : "danger"}>
+                            {idx + 1}. {answer.answer}
+                          </ListGroupItem>
+                        ))}
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  ))
 
-                      <Dropdown.Menu className="w-100 p-0">
-                        {question.answers.map((answer, idx) => {
-                          return (
-                            <Dropdown.Item
-                              key={`dropdown_${idx}`}
-                              style={{ cursor: "default" }}
-                              className={answer.id === question.correctAnswer ? "bg-success-subtle" : "bg-danger-subtle"}>
-                              {idx + 1}. {answer.answer}
-                            </Dropdown.Item>
-                          )
-                        })}
-                      </Dropdown.Menu>
-                    </Dropdown>
-
-                  )
-                })
-
-            }
+              }
+            </Accordion>
           </ListGroupItem>
 
         </ListGroup>
       </Modal.Body>
       <Modal.Footer>
         <Button name="Cancel" variant="outline-secondary" style={{ width: "75px" }} onClick={handleClickButton}>Cancel</Button>
-        <Button name="Save" variant="primary" style={{ width: "75px" }} onClick={handleClickButton}>Save</Button>
+        <Button name="Save" disabled={questions.length === 0} variant="primary" style={{ width: "75px" }} onClick={handleClickButton}>Save</Button>
       </Modal.Footer>
     </Modal>
   )
@@ -240,34 +249,3 @@ const TAGS = [
   "WordPress",
   "MySQL"
 ]
-
-// // forwardRef again here!
-// // Dropdown needs access to the DOM of the Menu to measure it
-// const CustomMenu = React.forwardRef(
-//   ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
-//     const [value, setValue] = React.useState('');
-
-//     return (
-//       <div
-//         ref={ref}
-//         style={style}
-//         className={className}
-//         aria-labelledby={labeledBy}
-//       >
-//         <Form.Control
-//           autoFocus
-//           className="mx-3 my-2 w-auto"
-//           placeholder="Type to filter..."
-//           onChange={(e) => setValue(e.target.value)}
-//           value={value}
-//         />
-//         <ul className="list-unstyled">
-//           {React.Children.toArray(children).filter(
-//             (child) =>
-//               !value || child.props.children.toLowerCase().startsWith(value),
-//           )}
-//         </ul>
-//       </div>
-//     );
-//   },
-// );

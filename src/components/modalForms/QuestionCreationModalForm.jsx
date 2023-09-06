@@ -7,17 +7,7 @@ import { BsArrowReturnLeft } from "react-icons/bs"
 import { v4 as uuidv4 } from "uuid"
 
 
-const LANGS = [
-  ["plaintext", "Plaintext"],
-  ["javascript", "JavaScript"],
-  ["python", "Python"],
-  ["cpp", "C++"],
-  ["java", "Java"],
-  ["bash", "Bash"]
-]
-
-
-const QuestionEditingModal = ({ show, saveHandler, cancelHandler }) => {
+const QuestionCreationModalForm = ({ show, saveHandler, cancelHandler }) => {
   const [inputs, setInputs] = React.useState(
     {
       id: uuidv4(),
@@ -29,9 +19,7 @@ const QuestionEditingModal = ({ show, saveHandler, cancelHandler }) => {
       shuffle: false
     }
   )
-  // VirtualList requires a separate component:
-  const [answers, setAnswers] = React.useState([])
-
+  const [answers, setAnswers] = React.useState([]) // VirtualList requires a separate component
   const answerRef = React.useRef()
 
 
@@ -134,10 +122,10 @@ const QuestionEditingModal = ({ show, saveHandler, cancelHandler }) => {
           <ListGroupItem>
             <Form.Label>Points</Form.Label>
             <Row>
-              <Col xs="2" className="d-flex align-items-center">
-                <Badge className="w-100 fs-5">{inputs.points}</Badge>
+              <Col xs="2" className="pe-0 d-flex justify-content-start align-items-center">
+                <Badge className="w-75 fs-6 me-0">{inputs.points}</Badge>
               </Col>
-              <Col>
+              <Col className="ps-0">
                 <RangeSlider
                   name="points"
                   value={inputs.points}
@@ -252,4 +240,13 @@ const QuestionEditingModal = ({ show, saveHandler, cancelHandler }) => {
   )
 }
 
-export default QuestionEditingModal
+export default QuestionCreationModalForm
+
+const LANGS = [
+  ["plaintext", "Plaintext"],
+  ["javascript", "JavaScript"],
+  ["python", "Python"],
+  ["cpp", "C++"],
+  ["java", "Java"],
+  ["bash", "Bash"]
+]

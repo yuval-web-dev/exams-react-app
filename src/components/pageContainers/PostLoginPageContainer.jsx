@@ -7,8 +7,8 @@ import { Navs } from "../navs"
 const PostLoginPageContainer = ({ children }) => {
   return (
     <React.Fragment>
-      <Navs.Navbar />
-      <Container fluid="lg">
+      <Navs.Navbar fluid={"xxl"} />
+      <Container fluid="xxl">
         {children}
       </Container>
       <Navs.Footer />

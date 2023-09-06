@@ -45,6 +45,7 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
           answers: answerObjects,
           correctAnswer,
           shuffle: false,
+          points: 5
         })
       }
     })

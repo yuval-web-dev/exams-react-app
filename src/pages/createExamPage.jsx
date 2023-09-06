@@ -23,6 +23,7 @@ const CreateExamPage = () => {
       ...metadata,
       ...questions
     }
+    console.log(exam)
     await storage.insertExam(exam)
   }
 
@@ -38,20 +39,21 @@ const CreateExamPage = () => {
       <PageContainers.PostLogin>
         <Tabs defaultActiveKey="metadata" transition={false} >
           <Tab eventKey="metadata" title="Metadata">
-            <div style={{ height: "75vh" }}>
+
+            <div className="border" style={{ height: "75vh", overflowY: "auto" }}>
               <Forms.ExamMetadata ref={metadataFormRef} />
             </div>
           </Tab>
           <Tab eventKey="questions" title="Questions">
-            <div style={{ height: "75vh" }}>
+            <div className="border" style={{ height: "75vh", overflowY: "auto", overflowX: "hidden" }}>
               <Forms.ExamQuestions ref={questionsFormRef} />
             </div>
           </Tab>
         </Tabs>
         <Row>
           <Col className="d-flex justify-content-end">
-            <Button name="Cancel" variant="outline-secondary" onClick={handleClick} style={{ width: "75px" }}>Cancel</Button>
-            <Button name="Save" variant="primary" onClick={handleClickSave} className="ms-1" style={{ width: "75px" }}>Save</Button>
+            <Button name="Cancel" variant="outline-secondary" onClick={handleClick} style={{ width: "100px" }}>Cancel</Button>
+            <Button name="Save" variant="primary" onClick={handleClickSave} className="ms-1" style={{ width: "100px" }}>Save</Button>
           </Col>
         </Row>
       </PageContainers.PostLogin>

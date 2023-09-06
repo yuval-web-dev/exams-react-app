@@ -120,10 +120,12 @@ const ExamMetadataForm = ({ }, ref) => {
       </ListGroupItem>
 
       <ListGroupItem>
-        <Form.Label>Duration (Mins)</Form.Label>
+        <Form.Label>Duration</Form.Label>
+
         <Row>
-          <Col xs="2" lg="1">
-            <Badge className="fs-5">{inputs.duration}</Badge>
+          <Col xs="3" className="d-flex justify-content-start align-items-center">
+            <div className="text-primary fs-4">{inputs.duration}</div>
+            &nbsp;&nbsp;Minutes
           </Col>
           <Col>
             <RangeSlider

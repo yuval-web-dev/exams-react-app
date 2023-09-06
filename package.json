@@ -20,6 +20,7 @@
     "react-bootstrap": "^2.7.2",
     "react-bootstrap-range-slider": "^3.0.8",
     "react-bootstrap-time-picker": "^2.0.1",
+    "react-countdown": "^2.3.5",
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",

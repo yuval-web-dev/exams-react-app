@@ -1,5 +1,5 @@
 import React from "react"
-import { Row, Col, Button, ListGroup, Image } from "react-bootstrap"
+import { Row, Col, Button, ListGroup, Image, ButtonGroup, Accordion } from "react-bootstrap"
 import VirtualList from "react-virtual-drag-list" // https://www.npmjs.com/package/react-virtual-drag-list
 import { v4 as uuidv4 } from "uuid"
 
@@ -10,7 +10,9 @@ import QuizApiLogo from "../../assets/quizapi_full.svg"
 const ExamQuestionsForm = ({ }, ref) => {
   const [questions, setQuestions] = React.useState([])
   const [shuffle, setShuffle] = React.useState(false)
-  const [modalFormShow, setModalFormShow] = React.useState(false)
+  const [showQuestionMF, setShowQuestionMF] = React.useState(false)
+  const [showQuizApiMF, setShowQuizApiMF] = React.useState(false)
+
   React.useImperativeHandle(
     ref,
     () => {
@@ -19,11 +21,16 @@ const ExamQuestionsForm = ({ }, ref) => {
     [questions, shuffle]
   )
 
+
   const handleClickButton = (event) => {
     event.preventDefault()
     switch (event.target.name) {
-      case "New Question":
-        setModalFormShow(true)
+      case "Create a Question":
+        setShowQuestionMF(true)
+        return
+
+      case "quiz-api":
+        setShowQuizApiMF(true)
         return
 
       case "Shuffled":
@@ -39,28 +46,43 @@ const ExamQuestionsForm = ({ }, ref) => {
     }
   }
 
-  const handleSaveModalForm = (modalFormData) => {
+  const handleSaveQuestionMF = (question) => {
     // Assuming the data passed validation
-    setQuestions([...questions, modalFormData])
-    setModalFormShow(false)
+    setQuestions([...questions, question])
+    setShowQuestionMF(false)
   }
 
-  const handleCancelModalForm = () => {
-    setModalFormShow(false)
+  const handleCancelQuestionMF = () => {
+    setShowQuestionMF(false)
+  }
+
+  const handleSaveQuizApiMF = (questionsArray) => {
+    // Assuming the data passed validation
+    setQuestions([...questions, ...questionsArray])
+    setShowQuizApiMF(false)
+  }
+
+  const handleCancelQuizApiMF = () => {
+    setShowQuizApiMF(false)
   }
 
   const handleDragEnd = (params) => {
-    console.log(params)
     if (params.changed) {
       setQuestions(params.list)
     }
-
   }
 
-  const handleRightClickQuestion = (event) => {
-    event.preventDefault()
-    const newQuestions = questions.filter(question => question.id !== event.target.id)
+  const handleRightClick = (questionId) => {
+    const newQuestions = questions.filter(question => question.id !== questionId)
     setQuestions(newQuestions)
+  }
+
+  const totalPoints = () => {
+    var points = 0
+    questions.forEach(question => {
+      points += Number(question.points)
+    })
+    return points
   }
 
   const noQuestions = questions.length === 0
@@ -68,9 +90,9 @@ const ExamQuestionsForm = ({ }, ref) => {
   return (
     <React.Fragment>
       <Row>
-        <Col className="d-flex">
+        <Col className="d-flex bg-light">
           <Button
-            name="New Question"
+            name="Create a Question"
             variant="light"
             className=""
             onClick={handleClickButton}>
@@ -79,50 +101,73 @@ const ExamQuestionsForm = ({ }, ref) => {
           <Button
             name="quiz-api"
             variant="light"
-            className="mx-1 p-1"
+            className=""
             onClick={handleClickButton}>
-            <Image src={QuizApiLogo} height="18px"></Image>
+            <Image
+              src={QuizApiLogo} height="18px"
+              style={{ pointerEvents: "none" }} />
           </Button>
           <Button
             name={shuffle ? "Shuffled" : "Ordered"}
             disabled={noQuestions}
             variant={shuffle ? "warning" : "light"}
-            className="ms-auto"
             onClick={handleClickButton}>
             {shuffle ? "Shuffled" : "Ordered"}
           </Button>
+          <div className="ms-auto me-2 d-flex align-items-center">
+            <div className={totalPoints() === 100 ? "text-success" : "text-danger"}>
+              {totalPoints()}
+            </div>
+            <div className="text-muted">
+              /100 Points
+            </div>
+          </div>
         </Col>
       </Row>
       <Row>
         <Col>
-          <ListGroup variant="flush">
-            <VirtualList
-              className="virtual-list"
-              dataKey="id"
-              dataSource={questions}
-              v-drop={handleDragEnd}>
+          <Accordion>
+            <VirtualList className="virtual-list" dataKey="id" dataSource={questions} v-drop={handleDragEnd}>
               {(question, idx, dataKey) => (
-                <ListGroup.Item
-                  id={dataKey}
-                  key={idx}
-                  onContextMenu={handleRightClickQuestion}
-                  action
-                  style={{ cursor: "grab" }}>
-                  {idx + 1}. {question.question}
-                </ListGroup.Item>
+                <Accordion.Item className="p-0" key={`question_${idx}`} eventKey={idx} onContextMenu={event => { event.preventDefault(); handleRightClick(question.id) }}>
+                  <Accordion.Header>
+                    <div className="w-100 d-flex flex-row justify-content-between">
+                      <div>
+                        {idx + 1}. {question.question}
+                      </div>
+                      <div className="pe-3">
+                        {question.points} Points
+                      </div>
+                    </div>
+                  </Accordion.Header>
+                  <Accordion.Body className="p-0">
+                    <ListGroup variant="flush">
+                      {question.answers.map((answer, idx) => (
+                        <ListGroup.Item
+                          key={`answer_${idx}`}
+                          variant={answer.id === question.correctAnswer ? "success" : "danger"}>
+                          {idx + 1}. {answer.answer}
+                        </ListGroup.Item>
+                      ))}
+                    </ListGroup>
+                  </Accordion.Body>
+                </Accordion.Item>
               )}
             </VirtualList>
-          </ListGroup>
+          </Accordion>
+
         </Col>
       </Row>
-      <ModalForms.QuestionEditing
+      <ModalForms.QuestionCreation
         key={uuidv4()}
-        show={modalFormShow}
-        saveHandler={handleSaveModalForm}
-        cancelHandler={handleCancelModalForm} />
+        show={showQuestionMF}
+        saveHandler={handleSaveQuestionMF}
+        cancelHandler={handleCancelQuestionMF} />
       <ModalForms.QuizApi
-        show={true} />
-
+        key={uuidv4()}
+        show={showQuizApiMF}
+        saveHandler={handleSaveQuizApiMF}
+        cancelHandler={handleCancelQuizApiMF} />
     </React.Fragment>
   )
 }
