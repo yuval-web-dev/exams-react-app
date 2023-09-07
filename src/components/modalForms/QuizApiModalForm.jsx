@@ -1,9 +1,13 @@
 import React from "react"
-import { Row, Col, Modal, Button, ListGroup, ListGroupItem, Alert, Form, InputGroup, Spinner, Accordion, Badge } from "react-bootstrap"
+import {
+  Row, Col, Modal, Button, ListGroup, ListGroupItem,
+  Alert, Form, InputGroup, Spinner, Accordion, Badge
+} from "react-bootstrap"
 import { PiEye, PiEyeClosed } from "react-icons/pi"
 import RangeSlider from "react-bootstrap-range-slider"; import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
-import { api } from "../../api"
+import { default as api } from "../../api"
+import { CATEGORIES, TAGS } from "./consts.js"
 import "./index.css"
 
 
@@ -16,6 +20,7 @@ const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
     tag: "",
     limit: 1
   })
+  const [loading, setLoading] = React.useState(false)
 
   const [questions, setQuestions] = React.useState([])
   const [showApiKey, setShowApiKey] = React.useState(false)
@@ -44,6 +49,7 @@ const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
   }
 
   const handleSearchQuestions = async () => {
+    setLoading(true)
     const apiQuestions = await api.getQuestionsQuizApi(
       inputs.apiKey,
       inputs.category,
@@ -59,6 +65,7 @@ const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
     else {
       setQuestions(apiQuestions)
     }
+    setLoading(false)
   }
 
   const handleClickButton = (event) => {
@@ -155,7 +162,7 @@ const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
                   value={inputs.limit}
                   onChange={handleChangeInput}>
                   {
-                    range(11).map(
+                    range(21).map(
                       (item, idx) => <option key={idx} value={item}>{item}</option>
                     )
                   }
@@ -168,8 +175,9 @@ const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
             <Button
               name="Search"
               className="w-100"
-              variant="outline-primary"
-              onClick={handleClickButton}>Search</Button>
+              disabled={loading}
+              variant={loading ? "secondary" : "outline-primary"}
+              onClick={handleClickButton}>{loading ? <Spinner size="sm" /> : "Search"}</Button>
           </ListGroupItem>
 
           <ListGroupItem className="p-0">
@@ -228,24 +236,5 @@ const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
   )
 }
 
+
 export default QuizApiModalForm
-
-const CATEGORIES = [
-  "Code",
-  "Linux",
-  "DevOps",
-  "CMS",
-  "Docker",
-  "SQL"
-]
-
-const TAGS = [
-  "PHP",
-  "HTML",
-  "Bash",
-  "JavaScript",
-  "Laravel",
-  "Kubernetes",
-  "WordPress",
-  "MySQL"
-]

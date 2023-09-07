@@ -6,6 +6,8 @@ import { Modal, Button, Form, InputGroup, Row, Col, ListGroup, ListGroupItem, Ba
 import { BsArrowReturnLeft } from "react-icons/bs"
 import { v4 as uuidv4 } from "uuid"
 
+import { LANGS } from "./consts.js"
+
 
 const QuestionCreationModalForm = ({ show, saveHandler, cancelHandler }) => {
   const [inputs, setInputs] = React.useState(
@@ -240,13 +242,5 @@ const QuestionCreationModalForm = ({ show, saveHandler, cancelHandler }) => {
   )
 }
 
-export default QuestionCreationModalForm
 
-const LANGS = [
-  ["plaintext", "Plaintext"],
-  ["javascript", "JavaScript"],
-  ["python", "Python"],
-  ["cpp", "C++"],
-  ["java", "Java"],
-  ["bash", "Bash"]
-]
+export default QuestionCreationModalForm

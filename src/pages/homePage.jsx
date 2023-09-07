@@ -4,8 +4,8 @@ import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
 
 import { SelectionLists, PageContainers } from "../components"
-import { api } from "../api"
-import { storage } from "../storage"
+import { default as api } from "../api"
+import { default as storage } from "../storage"
 
 
 const HomePage = () => {

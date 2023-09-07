@@ -3,7 +3,7 @@ import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
 
 import { PageContainers, Forms } from "../components"
-import { api } from "../api"
+import { default as api } from "../api"
 
 
 const LoginPage = () => {

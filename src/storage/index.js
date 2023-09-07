@@ -1,9 +1,9 @@
 import { localForage } from "./localForage.js"
 
 
-const insertExam = async (exam) => {
+const saveExam = async (exam) => {
   try {
-    await localForage.setOne("exams", exam, exam.name)
+    await localForage.setOne("exams", exam, exam.id)
     console.info(`Insertion of exam "${exam.name}" successful.`)
     return true
   }
@@ -15,13 +15,13 @@ const insertExam = async (exam) => {
 
 const getExams = async () => {
   try {
-    const localExams = await localForage.getMany("exams")
-    console.info("Fetching local exams successful.")
-    return localExams
+    const exams = await localForage.getMany("exams")
+    console.info("Getting all local exams successful.")
+    return exams
   }
   catch (err) {
-    console.error("Fetching local exams failed:", err)
-    return undefined
+    console.error("Getting all local exams failed:", err)
+    return null
   }
 }
 
@@ -57,10 +57,25 @@ const clearSelectedExam = async () => {
   }
 }
 
+const removeExam = async (examId) => {
+  try {
+    await localForage.removeOne("exams", examId)
+    console.info(`Removal of exam successful.`)
+    return true
+  }
+  catch (err) {
+    console.error(`Removal of exam failed:`, err)
+    return false
+  }
+}
 
-export const storage = {
-  insertExam,
+
+const storage = {
+  saveExam,
   getExams,
   getSelectedExam, setSelectedExam,
-  clearSelectedExam
+  clearSelectedExam,
+  removeExam
 }
+
+export default storage

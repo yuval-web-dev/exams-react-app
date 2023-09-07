@@ -1,14 +1,14 @@
 import React from "react"
-import { Button } from "react-bootstrap"
+import { Button, ListGroup } from "react-bootstrap"
 import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
 
-import { SelectionLists, PageContainers } from "../components"
-import { api } from "../api"
-import { storage } from "../storage"
+import { PageContainers } from "../components"
+import { default as api } from "../api"
+import { default as storage } from "../storage"
 
 
-const ExamsPage = () => {
+const MySubmissionsPage = () => {
   const [exams, setExams] = React.useState([])
   const [selectedExam, setSelectedExam] = React.useState(null)
 
@@ -72,17 +72,11 @@ const ExamsPage = () => {
 
   return (
     <PageContainers.PostLogin>
-      <SelectionLists.Exams exams={exams} selectedExam={selectedExam} handler={handleSelectExam} />
-      <Button
-        variant="outline-primary"
-        disabled={selectedExam === null}
-        onClick={handleClickStart}>
-        Start Exam
-      </Button>
+
     </PageContainers.PostLogin>
   )
 }
 
 
 
-export default ExamsPage
+export default MySubmissionsPage

@@ -1,7 +1,10 @@
 import { default as QuestionCreation } from "./QuestionCreationModalForm.jsx"
 import { default as QuizApi } from "./QuizApiModalForm.jsx"
 
-export const ModalForms = {
+
+const ModalForms = {
   QuestionCreation,
   QuizApi
 }
+
+export default ModalForms

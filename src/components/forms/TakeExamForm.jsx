@@ -2,7 +2,7 @@ import React from "react"
 import { Offcanvas, ListGroup, Pagination, Row, Col, Button, Badge, Collapse, Card } from "react-bootstrap"
 
 
-const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler }, ref) => {
+const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler }) => {
   const [currentIdx, setCurrentIdx] = React.useState(0)
   const [question, setQuestion] = React.useState(exam.questions[0])
   const [answers, setAnswers] = React.useState(
@@ -116,7 +116,8 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler }, ref) =
   )
 }
 
-export default React.forwardRef(TakeExamForm)
+
+export default TakeExamForm
 
 {/* <Button
 className="w-100 mt-3"

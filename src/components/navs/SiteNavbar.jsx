@@ -24,13 +24,13 @@ const SiteNavbar = ({ fluid }) => {
   }
 
   return (
-    <Navbar>
+    <Navbar className="bg-light">
       <Container fluid={fluid}>
-        <Navbar.Brand>Exams App</Navbar.Brand>
+        <Navbar.Brand><Nav.Link className="" href="/">Exams App</Nav.Link></Navbar.Brand>
         <Nav className="me-auto">
-          <Nav.Link className="" href="/">Home</Nav.Link>
-          <Nav.Link className="" href="/my-exams">Exams</Nav.Link>
-          <Nav.Link className="" href="/my-submissions">Submissions</Nav.Link>
+          <Nav.Link className="" href="/my-exams">My Exams</Nav.Link>
+          <Nav.Link className="" href="/my-submissions">My Submissions</Nav.Link>
+          <Nav.Link className="" href="/create-exam">Create an Exam</Nav.Link>
         </Nav>
         <Nav>
           <NavDropdown

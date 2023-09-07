@@ -6,10 +6,12 @@ import {
   Container, Spinner, Nav, NavDropdown, Navbar
 } from "react-bootstrap"
 import { ImCompass2 } from "react-icons/im"
+import Countdown from "react-countdown" // https://www.npmjs.com/package/react-countdown
 
 import { Forms } from "../components"
-import { api } from "../api"
-import { storage } from "../storage"
+import { default as api } from "../api"
+import { default as storage } from "../storage"
+import moment from "moment"
 
 
 const TakeExamPage = () => {
@@ -17,6 +19,7 @@ const TakeExamPage = () => {
   const [brand, setBrand] = React.useState(<Spinner />)
   const [loading, setLoading] = React.useState(true) // component is dependant on an async. function
   const [showNavigate, setShowNavigate] = React.useState(false)
+  const [endTime, setEndTime] = React.useState(null)
 
   const formRef = React.useRef(null);
   const authHeader = AuthKit.useAuthHeader()
@@ -31,6 +34,9 @@ const TakeExamPage = () => {
           const exam = await storage.getSelectedExam()
           setExam(exam)
           setBrand(exam.name)
+          const time = moment(exam.start)
+          time.add(exam.duration, "minutes")
+          setEndTime(time)
         }
         catch (err) {
           console.error("Error fetching selected exam:", err)
@@ -65,6 +71,7 @@ const TakeExamPage = () => {
 
   const fluid = "lg"
 
+
   if (loading) {
     return <Spinner />
   }
@@ -75,8 +82,14 @@ const TakeExamPage = () => {
           <Container fluid={fluid}>
             <Nav className="d-flex flex-row justify-content-start w-100">
               <Navbar.Brand>{brand}</Navbar.Brand>
-              <Nav.Link active={showNavigate} onClick={handleClickNavigateLink}>Navigate <ImCompass2 /></Nav.Link>
-              <Nav.Link className="ms-auto">Timer</Nav.Link>
+              <Nav.Link
+                active={showNavigate}
+                onClick={handleClickNavigateLink}>
+                <div className="d-flex align-items-center justify-content-center"><ImCompass2 />&nbsp;Navigate</div>
+              </Nav.Link>
+              <Nav.Link className="ms-auto">
+                <Countdown date={endTime} />
+              </Nav.Link>
               <NavDropdown
                 disabled
                 title={`${authUser().firstName} ${authUser().lastName}`} />
@@ -97,4 +110,4 @@ const TakeExamPage = () => {
 }
 
 
-export default TakeExamPage;
+export default TakeExamPage

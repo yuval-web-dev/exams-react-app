@@ -9,9 +9,8 @@ const ENDPOINT = `${URL}/${SERVICE}`
 
 
 const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
-  // fetches questions from QuizAPI's endpoint with specific parameters.
   try {
-    const res = await axios.get(
+    const apiResponse = await axios.get(
       "https://quizapi.io/api/v1/questions",
       {
         params:
@@ -24,7 +23,7 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
       }
     )
     const questions = []
-    res.data.forEach((question) => {
+    apiResponse.data.forEach(question => {
       if (question.multiple_correct_answers === "false") {
         var correctAnswer
         var answerObjects = []
@@ -62,17 +61,18 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
 const login = async (username, password) => {
   try {
     const data = { username, password }
-    const res = await axios.post(
+    const apiResponse = await axios.post(
       `${ENDPOINT}/login`,
       data,
       { headers: { "Content-Type": "application/json" } }
     )
+    const jwt = apiResponse.data
     console.info(`User login "${username}" successful.`)
-    return res?.data // the signed jwt
+    return jwt
   }
   catch (err) {
     console.error(`User login "${username}" failed:`, err)
-    return undefined
+    return null
   }
 }
 
@@ -85,7 +85,7 @@ const register = async (username, password, firstName, lastName, inviteCode) => 
       lastName,
       inviteCode
     }
-    await axios.post(
+    const apiResponse = await axios.post(
       `${ENDPOINT}/register`,
       data,
       { headers: { "Content-Type": "application/json" } }
@@ -101,15 +101,34 @@ const register = async (username, password, firstName, lastName, inviteCode) => 
 
 const getExams = async (authHeader) => {
   try {
-    const res = await axios.get(
+    const apiResponse = await axios.get(
       `${ENDPOINT}/get-exams`,
       { headers: { "Authorization": authHeader } }
     )
+    const exams = apiResponse.data.exams
     console.info("Getting exams from backend successful.")
-    return res?.data
+    return exams
   }
   catch (err) {
     console.error("Getting exams from backend failed:", err)
+    return null
+  }
+}
+
+const postExam = async (exam, authHeader) => {
+  try {
+    await axios.post(
+      `${ENDPOINT}/post-exam`,
+      exam,
+      { headers: { "Authorization": authHeader } }
+    )
+    console.info("Posting exam to backend successful.")
+    return true
+  }
+  catch (err) {
+    console.error("Posting exam to backend failed:", err)
+    return false
+
   }
 }
 
@@ -138,11 +157,13 @@ const postSubmission = async (examName, answers, authHeader) => {
   }
 }
 
-
-export const api = {
+const api = {
   getQuestionsQuizApi,
   login,
   register,
   getExams,
+  postExam,
   postSubmission
 }
+
+export default api

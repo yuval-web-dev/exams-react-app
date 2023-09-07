@@ -3,8 +3,8 @@ import { Row, Col, Button, ListGroup, Image, ButtonGroup, Accordion } from "reac
 import VirtualList from "react-virtual-drag-list" // https://www.npmjs.com/package/react-virtual-drag-list
 import { v4 as uuidv4 } from "uuid"
 
-import { ModalForms } from "../modalForms"
-import QuizApiLogo from "../../assets/quizapi_full.svg"
+import { default as ModalForms } from "../modalForms"
+import QuizApiLogo from "../../assets/quizapi.svg"
 
 
 const ExamQuestionsForm = ({ }, ref) => {

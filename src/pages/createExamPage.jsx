@@ -2,29 +2,46 @@ import React from "react"
 import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
 import { v4 as uuidv4 } from "uuid"
-import { Row, Col, Button, Tabs, Tab } from "react-bootstrap"
+import { Row, Col, Button, Tabs, Tab, Spinner } from "react-bootstrap"
 
-import { Forms, PageContainers, ModalForms } from "../components"
-import { storage } from "../storage"
+import { Forms, PageContainers } from "../components"
+import { default as storage } from "../storage"
 
 
 const CreateExamPage = () => {
+  const [loading, setLoading] = React.useState(false)
+  const [success, setSuccess] = React.useState(false)
+  const [fail, setFail] = React.useState(false)
   const authUser = AuthKit.useAuthUser()
+  const navigate = RouterDom.useNavigate()
 
   const metadataFormRef = React.useRef()
   const questionsFormRef = React.useRef()
 
-  const handleClickSave = async () => {
+  const handleClickSave = async (event) => {
+    event.preventDefault()
+    setLoading(true)
     const metadata = metadataFormRef.current.get()
     const questions = questionsFormRef.current.get()
-    // TODO validate the above
     const exam = {
       id: uuidv4(),
       ...metadata,
       ...questions
     }
-    console.log(exam)
-    await storage.insertExam(exam)
+    const storageResponse = await storage.saveExam(exam)
+    if (storageResponse) {
+      setSuccess(true)
+      setTimeout(
+        () => {
+          navigate("/my-exams")
+        },
+        500
+      )
+    }
+    else {
+      setFail(true)
+      setLoading(false)
+    }
   }
 
   const handleClick = (event) => {
@@ -52,8 +69,21 @@ const CreateExamPage = () => {
         </Tabs>
         <Row>
           <Col className="d-flex justify-content-end">
-            <Button name="Cancel" variant="outline-secondary" onClick={handleClick} style={{ width: "100px" }}>Cancel</Button>
-            <Button name="Save" variant="primary" onClick={handleClickSave} className="ms-1" style={{ width: "100px" }}>Save</Button>
+            <Button
+              name="Cancel"
+              variant="outline-secondary"
+              style={{ width: "100px" }}
+              onClick={handleClick}>
+              Cancel
+            </Button>
+            <Button
+              name="Save"
+              variant={loading ? "secondary" : "primary"}
+              className="ms-1"
+              style={{ width: "100px" }}
+              onClick={handleClickSave}>
+              {loading ? <Spinner size="sm" /> : "Save"}
+            </Button>
           </Col>
         </Row>
       </PageContainers.PostLogin>
