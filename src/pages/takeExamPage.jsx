@@ -96,7 +96,7 @@ const TakeExamPage = () => {
             </Nav>
           </Container>
         </Navbar>
-        <Container fluid={fluid}>
+        <Container fluid={fluid} className="p-0">
           <Forms.TakeExam
             ref={formRef}
             showNavigate={showNavigate}

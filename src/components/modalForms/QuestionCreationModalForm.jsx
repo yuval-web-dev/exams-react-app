@@ -26,10 +26,7 @@ const QuestionCreationModalForm = ({ show, saveHandler, cancelHandler }) => {
 
 
   const inputsSetter = (key, value) => {
-    setInputs({
-      ...inputs,
-      [key]: value
-    })
+    setInputs(values => ({ ...values, [key]: value }))
   }
 
   const handleChangeInput = (event) => {
@@ -51,11 +48,13 @@ const QuestionCreationModalForm = ({ show, saveHandler, cancelHandler }) => {
       id: inputs.id,
       points: inputs.points,
       question: inputs.question,
-      codeSnippet: inputs.codeSnippet,
-      codeLanguage: inputs.codeLanguage,
       correctAnswer: inputs.correctAnswer,
       shuffle: inputs.shuffle,
       answers,
+    }
+    if (inputs.codeSnippet !== "") {
+      formData.codeSnippet = inputs.codeSnippet
+      formData.codeLanguage = inputs.codeLanguage
     }
     saveHandler(formData)
   }
@@ -93,18 +92,19 @@ const QuestionCreationModalForm = ({ show, saveHandler, cancelHandler }) => {
 
   const handleRightClickAnswer = (event) => {
     event.preventDefault()
+    if (event.target.id === inputs.correctAnswer) {
+      inputsSetter("correctAnswer", null)
+    }
+    console.log(inputs)
     const newAnswers = answers.filter(answer => answer.id !== event.target.id)
     setAnswers(newAnswers)
-    if (event.target.id === inputs.correctAnswer) {
-      setInputs("correctAnswer", "")
-    }
   }
 
   const handleClickSetCorrect = (event) => {
     event.preventDefault()
     const answerId = event.target.id
     if (answerId === inputs.correctAnswer) {
-      inputsSetter("correctAnswer", "") // de-correct an answer
+      inputsSetter("correctAnswer", null) // de-correct an answer
     }
     else {
       inputsSetter("correctAnswer", answerId)
