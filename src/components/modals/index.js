@@ -1,5 +1,7 @@
 import { default as Confirm } from "./ConfirmModal.jsx"
 
-export const Modals = {
+
+const Modals = {
   Confirm
 }
+export default Modals

@@ -4,6 +4,8 @@ import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap"
 import * as RouterDom from "react-router-dom"
 import * as Icons from "react-bootstrap-icons"
 
+import { default as storage } from "../../storage"
+
 
 const SiteNavbar = ({ fluid }) => {
   const authUser = AuthKit.useAuthUser()
@@ -12,14 +14,14 @@ const SiteNavbar = ({ fluid }) => {
 
   const handleClickSignOut = async () => {
     // TODO clear local storage! and move to an outer function
-    if (signOut()) {
-      console.info(`User sign out "${authUser().username}" successful.`)
-      navigate("/")
+    const result = await storage.clearAll()
+    if (result) {
+      setTimeout(
+        () => navigate("/"),
+        500
+      )
+      signOut()
     }
-    else {
-      console.info(`User sign out "${authUser().username}" failed.`)
-    }
-
   }
 
   return (

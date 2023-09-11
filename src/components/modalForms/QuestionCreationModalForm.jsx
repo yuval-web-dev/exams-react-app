@@ -95,7 +95,6 @@ const QuestionCreationModalForm = ({ show, saveHandler, cancelHandler }) => {
     if (event.target.id === inputs.correctAnswer) {
       inputsSetter("correctAnswer", null)
     }
-    console.log(inputs)
     const newAnswers = answers.filter(answer => answer.id !== event.target.id)
     setAnswers(newAnswers)
   }

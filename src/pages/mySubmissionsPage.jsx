@@ -17,7 +17,6 @@ const MySubmissionsPage = () => {
       // Fetch exams from the API
       const submissions = await api.getSubmissions(authHeader())
       if (submissions) {
-        console.log(submissions)
         setSubmissions(submissions)
         setLoading(false)
       }
@@ -75,7 +74,12 @@ const MySubmissionsPage = () => {
         {submissions.map((submission, idx) => (
 
           <Accordion.Item key={idx} eventKey={idx}>
-            <Accordion.Header> {`${moment(submission.date).format("D/M/YY")} - ${submission.examName}`} </Accordion.Header>
+            <Accordion.Header>
+              <div className="w-100 d-flex flex-row justify-items-start">
+                <span className="me-auto" style={{ pointerEvents: "none" }}>{submission.examName}</span>
+                <span style={{ pointerEvents: "none" }}>{moment(submission.date).add(3, "hours").format("H:mm, D/M/YY")}</span>
+              </div>
+            </Accordion.Header>
 
             <Accordion.Body className="p-0" style={{ height: "300px", overflowY: "auto" }}>
 
@@ -89,7 +93,7 @@ const MySubmissionsPage = () => {
 
         ))}
       </Accordion>
-    </PageContainers.PostLogin>
+    </PageContainers.PostLogin >
   )
 }
 

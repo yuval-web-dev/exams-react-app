@@ -5,10 +5,11 @@ import { default as Registration } from "./RegistrationForm.jsx"
 import { default as TakeExam } from "./TakeExamForm.jsx"
 
 
-export const Forms = {
+const Forms = {
   ExamMetadata,
   ExamQuestions,
   Login,
   Registration,
   TakeExam
 }
+export default Forms

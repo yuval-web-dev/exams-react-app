@@ -92,26 +92,26 @@ const createStore = (storeName) => {
   )
 }
 
-const dropStore = async (storeName) => {
+const dropDb = async () => {
   try {
     // Drop the entire store, including its nested items
-    await localforage.dropInstance(
-      {
-        name: DB_NAME,
-        storeName: storeName,
-      }
-    )
-    console.info(`Dropping store "${storeName}" successful.`)
+    await localforage.dropInstance({ name: DB_NAME })
+    return true
   }
   catch (err) {
-    console.error(`Dropping store "${storeName}" failed:`, err)
+    console.error(err)
+    return false
   }
 }
 
 
-export const localForage = {
-  getOne, getMany,
-  setOne, setMany,
-  removeOne, removeMany,
-  dropStore
+const localForageFuncs = {
+  getOne,
+  getMany,
+  setOne,
+  setMany,
+  removeOne,
+  removeMany,
+  dropDb
 }
+export default localForageFuncs

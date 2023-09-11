@@ -35,7 +35,7 @@ const EditExamPage = () => {
   const handleClickButton = async (buttonName) => {
     switch (buttonName) {
       case "form-cancel":
-        return navigate("/")
+        return navigate("/my-exams")
 
       case "form-save":
         setLoadingSave(true)
@@ -46,14 +46,13 @@ const EditExamPage = () => {
           ...metadata,
           ...questions
         }
-        console.log(modifiedExam)
         const isLocal = await storage.getSelectedExamType()
         if (isLocal) {
           // push changes locally.
           const storageResponse = await storage.updateExam(exam.id, modifiedExam)
           if (storageResponse) {
             setTimeout(() => {
-              navigate("/")
+              navigate("/my-exams")
             }, 500)
           }
           else {
@@ -66,7 +65,7 @@ const EditExamPage = () => {
           const backendResponse = await api.updateExam(modifiedExam, authHeader())
           if (backendResponse) {
             setTimeout(() => {
-              navigate("/")
+              navigate("/my-exams")
             }, 500)
           }
           else {

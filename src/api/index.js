@@ -10,7 +10,7 @@ const ENDPOINT = `${URL}/${SERVICE}`
 
 const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
   try {
-    const apiResponse = await axios.get(
+    const res = await axios.get(
       "https://quizapi.io/api/v1/questions",
       {
         params:
@@ -23,7 +23,7 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
       }
     )
     const questions = []
-    apiResponse.data.forEach(question => {
+    res?.data?.forEach(question => {
       if (question.multiple_correct_answers === "false") {
         var correctAnswer
         var answerObjects = []
@@ -49,13 +49,13 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
       }
     })
 
-    console.info("Getting questions from QuizAPI successful.")
+    console.info("getting questions from QuizAPI successful")
     return questions
   }
   catch (err) {
     console.error(
-      "Getting questions from QuizAPI failed!",
-      err.response
+      "getting questions from QuizAPI failed",
+      err?.response
     )
     return false
   }
@@ -63,20 +63,19 @@ const getQuestionsQuizApi = async (apiKey, category, tags, limit) => {
 
 const login = async (username, password) => {
   try {
-    const data = { username, password }
-    const apiResponse = await axios.post(
+    const res = await axios.post(
       `${ENDPOINT}/login`,
-      data,
+      { username, password },
       { headers: { "Content-Type": "application/json" } }
     )
-    const jwt = apiResponse.data
-    console.info("User login successful.")
+    const jwt = res?.data
+    console.info("user login successful")
     return jwt
   }
   catch (err) {
     console.error(
-      "User login failed!",
-      err.response
+      "user login failed",
+      err?.response
     )
     return false
   }
@@ -84,48 +83,47 @@ const login = async (username, password) => {
 
 const register = async (username, password, firstName, lastName, inviteCode) => {
   try {
-    const data = {
-      username,
-      password,
-      firstName,
-      lastName,
-      inviteCode
-    }
-    const apiResponse = await axios.post(
+    const res = await axios.post(
       `${ENDPOINT}/register`,
-      data,
+      {
+        username,
+        password,
+        firstName,
+        lastName,
+        inviteCode
+      },
       { headers: { "Content-Type": "application/json" } }
     )
-    console.info("User registration successful.")
+    console.info("user registration successful")
     return true
   }
   catch (err) {
     console.error(
-      "User registration failed!",
-      err.response
+      "user registration failed",
+      err?.response
     )
     return false
   }
 }
 
-const getExams = async (jwt) => {
+const getUserExams = async (jwt) => {
   try {
-    const apiResponse = await axios.get(
-      `${ENDPOINT}/get-exams`,
+    const res = await axios.get(
+      `${ENDPOINT}/get-user-exams`,
       {
         headers: {
           "Authorization": jwt
         }
       }
     )
-    const exams = apiResponse.data.exams
-    console.info("Getting exams from backend successful.")
+    const exams = res?.data?.exams
+    console.info("getting exams from backend successful")
     return exams
   }
   catch (err) {
     console.error(
-      "Getting exams from backend failed!",
-      err.response
+      "getting exams from backend failed",
+      err?.response
     )
     return false
   }
@@ -135,21 +133,20 @@ const postExam = async (exam, jwt) => {
   try {
     const res = await axios.post(
       `${ENDPOINT}/post-exam`,
-      exam,
+      { exam },
       {
         headers: {
           "Authorization": jwt
         }
       }
     )
-    console.info(res?.response)
-    console.info("Posting exam to backend successful.")
+    console.info("posting exam to backend successful")
     return true
   }
   catch (err) {
     console.error(
-      "Posting exam to backend failed!",
-      err.response
+      "posting exam to backend failed",
+      err?.response
     )
     return false
   }
@@ -172,14 +169,13 @@ const postSubmission = async (examId, examName, answers, jwt) => {
         }
       }
     )
-    console.log(res?.response)
-    console.info("Posting submission to backend successful.")
+    console.info("posting submission to backend successful")
     return true
   }
   catch (err) {
     console.error(
-      "Posting submission to backend failed!",
-      err.response
+      "posting submission to backend failed",
+      err?.response
     )
     return false
   }
@@ -187,19 +183,41 @@ const postSubmission = async (examId, examName, answers, jwt) => {
 
 const getSubmissions = async (jwt) => {
   try {
-    const apiResponse = await axios.get(
+    const res = await axios.get(
       `${ENDPOINT}/get-submissions`,
       { headers: { "Authorization": jwt, } }
     )
-    const submissions = apiResponse.data
-    console.log(apiResponse)
-    console.info("Getting submissions from backend successful.")
+    const submissions = res?.data
+    console.info("getting submissions from backend successful")
     return submissions
   }
   catch (err) {
     console.error(
-      "Getting submissions from backend failed!",
-      err.response
+      "getting submissions from backend failed",
+      err?.response
+    )
+    return false
+  }
+}
+
+const getAllExams = async (jwt) => {
+  try {
+    const res = await axios.get(
+      `${ENDPOINT}/get-all-exams`,
+      {
+        headers: {
+          "Authorization": jwt
+        }
+      }
+    )
+    const exams = res?.data?.exams
+    console.info("getting all exams from backend successful")
+    return exams
+  }
+  catch (err) {
+    console.error(
+      "getting all exams from backend failed",
+      err?.response
     )
     return false
   }
@@ -217,14 +235,13 @@ const deleteExam = async (examId, jwt) => {
         }
       }
     )
-    console.log(res?.response)
-    console.info("Deleting exam from backend DB successful.")
+    console.info("deleting exam from backend DB successful")
     return true
   }
   catch (err) {
     console.error(
-      "Deleting exam from backend DB failed!",
-      err
+      "deleting exam from backend DB failed",
+      err?.response
     )
     return false
   }
@@ -241,7 +258,6 @@ const updateExam = async (exam, jwt) => {
         }
       }
     )
-    console.info(res?.response)
     console.info("updating exam in the backend successful")
     return true
   }
@@ -254,16 +270,18 @@ const updateExam = async (exam, jwt) => {
   }
 }
 
+
 const api = {
   getQuestionsQuizApi,
   login,
   register,
-  getExams,
+  getUserExams,
   postExam,
   postSubmission,
   getSubmissions,
   deleteExam,
-  updateExam
+  updateExam,
+  getAllExams
 }
 
 export default api

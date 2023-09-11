@@ -22,7 +22,7 @@ const LoginPage = () => {
     if (signInConfig) {
       setTimeout(
         () => signIn(signInConfig),
-        2000
+        500
       )
       return true
     }

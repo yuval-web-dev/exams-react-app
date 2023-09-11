@@ -2,7 +2,7 @@ import moment from "moment" // https://momentjs.com/
 import React from "react"
 import * as RouterDom from "react-router-dom"
 import * as AuthKit from "react-auth-kit"
-import { Col, Container, Spinner, Nav, Navbar } from "react-bootstrap"
+import { Container, Spinner, Nav, Navbar } from "react-bootstrap"
 import Countdown from "react-countdown" // https://www.npmjs.com/package/react-countdown
 import * as Icons from "react-bootstrap-icons"
 
@@ -19,7 +19,7 @@ const TakeExamPage = () => {
   const [endTime, setEndTime] = React.useState(null)
   const [timeRanOut, setTimeRanOut] = React.useState(false)
 
-  const getJwt = AuthKit.useAuthHeader()
+  const authHeader = AuthKit.useAuthHeader()
   const authUser = AuthKit.useAuthUser()
   const navigate = RouterDom.useNavigate()
 
@@ -47,9 +47,8 @@ const TakeExamPage = () => {
   )
 
   const handleSubmitExam = async (answers) => {
-    console.log(answers)
     setSubmitLoading(true)
-    const submitSuccess = await api.postSubmission(exam.id, exam.name, answers, getJwt())
+    const submitSuccess = await api.postSubmission(exam.id, exam.name, answers, authHeader())
     if (submitSuccess) {
       setTimeout(() => {
         navigate("/", { replace: true })

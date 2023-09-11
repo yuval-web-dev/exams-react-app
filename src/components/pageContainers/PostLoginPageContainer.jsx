@@ -1,7 +1,7 @@
 import React from "react"
 import { Container } from "react-bootstrap";
 
-import { Navs } from "../navs"
+import { default as Navs } from "../navs"
 
 
 const PostLoginPageContainer = ({ children }) => {

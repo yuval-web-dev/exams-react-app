@@ -1,9 +1,6 @@
 import React from "react"
 import moment from "moment-timezone"
-import {
-  Row, Col, Button,
-  ListGroup, Spinner, Container
-} from "react-bootstrap"
+import { Row, Col, Button, ListGroup, Spinner } from "react-bootstrap"
 import * as AuthKit from "react-auth-kit"
 import * as RouterDom from "react-router-dom"
 import * as Icons from "react-bootstrap-icons" // https://www.npmjs.com/package/react-bootstrap-icons
@@ -47,10 +44,15 @@ const MyExamsPage = () => {
   React.useEffect(() => {
     const getDbExams = async () => {
       setLoadingUpload(true)
-      const exams = await api.getExams(getJwt())
+      var exams
+      if (authUser().privilege === "lecturer") {
+        exams = await api.getUserExams(getJwt())
+      }
+      else {
+        exams = await api.getAllExams(getJwt())
+      }
       if (exams) {
         setDbExams(exams)
-        setLoadingUpload(false)
       }
       else {
         // TODO Alert error.
@@ -67,7 +69,6 @@ const MyExamsPage = () => {
     setSelectedExam(null)
     await storage.clearSelectedExam()
   }
-
 
   const getExamById = (examId) => {
     const allExams = [...localExams, ...dbExams]
@@ -153,14 +154,9 @@ const MyExamsPage = () => {
   const renderDbExams = (authUser) => {
     const isTime = (exam) => {
       const now = moment()
-      const startTime = moment.tz(exam.start, "Asia/Jerusalem")
-      const endTime = startTime.clone().add(exam.start, "minutes")
-
-      console.log(startTime.format())
-      console.log(now.format())
-      console.log(endTime.format())
-
-      // return now.isAfter(startTime) && now.isBefore(endTime)
+      const startTime = moment(exam.start).subtract(3, "hours")
+      const endTime = startTime.clone().add(exam.duration, "minutes")
+      return now.isAfter(startTime) && now.isBefore(endTime)
     }
 
     return (
@@ -170,7 +166,7 @@ const MyExamsPage = () => {
             <ListGroup.Item
               className="d-flex"
               variant="success"
-              key={`exam_${idx}`}
+              key={idx}
               id={exam.id}
               active={exam === selectedExam}
               style={{ cursor: "pointer" }}
@@ -178,7 +174,7 @@ const MyExamsPage = () => {
               <Icons.CloudCheck size="20" style={{ pointerEvents: "none" }} />
               &nbsp;
               <span style={{ pointerEvents: "none" }}>{exam.name}</span>
-              <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).subtract(3, "h").format("H:mm, D/M/YY")}</span>
+              <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).format("H:mm, D/M/YY")}</span>
             </ListGroup.Item>
           )
         }
@@ -186,15 +182,15 @@ const MyExamsPage = () => {
           return (
             <ListGroup.Item
               disabled={!isTime(exam)}
-              className="d-flex justify-content-between"
+              className="d-flex justify-content-between border"
               variant="light"
               key={`exam_${idx}`}
               id={exam.id}
               active={exam === selectedExam}
               style={{ cursor: "pointer" }}
               onClick={() => handleSelectExam(exam.id)}>
-              {moment(exam.start).format("H:mm, D/M/YY")}
-              &nbsp; - {exam.name}
+              <span style={{ pointerEvents: "none" }}>{exam.name}</span>
+              <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).format("H:mm, D/M/YY")}</span>
             </ListGroup.Item>
           )
         }
@@ -267,7 +263,7 @@ const MyExamsPage = () => {
     else {
       return (
         <Col className="d-flex flex-row">
-          <span className="fs-3">Exams</span>
+          <span className="fs-4">Exams</span>
         </Col>
       )
     }

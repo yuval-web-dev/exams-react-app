@@ -4,7 +4,7 @@ import CodeEditor from "@uiw/react-textarea-code-editor" // https://www.npmjs.co
 import * as Icons from "react-bootstrap-icons"
 import { v4 as uuidv4 } from "uuid"
 
-import { Modals } from "../modals"
+import { default as Modals } from "../modals"
 import { default as useBreakpoint } from "./useBreakpoint.js"
 import "./index.css"
 
@@ -14,8 +14,8 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoadin
   const [answers, setAnswers] = React.useState({}) // {questionId: {id: String, answer: String}}
   const [currentCard, setCurrentCard] = React.useState("start") // or "question" or "end"
   const [showSubmitModal, setShowSubmitModal] = React.useState(false)
-
   const breakpoint = useBreakpoint()
+
 
   const handleSelectAnswer = (questionId, selectedAnswer) => {
     const currentAnswer = answers[questionId] // the object holds values as answer id
@@ -29,7 +29,6 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoadin
         [questionId]: selectedAnswer
       })
     }
-    console.log(answers)
   }
 
   const handleClickButton = (event) => {

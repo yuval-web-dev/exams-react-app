@@ -1,12 +1,12 @@
 import React from "react"
+import moment from "moment"
 import * as AuthKit from "react-auth-kit"
-import { Row, Col, Form, ListGroup, ListGroupItem, Badge } from "react-bootstrap"
+import { Row, Col, Form, ListGroup, ListGroupItem } from "react-bootstrap"
 import TimePicker from "react-bootstrap-time-picker"
 import DatePicker from "react-datepicker"; import "react-datepicker/dist/react-datepicker.css"
 import RangeSlider from "react-bootstrap-range-slider"; import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
 import * as dateUtils from "./date.js"
-
 
 
 const ExamMetadataForm = ({ initialValues }, ref) => {
@@ -18,8 +18,8 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
     start: dateUtils.genStart(),
     duration: 30
   })
-  const [date, setDate] = React.useState(dateUtils.genStart()) // Millis
-  const [hour, setHour] = React.useState(9 * 60 * 60) // Secs
+  const [date, setDate] = React.useState(inputs.start)
+  const [hour, setHour] = React.useState(9 * 60 * 60)
 
   React.useImperativeHandle(
     ref,
@@ -38,6 +38,7 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
   React.useEffect(() => {
     if (initialValues) {
       setInputs(initialValues)
+      setDate(moment(inputs.start).toDate())
     }
   }, [])
 
@@ -99,8 +100,7 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
           <Form.Label>Date</Form.Label>
           <br />
           <DatePicker
-            value={date}
-            selected={date}
+            selected={moment(inputs.start).toDate()}
             className="form-control"
             minDate={dateUtils.genStart()}
             dateFormat="d/M/yy"
@@ -112,8 +112,8 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
             value={hour}
             format={24}
             step={30}
-            start={dateUtils.numberToHHmm(9)}
-            end={dateUtils.numberToHHmm(17)}
+            start={dateUtils.numberToHHmm(8)}
+            end={dateUtils.numberToHHmm(20)}
             onChange={handleHourChange} />
         </Col>
         <Col>

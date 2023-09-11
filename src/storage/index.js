@@ -1,102 +1,115 @@
-import { localForage } from "./localForage.js"
+import { default as funcs } from "./localForageFuncs.js"
 
 
 const saveExam = async (exam) => {
-  try {
-    await localForage.setOne("localExams", exam.id, exam)
-    console.info(`Insertion of exam "${exam.name}" successful.`)
+  const result = await funcs.setOne("localExams", exam.id, exam)
+  if (result) {
+    console.info(`insertion of exam successful (${exam.name})`)
     return true
   }
-  catch (err) {
-    console.error(`Insertion of exam "${exam.name}" failed:`, err)
+  else {
+    console.info(`insertion of exam failed (${exam.name})`)
     return false
   }
 }
 
 const getExams = async () => {
-  try {
-    const exams = await localForage.getMany("localExams")
-    console.info("Getting all local exams successful.")
-    return exams
+  const result = await funcs.getMany("localExams")
+  if (result) {
+    console.info("getting all local exams successful")
+    return result
   }
-  catch (err) {
-    console.error("Getting all local exams failed:", err)
+  else {
+    console.info("getting all local exams failed")
     return false
   }
 }
 
 const setSelectedExam = async (selectedExam, isLocal) => {
-  try {
-    await localForage.setOne("selectedExam", "selectedExam", selectedExam)
-    await localForage.setOne("selectedExam", "isLocal", isLocal)
-    console.info("setting selected exam successful")
-    return true
-  }
-  catch (err) {
-    console.error("Setting selected exam failed:", err)
+  var result = funcs.setOne("selectedExam", "selectedExam", selectedExam)
+  if (!result) {
+    console.info("setting selectedExam failed")
     return false
   }
+  result = funcs.setOne("selectedExam", "isLocal", isLocal)
+  if (!result) {
+    console.info("setting isLocal failed")
+    return false
+  }
+  console.info("setting selected exam successful")
+  return true
 }
 
 const getSelectedExam = async () => {
-  try {
-    const exam = await localForage.getOne("selectedExam", "selectedExam")
-    return exam
+  const result = await funcs.getOne("selectedExam", "selectedExam")
+  if (result) {
+    console.info("getting selected exam successful")
+    return result
   }
-  catch (err) {
-    console.error("Getting selected exam failed:", err)
+  else {
+    console.info("getting selected exam failed")
     return false
   }
 }
 
 const clearSelectedExam = async () => {
-  try {
-    const res = await localForage.dropStore("selectedExam")
+  const result = await funcs.dropStore("selectedExam")
+  if (result) {
     console.info("clearing selected exam successful")
     return true
   }
-  catch (err) {
-    console.error("clearing selected exam failed:", err)
+  else {
+    console.info("clearing selected exam failed")
     return false
   }
 }
 
 const removeExam = async (examId) => {
-  try {
-    await localForage.removeOne("localExams", examId)
+  const result = await funcs.removeOne("localExams", examId)
+  if (result) {
     console.info("removing exam successful")
     return true
   }
-  catch (err) {
+  else {
     console.error(
-      "removing exam failed",
-      err
+      "removing exam failed"
     )
     return false
   }
 }
 
 const updateExam = async (examId, newExam) => {
-  try {
-    const res = localForage.setOne("localExams", examId, newExam)
+  const result = funcs.setOne("localExams", examId, newExam)
+  if (result) {
+    console.info("updating exam successful")
     return true
   }
-  catch (err) {
-    console.error(
-      "replace exam failed",
-      err
-    )
+  else {
+    console.info("updating exam failed")
     return false
   }
 }
 
 const getSelectedExamType = async () => {
-  try {
-    const isLocal = await localForage.getOne("selectedExam", "isLocal")
-    return isLocal
+  const result = await funcs.getOne("selectedExam", "isLocal")
+  if (result !== null) {
+    console.info("getting selected exam type successful")
+    return result
   }
-  catch (err) {
-    console.error("Getting selected exam's type failed:", err)
+  else {
+    console.info("getting selected exam type failed")
+    return null
+  }
+}
+
+const clearAll = async () => {
+  const result = await funcs.dropDb()
+  if (result) {
+    console.info("clearing all data successful")
+    return true
+  }
+  else {
+    console.info("clearing all data failed")
     return false
   }
 }
@@ -110,7 +123,7 @@ const storage = {
   setSelectedExam,
   clearSelectedExam,
   removeExam,
-  getSelectedExamType
+  getSelectedExamType,
+  clearAll
 }
-
 export default storage
