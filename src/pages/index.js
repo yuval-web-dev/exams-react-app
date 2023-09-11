@@ -5,10 +5,9 @@ import { default as Exams } from "./myExamsPage.jsx"
 import { default as Submissions } from "./mySubmissionsPage.jsx"
 import { default as Registration } from "./registrationPage.jsx"
 import { default as TakeExam } from "./takeExamPage.jsx"
+import { default as EditExam } from "./editExamPage.jsx"
 
-
-
-export const Pages = {
+const Pages = {
   CreateExam,
   Home,
   Login,
@@ -16,4 +15,7 @@ export const Pages = {
   Submissions,
   Registration,
   TakeExam,
-};
+  EditExam
+}
+
+export default Pages

@@ -1,78 +1,94 @@
 import React from "react"
-import { Button, ListGroup } from "react-bootstrap"
+import moment from "moment"
+import { Row, Col, Accordion, ListGroup, Spinner } from "react-bootstrap"
 import * as AuthKit from "react-auth-kit"
-import * as RouterDom from "react-router-dom"
 
 import { PageContainers } from "../components"
 import { default as api } from "../api"
-import { default as storage } from "../storage"
 
 
 const MySubmissionsPage = () => {
-  const [exams, setExams] = React.useState([])
-  const [selectedExam, setSelectedExam] = React.useState(null)
-
-  const navigate = RouterDom.useNavigate()
+  const [submissions, setSubmissions] = React.useState([])
+  const [loading, setLoading] = React.useState(true)
   const authHeader = AuthKit.useAuthHeader()
 
   React.useEffect(() => {
-    const refreshExams = async () => {
-      try {
-        // Fetch exams from the API
-        const apiResponse = await api.getExams(authHeader());
-        if (apiResponse) {
-          // Filter out duplicates and update the state
-          setExams((prevExams) => {
-            const newExams = apiResponse.exams.filter(
-              (apiExam) => !prevExams.some((exam) => exam.id === apiExam.id)
-            );
-            return [...prevExams, ...newExams];
-          });
-        }
-
-        // Fetch exams from storage
-        const storageExams = await storage.getExams();
-        if (storageExams) {
-          // Filter out duplicates and update the state
-          setExams((prevExams) => {
-            const newExams = storageExams.filter(
-              (storageExam) => !prevExams.some((exam) => exam.id === storageExam.id)
-            );
-            return [...prevExams, ...newExams];
-          });
-        }
-      } catch (error) {
-        // Handle errors if needed
-        console.error("Error fetching exams:", error);
+    const getSubmissions = async () => {
+      // Fetch exams from the API
+      const submissions = await api.getSubmissions(authHeader())
+      if (submissions) {
+        console.log(submissions)
+        setSubmissions(submissions)
+        setLoading(false)
       }
-    };
-
-    refreshExams();
-  }, []);
-
-
-  const handleSelectExam = async (exam) => {
-    if (exam === selectedExam) {
-      setSelectedExam(null)
-      await storage.clearSelectedExam()
-    }
-    else {
-      setSelectedExam(exam)
-      await storage.setSelectedExam(exam)
     }
 
+    getSubmissions()
+  }, [])
+
+  const renderMetadata = (submission) => {
+    const totalAnswers = submission.answers.length
+    const totalUserAnswered = submission.answers.filter(answer => answer.selectedAnswer).length
+
+    return (
+      <ListGroup.Item>
+        <span>Answered: <span className={totalUserAnswered < totalAnswers ? "text-danger" : "text-success"}>{totalUserAnswered}</span>/{totalAnswers}</span>
+        <span className="ms-3">Score: <span className={submission.score < 56 ? "text-danger" : "text-success"}>{submission.score}</span>/100</span>
+      </ListGroup.Item>
+    )
   }
 
-  const handleClickStart = () => {
-    if (selectedExam) {
-      navigate("/take-exam")
+  const renderListGroupItem = (answer, idx) => {
+    var renderAnswer
+    var isCorrect = false
+    if (answer.repr.selectedAnswer) {
+      if (answer.selectedAnswer === answer.correctAnswer) {
+        isCorrect = true
+        renderAnswer = <span className="text-success">{answer.repr.selectedAnswer}</span>
+      }
+      else {
+        renderAnswer = <span className="text-danger">{answer.repr.selectedAnswer}</span>
+      }
     }
+    else {
+      renderAnswer = <span className="text-danger">*None selected</span>
+    }
+
+
+    return (
+      <ListGroup.Item key={idx} className="d-flex" variant={isCorrect ? "success" : "danger"}>
+        {idx + 1}.
+        <div className="ms-3">
+          Q: {answer.repr.question}
+          <br />
+          A: {renderAnswer}
+        </div>
+      </ListGroup.Item>
+    )
   }
 
 
   return (
     <PageContainers.PostLogin>
+      <span className="fs-3">Submissions</span>
+      <Accordion>
+        {submissions.map((submission, idx) => (
 
+          <Accordion.Item key={idx} eventKey={idx}>
+            <Accordion.Header> {`${moment(submission.date).format("D/M/YY")} - ${submission.examName}`} </Accordion.Header>
+
+            <Accordion.Body className="p-0" style={{ height: "300px", overflowY: "auto" }}>
+
+              <ListGroup variant="flush">
+                {renderMetadata(submission)}
+                {submission.answers.map((answer, idx) => renderListGroupItem(answer, idx))}
+              </ListGroup>
+
+            </Accordion.Body>
+          </Accordion.Item>
+
+        ))}
+      </Accordion>
     </PageContainers.PostLogin>
   )
 }

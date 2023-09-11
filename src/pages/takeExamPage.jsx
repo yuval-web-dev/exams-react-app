@@ -1,30 +1,29 @@
+import moment from "moment" // https://momentjs.com/
 import React from "react"
 import * as RouterDom from "react-router-dom"
 import * as AuthKit from "react-auth-kit"
-import {
-  Row, Col,
-  Container, Spinner, Nav, NavDropdown, Navbar
-} from "react-bootstrap"
-import { ImCompass2 } from "react-icons/im"
+import { Col, Container, Spinner, Nav, Navbar } from "react-bootstrap"
 import Countdown from "react-countdown" // https://www.npmjs.com/package/react-countdown
+import * as Icons from "react-bootstrap-icons"
 
 import { Forms } from "../components"
 import { default as api } from "../api"
 import { default as storage } from "../storage"
-import moment from "moment"
 
 
 const TakeExamPage = () => {
-  const [selectedExam, setExam] = React.useState(null)
-  const [brand, setBrand] = React.useState(<Spinner />)
-  const [loading, setLoading] = React.useState(true) // component is dependant on an async. function
+  const [exam, setExam] = React.useState(null)
+  const [pageLoading, setPageLoading] = React.useState(true) // component is dependant on an async. function
+  const [submitLoading, setSubmitLoading] = React.useState(false)
   const [showNavigate, setShowNavigate] = React.useState(false)
   const [endTime, setEndTime] = React.useState(null)
+  const [timeRanOut, setTimeRanOut] = React.useState(false)
 
-  const formRef = React.useRef(null);
-  const authHeader = AuthKit.useAuthHeader()
+  const getJwt = AuthKit.useAuthHeader()
   const authUser = AuthKit.useAuthUser()
   const navigate = RouterDom.useNavigate()
+
+  const FLUID = "md"
 
 
   React.useEffect(
@@ -33,16 +32,13 @@ const TakeExamPage = () => {
         try {
           const exam = await storage.getSelectedExam()
           setExam(exam)
-          setBrand(exam.name)
           const time = moment(exam.start)
           time.add(exam.duration, "minutes")
           setEndTime(time)
+          setPageLoading(false)
         }
         catch (err) {
           console.error("Error fetching selected exam:", err)
-        }
-        finally {
-          setLoading(false)
         }
       }
       fetchSelectedExam()
@@ -50,13 +46,20 @@ const TakeExamPage = () => {
     []
   )
 
-  const handleSubmitForm = async (answers) => {
-    try {
-      await api.postSubmission(selectedExam.name, answers, authHeader())
+  const handleSubmitExam = async (answers) => {
+    console.log(answers)
+    setSubmitLoading(true)
+    const submitSuccess = await api.postSubmission(exam.id, exam.name, answers, getJwt())
+    if (submitSuccess) {
+      setTimeout(() => {
+        navigate("/", { replace: true })
+      },
+        2000)
     }
-    catch (err) {
-      console.error("Posting the submission to backend failed:", err)
+    else {
+
     }
+    setSubmitLoading(false)
   }
 
   const handleClickNavigateLink = (event) => {
@@ -69,41 +72,69 @@ const TakeExamPage = () => {
     setShowNavigate(false)
   }
 
-  const fluid = "lg"
+  const renderExamTimer = ({ hours, minutes, seconds, completed }) => {
+    if (completed) {
+      setTimeRanOut(true)
+    }
+    else {
+      return (
+        <span
+          className={(hours < 1 && minutes < 10) ? "text-danger" : ""}>
+          {hours}:{minutes}:{seconds}
+        </span>
+      )
+    }
+  }
+
+  const navbar = () => (
+    <Navbar bg="light">
+      <Container fluid={FLUID}>
+        <Nav className="d-flex flex-row justify-content-start w-100">
+          <Nav.Link className="d-flex align-items-center">
+            <Icons.Stopwatch size="20" /> &nbsp;
+            <Countdown
+              date={moment(exam.start).add(exam.duration, "minutes")}
+              renderer={renderExamTimer} />
+          </Nav.Link>
+          <Nav.Link
+            active={showNavigate}
+            className="ms-2"
+            onClick={handleClickNavigateLink}>
+            <div className="d-flex align-items-center">
+              <Icons.Compass size="19" />&nbsp;Navigate
+            </div>
+          </Nav.Link>
+          <Nav.Link
+            disabled
+            className="ms-auto"
+            onClick={handleClickNavigateLink}>
+            <div className="d-flex justify-items-center align-items-center">
+              {`${authUser().firstName} ${authUser().lastName}`} &nbsp; <Icons.List size="20" />
+            </div>
+
+          </Nav.Link>
+        </Nav>
+      </Container>
+    </Navbar>
+  )
 
 
-  if (loading) {
+  if (pageLoading) {
     return <Spinner />
   }
   else {
     return (
       <React.Fragment>
-        <Navbar bg="light">
-          <Container fluid={fluid}>
-            <Nav className="d-flex flex-row justify-content-start w-100">
-              <Navbar.Brand>{brand}</Navbar.Brand>
-              <Nav.Link
-                active={showNavigate}
-                onClick={handleClickNavigateLink}>
-                <div className="d-flex align-items-center justify-content-center"><ImCompass2 />&nbsp;Navigate</div>
-              </Nav.Link>
-              <Nav.Link className="ms-auto">
-                <Countdown date={endTime} />
-              </Nav.Link>
-              <NavDropdown
-                disabled
-                title={`${authUser().firstName} ${authUser().lastName}`} />
-            </Nav>
-          </Container>
-        </Navbar>
-        <Container fluid={fluid} className="p-0">
+        {navbar()}
+        <Container fluid={FLUID} className="p-0">
           <Forms.TakeExam
-            ref={formRef}
             showNavigate={showNavigate}
             hideHandler={handleHideNavigate}
-            exam={selectedExam}
-            submitHandler={handleSubmitForm} />
+            exam={exam}
+            submitHandler={handleSubmitExam}
+            isLoading={submitLoading} />
         </Container>
+
       </React.Fragment>
     )
   }

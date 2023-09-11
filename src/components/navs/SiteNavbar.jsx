@@ -1,15 +1,14 @@
 import React from "react"
-import { useAuthUser, useSignOut } from "react-auth-kit"
-import { Container, Navbar, Nav, Button, NavDropdown } from "react-bootstrap"
-import { useNavigate } from "react-router-dom"
-import { BsGear } from "react-icons/bs"
-import { MdLogout } from "react-icons/md"
+import * as AuthKit from "react-auth-kit"
+import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap"
+import * as RouterDom from "react-router-dom"
+import * as Icons from "react-bootstrap-icons"
 
 
 const SiteNavbar = ({ fluid }) => {
-  const authUser = useAuthUser()
-  const signOut = useSignOut()
-  const navigate = useNavigate()
+  const authUser = AuthKit.useAuthUser()
+  const signOut = AuthKit.useSignOut()
+  const navigate = RouterDom.useNavigate()
 
   const handleClickSignOut = async () => {
     // TODO clear local storage! and move to an outer function
@@ -27,30 +26,28 @@ const SiteNavbar = ({ fluid }) => {
     <Navbar className="bg-light">
       <Container fluid={fluid}>
         <Navbar.Brand><Nav.Link className="" href="/">Exams App</Nav.Link></Navbar.Brand>
-        <Nav className="me-auto">
-          <Nav.Link className="" href="/my-exams">My Exams</Nav.Link>
-          <Nav.Link className="" href="/my-submissions">My Submissions</Nav.Link>
-          <Nav.Link className="" href="/create-exam">Create an Exam</Nav.Link>
-        </Nav>
         <Nav>
-          <NavDropdown
-            className="me-auto"
-            align="end"
-            title={`${authUser().firstName} ${authUser().lastName}`}>
-            <NavDropdown.Item
-              href="#"
-              className="d-flex justify-content-between align-items-center"
-              onClick={() => { }}>
-              Settings
-              <BsGear />
+          <NavDropdown align="end" title={`${authUser().firstName} ${authUser().lastName}`}>
+            {authUser().privilege === "lecturer" ?
+              <NavDropdown.Item href="/create-exam" onClick={() => { }} style={{ width: "200px" }}>
+                <Icons.Pencil />
+                <span className="ms-2">Create an Exam</span>
+              </NavDropdown.Item>
+              :
+              null
+            }
+            <NavDropdown.Item href="/my-exams">
+              <Icons.UiChecks />
+              <span className="ms-2">Exams</span>
+            </NavDropdown.Item>
+            <NavDropdown.Item href="/my-submissions">
+              <Icons.Send />
+              <span className="ms-2">Submissions</span>
             </NavDropdown.Item>
             <NavDropdown.Divider />
-            <NavDropdown.Item
-              href="#"
-              className="d-flex justify-content-between align-items-center"
-              onClick={handleClickSignOut}>
-              Sign out
-              <MdLogout />
+            <NavDropdown.Item className="text-danger" href="#" onClick={handleClickSignOut}>
+              <Icons.BoxArrowRight />
+              <span className="ms-2">Sign out</span>
             </NavDropdown.Item>
           </NavDropdown>
         </Nav>

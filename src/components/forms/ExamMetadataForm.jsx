@@ -9,7 +9,7 @@ import * as dateUtils from "./date.js"
 
 
 
-const ExamMetadataForm = ({ }, ref) => {
+const ExamMetadataForm = ({ initialValues }, ref) => {
   const authUser = AuthKit.useAuthUser()
   const [inputs, setInputs] = React.useState({
     name: "",
@@ -34,6 +34,12 @@ const ExamMetadataForm = ({ }, ref) => {
     },
     [inputs]
   )
+
+  React.useEffect(() => {
+    if (initialValues) {
+      setInputs(initialValues)
+    }
+  }, [])
 
 
   const inputsSetter = (key, value) => {

@@ -9,43 +9,41 @@ import { default as storage } from "../storage"
 
 
 const CreateExamPage = () => {
-  const [loading, setLoading] = React.useState(false)
-  const [success, setSuccess] = React.useState(false)
-  const [fail, setFail] = React.useState(false)
+  const [loadingSave, setLoadingSave] = React.useState(false)
   const authUser = AuthKit.useAuthUser()
   const navigate = RouterDom.useNavigate()
 
   const metadataFormRef = React.useRef()
   const questionsFormRef = React.useRef()
 
-  const handleClickSave = async (event) => {
-    event.preventDefault()
-    setLoading(true)
-    const metadata = metadataFormRef.current.get()
-    const questions = questionsFormRef.current.get()
-    const exam = {
-      id: uuidv4(),
-      ...metadata,
-      ...questions
-    }
-    const storageResponse = await storage.saveExam(exam)
-    if (storageResponse) {
-      setSuccess(true)
-      setTimeout(
-        () => {
-          navigate("/my-exams")
-        },
-        500
-      )
-    }
-    else {
-      setFail(true)
-      setLoading(false)
-    }
-  }
+  const handleClickButton = async (buttonName) => {
+    switch (buttonName) {
+      case "form-cancel":
+        return navigate("/")
 
-  const handleClick = (event) => {
-    event.preventDefault()
+      case "form-save":
+        setLoadingSave(true)
+        const metadata = metadataFormRef.current.get()
+        const questions = questionsFormRef.current.get()
+        const exam = {
+          id: uuidv4(),
+          ...metadata,
+          ...questions
+        }
+        const storageResponse = await storage.saveExam(exam)
+        if (storageResponse) {
+          setTimeout(() => {
+            navigate("/")
+          }, 500)
+        }
+        else {
+          setLoadingSave(false)
+        }
+        return
+
+      default:
+        return
+    }
   }
 
 
@@ -54,6 +52,7 @@ const CreateExamPage = () => {
       <RouterDom.Navigate to="/" />
       :
       <PageContainers.PostLogin>
+        <span className="fs-3">Create a New Exam</span>
         <Tabs defaultActiveKey="metadata" transition={false} >
           <Tab eventKey="metadata" title="Metadata">
 
@@ -70,19 +69,17 @@ const CreateExamPage = () => {
         <Row>
           <Col className="d-flex justify-content-end">
             <Button
-              name="Cancel"
               variant="outline-secondary"
               style={{ width: "100px" }}
-              onClick={handleClick}>
+              onClick={() => handleClickButton("form-cancel")}>
               Cancel
             </Button>
             <Button
-              name="Save"
-              variant={loading ? "secondary" : "primary"}
+              variant={loadingSave ? "secondary" : "primary"}
               className="ms-1"
               style={{ width: "100px" }}
-              onClick={handleClickSave}>
-              {loading ? <Spinner size="sm" /> : "Save"}
+              onClick={() => handleClickButton("form-save")}>
+              {loadingSave ? <Spinner size="sm" /> : "Save"}
             </Button>
           </Col>
         </Row>

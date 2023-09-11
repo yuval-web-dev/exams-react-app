@@ -2,7 +2,7 @@ import React from "react"
 import { Navigate, Routes, Route } from "react-router-dom"
 import * as AuthKit from "react-auth-kit" // https://authkit.arkadip.dev/
 
-import { Pages } from "../pages"
+import { default as Pages } from "../pages"
 
 
 const LOGIN = "/login"
@@ -21,6 +21,7 @@ const ProtectedRoutesElement = () => {
       <Route path="/my-submissions" element={<Pages.Submissions />} />
       <Route path="/create-exam" element={<Pages.CreateExam />} />
       <Route path="/take-exam" element={<Pages.TakeExam />} />
+      <Route path="/edit-exam" element={<Pages.EditExam />} />
     </Routes>
   )
 }

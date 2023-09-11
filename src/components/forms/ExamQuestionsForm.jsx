@@ -1,5 +1,5 @@
 import React from "react"
-import { Row, Col, Button, ListGroup, Image, ButtonGroup, Accordion } from "react-bootstrap"
+import { Row, Col, Button, ListGroup, Image, Accordion } from "react-bootstrap"
 import VirtualList from "react-virtual-drag-list" // https://www.npmjs.com/package/react-virtual-drag-list
 import { v4 as uuidv4 } from "uuid"
 
@@ -7,7 +7,7 @@ import { default as ModalForms } from "../modalForms"
 import QuizApiLogo from "../../assets/quizapi.svg"
 
 
-const ExamQuestionsForm = ({ }, ref) => {
+const ExamQuestionsForm = ({ initialValues }, ref) => {
   const [questions, setQuestions] = React.useState([])
   const [shuffle, setShuffle] = React.useState(false)
   const [showQuestionMF, setShowQuestionMF] = React.useState(false)
@@ -20,6 +20,13 @@ const ExamQuestionsForm = ({ }, ref) => {
     },
     [questions, shuffle]
   )
+
+  React.useState(() => {
+    if (initialValues) {
+      setQuestions(initialValues.questions)
+      setShuffle(initialValues.shuffle)
+    }
+  }, [])
 
 
   const handleClickButton = (event) => {

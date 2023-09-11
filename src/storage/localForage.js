@@ -3,9 +3,9 @@ import localforage from "localforage" // https://localforage.github.io/localFora
 
 const DB_NAME = "react-app"
 
-const setOne = async (storeName, object, yourKey) => {
+const setOne = async (storeName, yourKey, object) => {
   try {
-    const instance = createStoreInstance(storeName)
+    const instance = createStore(storeName)
     await instance.setItem(yourKey, object)
     console.info(`Setting object to store "${storeName}" successful.`)
   }
@@ -16,7 +16,7 @@ const setOne = async (storeName, object, yourKey) => {
 
 const setMany = async (storeName, objectsArray, objectKey) => {
   try {
-    const instance = createStoreInstance(storeName)
+    const instance = createStore(storeName)
     const promises = objectsArray.map(async (object) => {
       await instance.setItem(object[objectKey], object)
     })
@@ -30,7 +30,7 @@ const setMany = async (storeName, objectsArray, objectKey) => {
 
 const getOne = async (storeName, itemKey) => {
   try {
-    const instance = createStoreInstance(storeName);
+    const instance = createStore(storeName);
     const item = await instance.getItem(itemKey)
     console.info(`Getting item from store "${storeName}" successful.`)
     return item
@@ -42,7 +42,7 @@ const getOne = async (storeName, itemKey) => {
 
 const getMany = async (storeName) => {
   try {
-    const instance = createStoreInstance(storeName)
+    const instance = createStore(storeName)
     const keys = await instance.keys()
     const items = []
     const promises = keys.map(async (key) => {
@@ -60,7 +60,7 @@ const getMany = async (storeName) => {
 
 const removeOne = async (storeName, itemKey) => {
   try {
-    const instance = createStoreInstance(storeName)
+    const instance = createStore(storeName)
     await instance.removeItem(itemKey)
     console.info(`Removal of one item from store ${storeName} successful:\n${itemKey}`)
   }
@@ -71,7 +71,7 @@ const removeOne = async (storeName, itemKey) => {
 
 const removeMany = async (storeName, keys) => {
   try {
-    const instance = createStoreInstance(storeName);
+    const instance = createStore(storeName);
     const promises = keys.map(async key => {
       await instance.removeItem(key)
     })
@@ -83,7 +83,7 @@ const removeMany = async (storeName, keys) => {
   }
 }
 
-const createStoreInstance = (storeName) => {
+const createStore = (storeName) => {
   return localforage.createInstance(
     {
       name: DB_NAME, // Optionally, set your preferred database name
@@ -92,7 +92,7 @@ const createStoreInstance = (storeName) => {
   )
 }
 
-const dropStoreInstance = async (storeName) => {
+const dropStore = async (storeName) => {
   try {
     // Drop the entire store, including its nested items
     await localforage.dropInstance(
@@ -113,4 +113,5 @@ export const localForage = {
   getOne, getMany,
   setOne, setMany,
   removeOne, removeMany,
-};
+  dropStore
+}
