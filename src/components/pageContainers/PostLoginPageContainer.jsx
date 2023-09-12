@@ -11,7 +11,7 @@ const PostLoginPageContainer = ({ children }) => {
       <Container fluid="md">
         {children}
       </Container>
-      <Navs.Footer />
+      {/* <Navs.Footer /> */}
     </React.Fragment>
   )
 };

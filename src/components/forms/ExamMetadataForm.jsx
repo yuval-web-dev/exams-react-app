@@ -1,150 +1,123 @@
 import React from "react"
 import moment from "moment"
+import DatePicker from "react-datepicker"; import "react-datepicker/dist/react-datepicker.css"; // https://www.npmjs.com/package/react-datepicker
+import RangeSlider from "react-bootstrap-range-slider"; import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css'; // https://www.npmjs.com/package/react-bootstrap-range-slider
 import * as AuthKit from "react-auth-kit"
-import { Row, Col, Form, ListGroup, ListGroupItem } from "react-bootstrap"
-import TimePicker from "react-bootstrap-time-picker"
-import DatePicker from "react-datepicker"; import "react-datepicker/dist/react-datepicker.css"
-import RangeSlider from "react-bootstrap-range-slider"; import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
-
-import * as dateUtils from "./date.js"
+import { Col, Form, ListGroup } from "react-bootstrap"
 
 
 const ExamMetadataForm = ({ initialValues }, ref) => {
   const authUser = AuthKit.useAuthUser()
   const [inputs, setInputs] = React.useState({
-    name: "",
-    lecturerFirstName: authUser().firstName,
-    lecturerLastName: authUser().lastName,
-    start: dateUtils.genStart(),
-    duration: 30
+    duration: 30,
+    start: moment().add(4, "h").startOf("h").toDate()
   })
-  const [date, setDate] = React.useState(inputs.start)
-  const [hour, setHour] = React.useState(9 * 60 * 60)
 
-  React.useImperativeHandle(
-    ref,
-    () => {
-      return {
-        get() {
-          const inputsModified = inputs
-          inputsModified.duration = Number(inputs.duration)
-          return inputsModified
-        }
+  React.useImperativeHandle(ref, () => {
+    return {
+      get() {
+        const inputs1 = inputs
+        inputs1.duration = Number(inputs.duration)
+        inputs1.end = moment(inputs1.start).add(inputs1.duration, "minutes").toDate()
+        return inputs1
       }
-    },
-    [inputs]
-  )
+    }
+  }, [inputs])
 
   React.useEffect(() => {
     if (initialValues) {
       setInputs(initialValues)
-      setDate(moment(inputs.start).toDate())
     }
   }, [])
 
 
   const inputsSetter = (key, value) => {
-    setInputs(
-      { ...inputs, [key]: value }
-    )
+    setInputs({ ...inputs, [key]: value })
   }
 
-  const handleChangeInput = (event) => {
-    inputsSetter(event.target.name, event.target.value)
+  const handleChangeDate = (newDate) => {
+    inputsSetter("start", newDate)
   }
 
-  const handleHourChange = (newHour) => {
-    setHour(newHour)
-    inputsSetter("start", dateUtils.calcStart(date, newHour))
+  const handleChangeDuration = (newDuration) => {
+    inputsSetter("duration", newDuration)
   }
 
-  const handleDateChange = (newDate) => {
-    setDate(newDate)
-    inputsSetter("start", dateUtils.calcStart(newDate, hour))
+  const filterPassedTime = (time) => {
+    const currentDate = moment().add(3, "h")
+    const selectedDate = moment(time)
+    return currentDate.isBefore(selectedDate)
   }
-
 
   return (
     <ListGroup variant="flush">
-      <ListGroupItem className="d-flex">
-        <Col className="pe-3">
-          <Form.Label>Exam</Form.Label>
+
+      <ListGroup.Item>
+        <Form.Label>Exam</Form.Label>
+        <Form.Control
+          value={inputs?.name || ""}
+          type="text"
+          placeholder="Name"
+          onChange={event => inputsSetter("name", event.target.value)} />
+      </ListGroup.Item>
+
+      <ListGroup.Item>
+        <Form.Label>Author</Form.Label>
+        <Form.Control
+          disabled
+          value={authUser().username}
+          type="text"
+          placeholder="Name"
+          onChange={event => inputsSetter("name", event.target.value)} />
+      </ListGroup.Item>
+
+      <ListGroup.Item>
+        <Form.Label>Lecturer</Form.Label>
+        <div className="d-flex">
           <Form.Control
-            name="name"
-            value={inputs.name}
+            value={inputs.lecturerFirstName || authUser().firstName}
             type="text"
-            placeholder="Name"
-            onChange={handleChangeInput} />
-        </Col>
-        <Col>
-          <Form.Label>Lecturer</Form.Label>
-          <div className="d-flex">
-            <Form.Control
-              name="lecturerFirstName"
-              value={inputs.lecturerFirstName}
-              type="text"
-              placeholder="First name"
-              onChange={handleChangeInput} />
-            <Form.Control
-              name="lecturerLastName"
-              value={inputs.lecturerLastName}
-              type="text"
-              placeholder="Last name"
-              onChange={handleChangeInput} />
-          </div>
-        </Col>
-      </ListGroupItem>
+            placeholder="First name"
+            onChange={event => inputsSetter("lecturerFirstName", event.target.value)} />
+          <Form.Control
+            value={inputs.lecturerLastName || authUser().lastName}
+            type="text"
+            placeholder="Last name"
+            onChange={event => inputsSetter("lecturerLastName", event.target.value)} />
+        </div>
+      </ListGroup.Item>
 
-      <ListGroupItem className="d-flex flex-row">
-        <Col>
-          <Form.Label>Date</Form.Label>
-          <br />
-          <DatePicker
-            selected={moment(inputs.start).toDate()}
-            className="form-control"
-            minDate={dateUtils.genStart()}
-            dateFormat="d/M/yy"
-            onChange={handleDateChange} />
-        </Col>
-        <Col>
-          <Form.Label>Start</Form.Label>
-          <TimePicker
-            value={hour}
-            format={24}
-            step={30}
-            start={dateUtils.numberToHHmm(8)}
-            end={dateUtils.numberToHHmm(20)}
-            onChange={handleHourChange} />
-        </Col>
-        <Col>
-          <Form.Label>End</Form.Label>
-          <TimePicker
-            value={hour + (inputs.duration * 60)}
-            format={24}
-            style={{ color: "grey", pointerEvents: "none" }} />
-        </Col>
-      </ListGroupItem>
+      <ListGroup.Item>
+        <Form.Label>Date, Hour</Form.Label>
+        <DatePicker
+          withPortal
+          showTimeSelect
+          className="w-100 form-control"
+          minDate={moment().toDate()}
+          selected={inputs.start}
+          filterTime={filterPassedTime}
+          dateFormat="d/M/yy, HH:mm"
+          timeFormat="HH:mm"
+          timeIntervals={60}
+          onChange={date => handleChangeDate(date)} />
+      </ListGroup.Item>
 
-      <ListGroupItem>
+      <ListGroup.Item>
         <Form.Label>Duration</Form.Label>
-
-        <Row>
-          <Col xs="3" className="d-flex justify-content-start align-items-center">
-            <div className="text-primary fs-4">{inputs.duration}</div>
-            &nbsp;&nbsp;Minutes
-          </Col>
-          <Col>
+        <Col className="d-flex align-items-center">
+          <span className="ms-auto"><span className="text-primary">{inputs.duration}</span> Minutes</span>
+          <div className="ps-3 flex-grow-1">
             <RangeSlider
-              name="duration"
+              className="w-100"
               value={inputs.duration}
               step={30}
               min={30}
               max={180}
               tooltip="off"
-              onChange={handleChangeInput} />
-          </Col>
-        </Row>
-      </ListGroupItem>
+              onChange={event => handleChangeDuration(event.target.value)} />
+          </div>
+        </Col>
+      </ListGroup.Item>
     </ListGroup>
   )
 }

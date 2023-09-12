@@ -27,6 +27,7 @@ const CreateExamPage = () => {
         const questions = questionsFormRef.current.get()
         const exam = {
           id: uuidv4(),
+          author: authUser().username,
           ...metadata,
           ...questions
         }
@@ -46,22 +47,18 @@ const CreateExamPage = () => {
     }
   }
 
-
-  return (
-    authUser().privilege !== "lecturer" ?
-      <RouterDom.Navigate to="/" />
-      :
+  if (authUser().privilege === "lecturer") {
+    return (
       <PageContainers.PostLogin>
-        <span className="fs-3">Create a New Exam</span>
+        <div className="fs-4 my-2">Create a New Exam:</div>
         <Tabs defaultActiveKey="metadata" transition={false} >
           <Tab eventKey="metadata" title="Metadata">
-
-            <div className="border" style={{ height: "75vh", overflowY: "auto" }}>
+            <div className="border" style={{ height: "50vh", overflowY: "auto" }}>
               <Forms.ExamMetadata ref={metadataFormRef} />
             </div>
           </Tab>
           <Tab eventKey="questions" title="Questions">
-            <div className="border" style={{ height: "75vh", overflowY: "auto", overflowX: "hidden" }}>
+            <div className="border" style={{ height: "50vh", overflowY: "auto", overflowX: "hidden" }}>
               <Forms.ExamQuestions ref={questionsFormRef} />
             </div>
           </Tab>
@@ -84,7 +81,11 @@ const CreateExamPage = () => {
           </Col>
         </Row>
       </PageContainers.PostLogin>
-  )
+    )
+  }
+  else {
+    return <RouterDom.Navigate to="/" />
+  }
 }
 
 export default CreateExamPage
