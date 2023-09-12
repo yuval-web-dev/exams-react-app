@@ -2,7 +2,7 @@ import moment from "moment" // https://momentjs.com/
 import React from "react"
 import * as RouterDom from "react-router-dom"
 import * as AuthKit from "react-auth-kit"
-import { Container, Spinner, Nav, Navbar } from "react-bootstrap"
+import { Container, Spinner, Nav, Navbar, NavDropdown } from "react-bootstrap"
 import Countdown from "react-countdown" // https://www.npmjs.com/package/react-countdown
 import * as Icons from "react-bootstrap-icons"
 
@@ -17,7 +17,7 @@ const TakeExamPage = () => {
   const [submitLoading, setSubmitLoading] = React.useState(false)
   const [showNavigate, setShowNavigate] = React.useState(false)
   const [endTime, setEndTime] = React.useState(null)
-  const [timeRanOut, setTimeRanOut] = React.useState(false)
+  const [triggerEnd, setTriggerEnd] = React.useState(false)
 
   const authHeader = AuthKit.useAuthHeader()
   const authUser = AuthKit.useAuthUser()
@@ -26,39 +26,46 @@ const TakeExamPage = () => {
   const FLUID = "md"
 
 
-  React.useEffect(
-    () => {
-      const fetchSelectedExam = async () => {
-        try {
-          const exam = await storage.getSelectedExam()
-          setExam(exam)
-          const time = moment(exam.start)
-          time.add(exam.duration, "minutes")
-          setEndTime(time)
-          setPageLoading(false)
-        }
-        catch (err) {
-          console.error("Error fetching selected exam:", err)
-        }
+  React.useEffect(() => {
+    const fetchSelectedExam = async () => {
+      const exam = await storage.stores.selectedExam.get()
+      if (exam) {
+        setExam(exam)
+        const time = moment(exam.start)
+        time.add(exam.duration, "minutes")
+        setPageLoading(false)
       }
-      fetchSelectedExam()
-    },
-    []
-  )
+      else {
+        navigate("/")
+      }
+    }
+    fetchSelectedExam()
+  }, [])
+
+  React.useEffect(() => {
+
+  }, [triggerEnd])
 
   const handleSubmitExam = async (answers) => {
     setSubmitLoading(true)
-    const submitSuccess = await api.postSubmission(exam.id, exam.name, answers, authHeader())
-    if (submitSuccess) {
+    if (authUser().privilege === "lecturer") {
+      // lecturers only demo their exams.
       setTimeout(() => {
         navigate("/", { replace: true })
-      },
-        2000)
+      }, 500)
     }
     else {
-
+      const submitSuccess = await api.db.postSubmission(exam.id, exam.name, answers, authHeader())
+      if (submitSuccess) {
+        setTimeout(() => {
+          navigate("/", { replace: true })
+        }, 500)
+      }
+      else {
+        setSubmitLoading(false)
+        // TODO add an Alert
+      }
     }
-    setSubmitLoading(false)
   }
 
   const handleClickNavigateLink = (event) => {
@@ -73,7 +80,7 @@ const TakeExamPage = () => {
 
   const renderExamTimer = ({ hours, minutes, seconds, completed }) => {
     if (completed) {
-      setTimeRanOut(true)
+      triggerEnd(true)
     }
     else {
       return (
@@ -85,7 +92,7 @@ const TakeExamPage = () => {
     }
   }
 
-  const navbar = () => (
+  const renderNavbar = () => (
     <Navbar bg="light">
       <Container fluid={FLUID}>
         <Nav className="d-flex flex-row justify-content-start w-100">
@@ -103,15 +110,7 @@ const TakeExamPage = () => {
               <Icons.Compass size="19" />&nbsp;Navigate
             </div>
           </Nav.Link>
-          <Nav.Link
-            disabled
-            className="ms-auto"
-            onClick={handleClickNavigateLink}>
-            <div className="d-flex justify-items-center align-items-center">
-              {`${authUser().firstName} ${authUser().lastName}`} &nbsp; <Icons.List size="20" />
-            </div>
-
-          </Nav.Link>
+          <NavDropdown className="ms-auto" disabled align="end" title={`${authUser().firstName} ${authUser().lastName}`} />
         </Nav>
       </Container>
     </Navbar>
@@ -124,7 +123,7 @@ const TakeExamPage = () => {
   else {
     return (
       <React.Fragment>
-        {navbar()}
+        {renderNavbar()}
         <Container fluid={FLUID} className="p-0">
           <Forms.TakeExam
             showNavigate={showNavigate}

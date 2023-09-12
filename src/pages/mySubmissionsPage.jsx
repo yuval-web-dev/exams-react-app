@@ -15,7 +15,7 @@ const MySubmissionsPage = () => {
   React.useEffect(() => {
     const getSubmissions = async () => {
       // Fetch exams from the API
-      const submissions = await api.getSubmissions(authHeader())
+      const submissions = await api.db.getSubmissions(authHeader())
       if (submissions) {
         setSubmissions(submissions)
         setLoading(false)

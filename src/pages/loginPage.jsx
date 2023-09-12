@@ -18,7 +18,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (inputs) => {
     const { username, password } = inputs
-    const signInConfig = await api.login(username, password)
+    const signInConfig = await api.auth.login(username, password)
     if (signInConfig) {
       setTimeout(
         () => signIn(signInConfig),

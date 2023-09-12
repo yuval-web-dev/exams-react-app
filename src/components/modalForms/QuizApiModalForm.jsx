@@ -50,22 +50,25 @@ const QuizApiModalForm = ({ show, saveHandler, cancelHandler }) => {
 
   const handleSearchQuestions = async () => {
     setLoading(true)
-    const apiQuestions = await api.getQuestionsQuizApi(
+    const apiQuestions = await api.misc.quizApi(
       inputs.apiKey,
       inputs.category,
       inputs.tag,
       inputs.limit
     )
-    if (!apiQuestions) {
-      alert("server error")
-    }
-    else if (apiQuestions === []) {
-      setShowAlert(true)
+    if (apiQuestions) {
+      if (apiQuestions.length < 1) {
+        setShowAlert(true)
+      }
+      else {
+        setQuestions(apiQuestions)
+      }
+      setLoading(false)
+      return
     }
     else {
-      setQuestions(apiQuestions)
+      return
     }
-    setLoading(false)
   }
 
   const handleClickButton = (event) => {

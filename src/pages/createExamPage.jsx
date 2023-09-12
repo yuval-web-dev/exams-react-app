@@ -30,10 +30,10 @@ const CreateExamPage = () => {
           ...metadata,
           ...questions
         }
-        const storageResponse = await storage.saveExam(exam)
+        const storageResponse = await storage.stores.localExams.save(exam)
         if (storageResponse) {
           setTimeout(() => {
-            navigate("/")
+            navigate("/my-exams")
           }, 500)
         }
         else {

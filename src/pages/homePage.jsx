@@ -9,31 +9,19 @@ import { default as storage } from "../storage"
 
 
 const HomePage = () => {
-  const navigate = RouterDom.useNavigate()
   const authUser = AuthKit.useAuthUser()
-
-  const handleClickButton = (event) => {
-    navigate(event.target.name)
-  }
-
-  const md = () => {
-    if (authUser().privilege === "lecturer") {
-      return 4
-    }
-    else {
-      return 6
-    }
-  }
 
   return (
     <PageContainers.PostLogin>
-      <Row>
-        <Col className="h-100 d-flex justify-content-center align-items-center">
-          <p className="display-6">
-            Welcome back, {authUser().firstName}.
-          </p>
-        </Col>
-      </Row>
+      <div style={{ height: "80vh" }}>
+        <Row className="h-100">
+          <Col className="h-100 d-flex justify-content-center align-items-center">
+            <p className="display-1">
+              Welcome back, {authUser().firstName}.
+            </p>
+          </Col>
+        </Row>
+      </div>
     </PageContainers.PostLogin>
   )
 }

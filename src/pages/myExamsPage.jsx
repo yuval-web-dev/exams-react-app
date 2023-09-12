@@ -26,7 +26,7 @@ const MyExamsPage = () => {
 
   React.useEffect(() => {
     const getLocalExams = async () => {
-      const exams = await storage.getExams()
+      const exams = await storage.stores.localExams.get()
       if (exams) {
         setLocalExams(exams)
         setLoadingPage(false)
@@ -44,20 +44,21 @@ const MyExamsPage = () => {
   React.useEffect(() => {
     const getDbExams = async () => {
       setLoadingUpload(true)
-      var exams
+      var dbExams
       if (authUser().privilege === "lecturer") {
-        exams = await api.getUserExams(getJwt())
+        dbExams = await api.db.getUserExams(getJwt())
       }
       else {
-        exams = await api.getAllExams(getJwt())
+        dbExams = await api.db.getAllExams(getJwt())
       }
-      if (exams) {
-        setDbExams(exams)
+      if (dbExams) {
+        setDbExams(dbExams)
+        setLoadingUpload(false)
       }
       else {
-        // TODO Alert error.
+        // TODO add an Alert error.
       }
-      setLoadingUpload(false)
+      return
     }
     getDbExams()
   }, [refresh])
@@ -67,7 +68,7 @@ const MyExamsPage = () => {
 
   const clearExam = async () => {
     setSelectedExam(null)
-    await storage.clearSelectedExam()
+    await storage.stores.selectedExam.clear()
   }
 
   const getExamById = (examId) => {
@@ -83,7 +84,7 @@ const MyExamsPage = () => {
     if (!selectedExam) {
       // No exam is currently selected.
       setSelectedExam(exam)
-      await storage.setSelectedExam(exam, isLocal)
+      await storage.stores.selectedExam.set(exam, isLocal)
     }
     else if (examId === selectedExam.id) {
       // The selected exam is the currently selected exam;
@@ -94,7 +95,7 @@ const MyExamsPage = () => {
       // There is a selected exam already;
       // Change it to the newly selected one (examId).
       setSelectedExam(exam)
-      await storage.setSelectedExam(exam, isLocal)
+      await storage.stores.selectedExam.set(exam, isLocal)
     }
   }
 
@@ -103,13 +104,13 @@ const MyExamsPage = () => {
     setLoadingDelete(true)
 
     if (localExams.find(exam => exam.id === selectedExam.id)) {
-      await storage.removeExam(selectedExam.id)
+      await storage.stores.localExams.remove(selectedExam.id)
     }
     else if (dbExams.find(exam => exam.id === selectedExam.id)) {
-      await api.deleteExam(selectedExam.id, getJwt())
+      await api.db.deleteExam(selectedExam.id, getJwt())
     }
     else {
-      alert("error!")
+      // TODO error
     }
     await clearExam()
     setShowDeleteModal(false)
@@ -129,10 +130,10 @@ const MyExamsPage = () => {
         navigate("/edit-exam")
         return
       case "upload":
-        const posted = await api.postExam(selectedExam, getJwt())
+        const posted = await api.db.postExam(selectedExam, getJwt())
         if (posted) {
-          await storage.removeExam(selectedExam.id)
-          await storage.clearSelectedExam()
+          await storage.stores.localExams.remove(selectedExam.id)
+          await storage.stores.selectedExam.clear()
           triggerRefresh()
         }
         else {
@@ -143,6 +144,7 @@ const MyExamsPage = () => {
       case "delete":
         setShowDeleteModal(true)
         return
+      case "demo":
       case "start":
         navigate("/take-exam")
         return
@@ -162,21 +164,40 @@ const MyExamsPage = () => {
     return (
       dbExams.map((exam, idx) => {
         if (authUser().privilege === "lecturer") {
-          return (
-            <ListGroup.Item
-              className="d-flex"
-              variant="success"
-              key={idx}
-              id={exam.id}
-              active={exam === selectedExam}
-              style={{ cursor: "pointer" }}
-              onClick={() => handleSelectExam(exam.id)}>
-              <Icons.CloudCheck size="20" style={{ pointerEvents: "none" }} />
-              &nbsp;
-              <span style={{ pointerEvents: "none" }}>{exam.name}</span>
-              <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).format("H:mm, D/M/YY")}</span>
-            </ListGroup.Item>
-          )
+          if (exam?.modifiable) {
+            return (
+              <ListGroup.Item
+                className="d-flex align-items-end"
+                variant="success"
+                key={idx}
+                id={exam.id}
+                active={exam === selectedExam}
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSelectExam(exam.id)}>
+                <Icons.CloudCheck className="me-3" size="20" style={{ pointerEvents: "none" }} />
+                <span style={{ pointerEvents: "none" }}>{exam.name}</span>
+                <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).format("H:mm, D/M/YY")}</span>
+              </ListGroup.Item>
+            )
+          }
+          else {
+            return (
+              <ListGroup.Item
+                disabled
+                className="border d-flex align-items-end"
+                variant="light"
+                key={idx}
+                id={exam.id}
+                active={exam === selectedExam}
+                style={{ cursor: "pointer" }}
+                onClick={() => handleSelectExam(exam.id)}>
+                <Icons.SendCheck className="me-3" size="18" style={{ pointerEvents: "none" }} />
+                <span style={{ pointerEvents: "none" }}>{exam.name}</span>
+                <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).format("H:mm, D/M/YY")}</span>
+              </ListGroup.Item>
+            )
+          }
+
         }
         else {
           return (
@@ -204,15 +225,14 @@ const MyExamsPage = () => {
         localExams.map((exam, idx) => (
           <ListGroup.Item
             key={idx}
-            className="d-flex"
+            className="d-flex align-items-end"
             variant="warning"
             active={exam === selectedExam}
             style={{ cursor: "pointer" }}
             onClick={() => handleSelectExam(exam.id)}>
-            <Icons.CloudSlash size="20" />
-            &nbsp;
+            <Icons.CloudSlash className="me-3" size="20" />
             <span style={{ pointerEvents: "none" }}>{exam.name}</span>
-            <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).subtract(3, "h").format("H:mm, D/M/YY")}</span>
+            <span className="ms-auto" style={{ pointerEvents: "none" }}>{moment(exam.start).format("H:mm, D/M/YY")}</span>
           </ListGroup.Item>
         ))
       )
@@ -269,6 +289,32 @@ const MyExamsPage = () => {
     }
   }
 
+  const renderStartOrDemoButton = (authUser) => {
+    if (authUser().privilege === "lecturer") {
+      return (
+        <Button
+          className="ms-1 w-100"
+          variant="outline-primary"
+          disabled={selectedExam === null || localExams.find(exam => exam.id === selectedExam.id)}
+          onClick={() => handleClickButton("demo")}>
+          Demo
+        </Button>
+      )
+
+    }
+    else {
+      return (
+        <Button
+          className="ms-1 w-100"
+          variant="primary"
+          disabled={selectedExam === null || localExams.find(exam => exam.id === selectedExam.id)}
+          onClick={() => handleClickButton("start")}>
+          Start
+        </Button>
+      )
+    }
+  }
+
   return (
     <PageContainers.PostLogin>
       <Row className="">
@@ -288,14 +334,7 @@ const MyExamsPage = () => {
           </ListGroup>
         </Col>
         <Col xs="12" className="mt-2">
-          <Button
-            className="ms-1 w-100"
-            variant="primary"
-            disabled={selectedExam === null || localExams.find(exam => exam.id === selectedExam.id)}
-            style={{ width: "75px" }}
-            onClick={() => handleClickButton("start")}>
-            Start
-          </Button>
+          {renderStartOrDemoButton(authUser)}
         </Col>
       </Row>
 

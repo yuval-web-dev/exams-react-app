@@ -19,7 +19,7 @@ const EditExamPage = () => {
 
   React.useEffect(() => {
     const getExam = async () => {
-      const selectedExam = await storage.getSelectedExam()
+      const selectedExam = await storage.stores.selectedExam.get()
       if (!selectedExam) {
         navigate("/")
       }
@@ -46,10 +46,10 @@ const EditExamPage = () => {
           ...metadata,
           ...questions
         }
-        const isLocal = await storage.getSelectedExamType()
+        const isLocal = await storage.stores.selectedExam.type()
         if (isLocal) {
           // push changes locally.
-          const storageResponse = await storage.updateExam(exam.id, modifiedExam)
+          const storageResponse = await storage.stores.localExams.update(exam.id, modifiedExam)
           if (storageResponse) {
             setTimeout(() => {
               navigate("/my-exams")
@@ -62,7 +62,7 @@ const EditExamPage = () => {
         }
         else {
           // push changes immediately to backend DB.
-          const backendResponse = await api.updateExam(modifiedExam, authHeader())
+          const backendResponse = await api.db.updateExam(modifiedExam, authHeader())
           if (backendResponse) {
             setTimeout(() => {
               navigate("/my-exams")

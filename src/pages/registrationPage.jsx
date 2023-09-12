@@ -16,9 +16,8 @@ const RegistrationPage = () => {
   )
 
   const handleSubmit = async (inputs) => {
-    const { username, password, firstName, lastName, inviteCode } = inputs
-    const apiResponse = await api.register(username, password, firstName, lastName, inviteCode)
-    if (apiResponse) {
+    const registered = await api.auth.register({ ...inputs })
+    if (registered) {
       setTimeout(
         () => navigate("/login"),
         2000
