@@ -50,21 +50,28 @@ const CreateExamPage = () => {
   if (authUser().privilege === "lecturer") {
     return (
       <PageContainers.PostLogin>
-        <div className="fs-4 my-2">Create a New Exam:</div>
-        <Tabs defaultActiveKey="metadata" transition={false} >
-          <Tab eventKey="metadata" title="Metadata">
-            <div className="border" style={{ height: "50vh", overflowY: "auto" }}>
-              <Forms.ExamMetadata ref={metadataFormRef} />
-            </div>
-          </Tab>
-          <Tab eventKey="questions" title="Questions">
-            <div className="border" style={{ height: "50vh", overflowY: "auto", overflowX: "hidden" }}>
-              <Forms.ExamQuestions ref={questionsFormRef} />
-            </div>
-          </Tab>
-        </Tabs>
         <Row>
-          <Col className="d-flex justify-content-end">
+
+          <Col xs="12" className="my-3">
+            <span className="fs-4">Create a New Exam:</span>
+          </Col>
+
+          <Col xs="12">
+            <Tabs defaultActiveKey="metadata" transition={false} >
+              <Tab eventKey="metadata" title="Metadata">
+                <div className="border" style={{ height: "50vh", overflowY: "auto" }}>
+                  <Forms.ExamMetadata ref={metadataFormRef} />
+                </div>
+              </Tab>
+              <Tab eventKey="questions" title="Questions">
+                <div className="border" style={{ height: "50vh", overflowY: "auto", overflowX: "hidden" }}>
+                  <Forms.ExamQuestions ref={questionsFormRef} />
+                </div>
+              </Tab>
+            </Tabs>
+          </Col>
+
+          <Col xs="12" className="d-flex justify-content-end">
             <Button
               variant="outline-secondary"
               style={{ width: "100px" }}
@@ -79,6 +86,7 @@ const CreateExamPage = () => {
               {loadingSave ? <Spinner size="sm" /> : "Save"}
             </Button>
           </Col>
+
         </Row>
       </PageContainers.PostLogin>
     )

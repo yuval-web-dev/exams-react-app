@@ -43,6 +43,10 @@ const TakeExamPage = () => {
   }, [])
 
   React.useEffect(() => {
+    const submit = async () => {
+
+    }
+    submit()
 
   }, [triggerEnd])
 
@@ -99,7 +103,7 @@ const TakeExamPage = () => {
           <Nav.Link className="d-flex align-items-center">
             <Icons.Stopwatch size="20" /> &nbsp;
             <Countdown
-              date={moment(exam.start).add(exam.duration, "minutes")}
+              date={moment(exam.end).subtract(3, "h")}
               renderer={renderExamTimer} />
           </Nav.Link>
           <Nav.Link

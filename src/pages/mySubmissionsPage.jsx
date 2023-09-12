@@ -9,7 +9,7 @@ import { default as api } from "../api"
 
 const MySubmissionsPage = () => {
   const [submissions, setSubmissions] = React.useState([])
-  const [loading, setLoading] = React.useState(true)
+  const [pageLoading, setPageLoading] = React.useState(true)
   const authHeader = AuthKit.useAuthHeader()
 
   React.useEffect(() => {
@@ -18,7 +18,7 @@ const MySubmissionsPage = () => {
       const submissions = await api.db.getSubmissions(authHeader())
       if (submissions) {
         setSubmissions(submissions)
-        setLoading(false)
+        setPageLoading(false)
       }
     }
 
@@ -66,33 +66,52 @@ const MySubmissionsPage = () => {
     )
   }
 
+  const calcAvg = (submissions) => {
+    var avg = 0
+    submissions.forEach(submission => { avg += submission.score })
+    return avg / submissions.length
+  }
+
 
   return (
     <PageContainers.PostLogin>
-      <span className="fs-3">Submissions</span>
-      <Accordion>
-        {submissions.map((submission, idx) => (
+      <Row>
+        <Col xs="12" className="my-3">
+          <span className="fs-4">Submissions</span>
+        </Col>
+        {
+          pageLoading ? <Spinner /> :
+            <React.Fragment>
+              <Col xs="12" className="my-2">
+                <span className="fs-5">Grades average: {calcAvg(submissions)}</span>
+              </Col>
+              <Col xs="12">
+                <Accordion>
+                  {submissions.map((submission, idx) => (
+                    <Accordion.Item key={idx} eventKey={idx}>
+                      <Accordion.Header>
+                        <div className="w-100 d-flex flex-row justify-items-start">
+                          <span className="me-auto" style={{ pointerEvents: "none" }}>{submission.examName}</span>
+                          <span style={{ pointerEvents: "none" }}>{moment(submission.date).add(3, "hours").format("H:mm, D/M/YY")}</span>
+                        </div>
+                      </Accordion.Header>
 
-          <Accordion.Item key={idx} eventKey={idx}>
-            <Accordion.Header>
-              <div className="w-100 d-flex flex-row justify-items-start">
-                <span className="me-auto" style={{ pointerEvents: "none" }}>{submission.examName}</span>
-                <span style={{ pointerEvents: "none" }}>{moment(submission.date).add(3, "hours").format("H:mm, D/M/YY")}</span>
-              </div>
-            </Accordion.Header>
+                      <Accordion.Body className="p-0" style={{ height: "300px", overflowY: "auto" }}>
 
-            <Accordion.Body className="p-0" style={{ height: "300px", overflowY: "auto" }}>
+                        <ListGroup variant="flush">
+                          {renderMetadata(submission)}
+                          {submission.answers.map((answer, idx) => renderListGroupItem(answer, idx))}
+                        </ListGroup>
 
-              <ListGroup variant="flush">
-                {renderMetadata(submission)}
-                {submission.answers.map((answer, idx) => renderListGroupItem(answer, idx))}
-              </ListGroup>
+                      </Accordion.Body>
+                    </Accordion.Item>
 
-            </Accordion.Body>
-          </Accordion.Item>
-
-        ))}
-      </Accordion>
+                  ))}
+                </Accordion>
+              </Col>
+            </React.Fragment>
+        }
+      </Row>
     </PageContainers.PostLogin >
   )
 }

@@ -4,7 +4,7 @@ import moment from "moment"
 import { ENDPOINT } from "./consts.js"
 
 
-// jwt only endpoints
+// any JWT endpoints
 const getAllExams = async (jwt) => {
   try {
     const response = await axios.get(
@@ -57,7 +57,26 @@ const postSubmission = async (examId, examName, answers, jwt) => {
   }
 }
 
-// jwt and lecturer endpoints
+const getSubmissions = async (jwt) => {
+  try {
+    const response = await axios.get(
+      `${ENDPOINT}/jwt-any/get-submissions`,
+      { headers: { "Authorization": jwt, } }
+    )
+    const submissions = response?.data
+    console.info("getting submissions from backend successful")
+    return submissions
+  }
+  catch (err) {
+    console.error(
+      "getting submissions from backend failed",
+      err?.response
+    )
+    return false
+  }
+}
+
+// lecturer JWT endpoints
 const getUserExams = async (jwt) => {
   try {
     const res = await axios.get(
@@ -98,25 +117,6 @@ const postExam = async (exam, jwt) => {
   catch (err) {
     console.error(
       "posting exam to backend failed",
-      err?.response
-    )
-    return false
-  }
-}
-
-const getSubmissions = async (jwt) => {
-  try {
-    const response = await axios.get(
-      `${ENDPOINT}/get-submissions`,
-      { headers: { "Authorization": jwt, } }
-    )
-    const submissions = response?.data
-    console.info("getting submissions from backend successful")
-    return submissions
-  }
-  catch (err) {
-    console.error(
-      "getting submissions from backend failed",
       err?.response
     )
     return false

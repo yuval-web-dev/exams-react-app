@@ -10,7 +10,9 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
   const authUser = AuthKit.useAuthUser()
   const [inputs, setInputs] = React.useState({
     duration: 30,
-    start: moment().add(4, "h").startOf("h").toDate()
+    lecturerFirstName: authUser().firstName,
+    lecturerLastName: authUser().lastName,
+    start: moment().add(3, "h").startOf("h").toDate()
   })
 
   React.useImperativeHandle(ref, () => {
@@ -26,6 +28,7 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
 
   React.useEffect(() => {
     if (initialValues) {
+      console.log(initialValues)
       setInputs(initialValues)
     }
   }, [])
@@ -44,9 +47,9 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
   }
 
   const filterPassedTime = (time) => {
-    const currentDate = moment().add(3, "h")
-    const selectedDate = moment(time)
-    return currentDate.isBefore(selectedDate)
+    const currentDate = moment().add(3, "h").startOf("h")
+    const selectedDate = moment(time).startOf("h")
+    return currentDate.isSameOrBefore(selectedDate)
   }
 
   return (
@@ -75,12 +78,12 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
         <Form.Label>Lecturer</Form.Label>
         <div className="d-flex">
           <Form.Control
-            value={inputs.lecturerFirstName || authUser().firstName}
+            value={inputs.lecturerFirstName}
             type="text"
             placeholder="First name"
             onChange={event => inputsSetter("lecturerFirstName", event.target.value)} />
           <Form.Control
-            value={inputs.lecturerLastName || authUser().lastName}
+            value={inputs.lecturerLastName}
             type="text"
             placeholder="Last name"
             onChange={event => inputsSetter("lecturerLastName", event.target.value)} />
@@ -94,7 +97,7 @@ const ExamMetadataForm = ({ initialValues }, ref) => {
           showTimeSelect
           className="w-100 form-control"
           minDate={moment().toDate()}
-          selected={inputs.start}
+          selected={moment(inputs.start).toDate()}
           filterTime={filterPassedTime}
           dateFormat="d/M/yy, HH:mm"
           timeFormat="HH:mm"

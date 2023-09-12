@@ -89,15 +89,15 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoadin
     }
     else {
       return (
-        <Col className="border-bottom h-50">
-          <Col xs="12" className="h-25 fs-3 d-flex justify-content-center align-items-center">{question.question}</Col>
-          <Col xs="12" className="" style={{ height: "300px", overflowY: "auto" }}>{
+        <Col className="border-bottom h-50" style={{ overflowY: "auto" }}>
+          <Col xs="12" className="fs-3 d-flex justify-content-center align-items-center">{question.question}</Col>
+          <Col xs="12">{
             question.codeSnippet === "" ? null :
               <CodeEditor
+                style={{ fontFamily: "Hack" }}
                 className="fs-6"
                 readOnly
                 name="codeSnippet"
-                style={{ fontFamily: "Hack" }}
                 language={question.codeLanguage === "" ? "plaintext" : question.codeLanguage}
                 value={question.codeSnippet} />
           }</Col>
@@ -133,7 +133,11 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoadin
         placement={breakpoint === "xxl" ? "start" : "bottom"}
         style={breakpoint === "xxl" ? { width: "20vw" } : { height: "30vh" }}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Navigator</Offcanvas.Title>
+          <Offcanvas.Title>
+            <span>Answered: </span>
+            <span className={answeredAll ? "text-success" : "text-danger"}>{totalAnswered()}</span>
+            <span>/{exam.questions.length}</span>
+          </Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body className="p-0">
           <ListGroup variant="flush">
@@ -170,19 +174,26 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoadin
       </Card.Header>
 
       <Card.Body style={{ height: "50vh" }}>
-        <Row className="fs-4">
-          <Col xs="12" className="d-flex justify-content-center">
+        <Row className="fs-5">
+          <Col xs="12" className="mb-5 d-flex justify-content-center">
             <span className="fs-1">{exam.name}</span>
           </Col>
-          <Col xs="12">
-            <span>Questions</span>
-            <br />
-            <span>{exam.questions.length}</span>
-            <br /><br />
-            <span>Time</span>
-            <br />
-            <span>{exam.duration} Minutes</span>
-
+          <Col xs="12" className="d-flex flex-column justify-content-center align-items-center">
+            <div className="mb-2">
+              <span>Lecturer:</span>
+              &nbsp;
+              <span>{exam.lecturerLastName}, {exam.lecturerFirstName}</span>
+            </div>
+            <div className="mb-2">
+              <span>Questions:</span>
+              &nbsp;
+              <span>{exam.questions.length}</span>
+            </div>
+            <div>
+              <span>Time:</span>
+              &nbsp;
+              <span>{exam.duration} Minutes</span>
+            </div>
           </Col>
         </Row>
       </Card.Body>
@@ -201,7 +212,6 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoadin
             ...
           </Button >
           <Button
-            disabled={idx === exam.questions.length - 1}
             name="start-card-next-button"
             variant="light"
             style={{ width: "100px" }}
