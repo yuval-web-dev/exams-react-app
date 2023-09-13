@@ -9,13 +9,20 @@ import { default as useBreakpoint } from "./useBreakpoint.js"
 import "./index.css"
 
 
-const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoading }) => {
+const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoading }, ref) => {
   const [idx, setIdx] = React.useState(0)
   const [answers, setAnswers] = React.useState({}) // {questionId: {id: String, answer: String}}
   const [currentCard, setCurrentCard] = React.useState("start") // or "question" or "end"
   const [showSubmitModal, setShowSubmitModal] = React.useState(false)
   const breakpoint = useBreakpoint()
 
+  React.useImperativeHandle(ref, () => {
+    return {
+      get() {
+        return answers
+      }
+    }
+  }, [answers])
 
   const handleSelectAnswer = (questionId, selectedAnswer) => {
     const currentAnswer = answers[questionId] // the object holds values as answer id
@@ -388,4 +395,4 @@ const TakeExamForm = ({ showNavigate, hideHandler, exam, submitHandler, isLoadin
 }
 
 
-export default TakeExamForm
+export default React.forwardRef(TakeExamForm)

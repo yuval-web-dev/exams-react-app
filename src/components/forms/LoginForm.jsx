@@ -40,8 +40,8 @@ const LoginForm = ({ submitHandler }, ref) => {
 
   return (
     <Card className="w-100 h-50">
-      <Card.Header className="d-flex justify-content-center display-4">
-        Login
+      <Card.Header className="d-flex justify-content-center display-5">
+        Exams App
       </Card.Header>
       <Card.Body>
         <Form onSubmit={handleSubmitForm} className="d-flex flex-column h-100">

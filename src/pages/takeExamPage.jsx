@@ -18,7 +18,7 @@ const TakeExamPage = () => {
   const [showNavigate, setShowNavigate] = React.useState(false)
   const [endTime, setEndTime] = React.useState(null)
   const [triggerEnd, setTriggerEnd] = React.useState(false)
-
+  const formRef = React.useRef()
   const authHeader = AuthKit.useAuthHeader()
   const authUser = AuthKit.useAuthUser()
   const navigate = RouterDom.useNavigate()
@@ -27,26 +27,29 @@ const TakeExamPage = () => {
 
 
   React.useEffect(() => {
-    const fetchSelectedExam = async () => {
-      const exam = await storage.stores.selectedExam.get()
-      if (exam) {
-        setExam(exam)
-        const time = moment(exam.start)
-        time.add(exam.duration, "minutes")
-        setPageLoading(false)
-      }
-      else {
+    if (triggerEnd) {
+      const submitEnd = async () => {
+        await handleSubmitExam(formRef?.current?.get())
         navigate("/")
       }
+      submitEnd()
     }
-    fetchSelectedExam()
-  }, [])
+    else {
+      const fetchSelectedExam = async () => {
+        const exam = await storage.stores.selectedExam.get()
+        if (exam) {
+          setExam(exam)
+          const time = moment(exam.start)
+          time.add(exam.duration, "minutes")
+          setPageLoading(false)
+        }
+        else {
+          navigate("/")
+        }
+      }
 
-  React.useEffect(() => {
-    const submit = async () => {
-
+      fetchSelectedExam()
     }
-    submit()
 
   }, [triggerEnd])
 
@@ -130,13 +133,13 @@ const TakeExamPage = () => {
         {renderNavbar()}
         <Container fluid={FLUID} className="p-0">
           <Forms.TakeExam
+            ref={formRef}
             showNavigate={showNavigate}
             hideHandler={handleHideNavigate}
             exam={exam}
             submitHandler={handleSubmitExam}
             isLoading={submitLoading} />
         </Container>
-
       </React.Fragment>
     )
   }
