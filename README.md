@@ -66,4 +66,4 @@ Before opening any new pull requests or issues, please check the table below :
 
 # License
 Licensed under the [GPLv3](./LICENSE).  
-Copyright (c) 2023 yuval-ro. All rights reserved.
+Copyright (c) 2024 yuvalroo. All rights reserved.
